@@ -50,10 +50,10 @@ const busSchema = new mongoose.Schema({
     default: 40,
   },
   seats: [seatSchema],
-  supervisor: {
+  supervisors: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-  },
+  }],
   status: {
     type: String,
     enum: ['active', 'inactive', 'maintenance'],

@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { auth, googleProvider } from '../firebase';
 import { signInWithPopup } from 'firebase/auth';
 import { FaBus, FaGoogle } from 'react-icons/fa';
-import { HiMail, HiLockClosed, HiUser, HiIdentification, HiAcademicCap, HiArrowRight } from 'react-icons/hi';
+import { HiMail, HiLockClosed, HiUser, HiIdentification, HiAcademicCap, HiArrowRight, HiEye, HiEyeOff } from 'react-icons/hi';
 import toast from 'react-hot-toast';
 
 const SupervisorRegister = () => {
@@ -12,6 +12,8 @@ const SupervisorRegister = () => {
     name: '', email: '', password: '', confirmPassword: '',
     employeeId: '', department: '',
   });
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const { register, googleLogin } = useAuth();
   const navigate = useNavigate();
@@ -127,16 +129,24 @@ const SupervisorRegister = () => {
               <label className="block text-sm font-semibold text-dark-700 mb-1.5">Password</label>
               <div className="relative">
                 <HiLockClosed className="absolute left-3.5 top-1/2 -translate-y-1/2 text-dark-400" />
-                <input name="password" type="password" value={formData.password} onChange={handleChange}
-                  className="input-field !pl-10" placeholder="Min 6 characters" required />
+                <input name="password" type={showPassword ? "text" : "password"} value={formData.password} onChange={handleChange}
+                  className="input-field !pl-10 !pr-10" placeholder="Min 6 characters" required />
+                <button type="button" onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-dark-400 hover:text-dark-600 z-10 p-1">
+                  {showPassword ? <HiEyeOff className="text-lg" /> : <HiEye className="text-lg" />}
+                </button>
               </div>
             </div>
             <div>
               <label className="block text-sm font-semibold text-dark-700 mb-1.5">Confirm Password</label>
               <div className="relative">
                 <HiLockClosed className="absolute left-3.5 top-1/2 -translate-y-1/2 text-dark-400" />
-                <input name="confirmPassword" type="password" value={formData.confirmPassword} onChange={handleChange}
-                  className="input-field !pl-10" placeholder="Repeat your password" required />
+                <input name="confirmPassword" type={showConfirmPassword ? "text" : "password"} value={formData.confirmPassword} onChange={handleChange}
+                  className="input-field !pl-10 !pr-10" placeholder="Repeat your password" required />
+                <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-dark-400 hover:text-dark-600 z-10 p-1">
+                  {showConfirmPassword ? <HiEyeOff className="text-lg" /> : <HiEye className="text-lg" />}
+                </button>
               </div>
             </div>
             <button type="submit" disabled={loading}

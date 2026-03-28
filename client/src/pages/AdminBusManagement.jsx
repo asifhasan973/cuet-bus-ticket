@@ -21,12 +21,13 @@ const AdminBusManagement = () => {
     departure: '',
     arrival: '',
     days: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday'],
-    supervisor: '',
+    supervisors: [],
     stops: [{ name: '', time: '', order: 1 }],
   });
 
   // Edit form state
   const [editData, setEditData] = useState({
+    busNumber: '',
     routeName: '',
     totalSeats: 40,
     departure: '',
@@ -109,14 +110,14 @@ const AdminBusManagement = () => {
           days: formData.days,
         },
         totalSeats: formData.totalSeats,
-        supervisor: formData.supervisor || undefined,
+        supervisors: formData.supervisors,
       });
       toast.success('Bus added successfully!');
       setShowAddForm(false);
       setFormData({
         busNumber: '', routeName: '', totalSeats: 40, departure: '', arrival: '',
         days: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday'],
-        supervisor: '', stops: [{ name: '', time: '', order: 1 }],
+        supervisors: [], stops: [{ name: '', time: '', order: 1 }],
       });
       fetchBuses();
     } catch (error) {
@@ -129,6 +130,7 @@ const AdminBusManagement = () => {
     setEditingBus(bus._id);
     setExpandedBus(bus._id);
     setEditData({
+      busNumber: bus.busNumber || '',
       routeName: bus.route?.name || '',
       totalSeats: bus.totalSeats || 40,
       departure: bus.schedule?.departure || '',
@@ -136,6 +138,7 @@ const AdminBusManagement = () => {
       days: bus.schedule?.days || [],
       status: bus.status,
       stops: bus.route?.stops || [],
+      supervisors: bus.supervisors ? bus.supervisors.map(s => s._id) : [],
     });
   };
 
@@ -160,6 +163,7 @@ const AdminBusManagement = () => {
   const handleSaveEdit = async (busId) => {
     try {
       await API.put(`/buses/${busId}`, {
+        busNumber: editData.busNumber,
         route: {
           name: editData.routeName,
           stops: editData.stops,
@@ -171,6 +175,7 @@ const AdminBusManagement = () => {
         },
         totalSeats: editData.totalSeats,
         status: editData.status,
+        supervisors: editData.supervisors,
       });
       toast.success('Bus updated successfully!');
       setEditingBus(null);
@@ -259,15 +264,27 @@ const AdminBusManagement = () => {
                   className="input-field" placeholder="e.g. 7:50 AM" required />
               </div>
               <div>
-                <label className="block text-sm font-semibold text-dark-700 mb-1.5">Assign Supervisor</label>
-                <select value={formData.supervisor}
-                  onChange={(e) => setFormData({ ...formData, supervisor: e.target.value })}
-                  className="input-field">
-                  <option value="">None</option>
-                  {supervisors.map(s => (
-                    <option key={s._id} value={s._id}>{s.name} ({s.email})</option>
-                  ))}
-                </select>
+                <label className="block text-sm font-semibold text-dark-700 mb-1.5">Assign Supervisors</label>
+                <div className="flex flex-wrap gap-2">
+                  {supervisors.map(s => {
+                    const isSelected = formData.supervisors.includes(s._id);
+                    return (
+                      <button key={s._id} type="button"
+                        onClick={() => {
+                          setFormData({ ...formData, supervisors: isSelected 
+                            ? formData.supervisors.filter(id => id !== s._id)
+                            : [...formData.supervisors, s._id] 
+                          });
+                        }}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                          isSelected ? 'bg-primary-600 text-white' : 'bg-dark-100 text-dark-500 hover:bg-dark-200'
+                        }`}>
+                        {s.name}
+                      </button>
+                    );
+                  })}
+                  {supervisors.length === 0 && <span className="text-xs text-dark-400">No supervisors available</span>}
+                </div>
               </div>
             </div>
 
@@ -395,7 +412,13 @@ const AdminBusManagement = () => {
                 {editingBus === bus._id ? (
                   /* ─── Edit Mode ─── */
                   <div className="space-y-4">
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
+                      <div className="col-span-2 sm:col-span-1">
+                        <label className="block text-xs font-semibold text-dark-500 mb-1">Bus Number</label>
+                        <input type="text" value={editData.busNumber}
+                          onChange={(e) => setEditData({ ...editData, busNumber: e.target.value })}
+                          className="input-field text-sm" />
+                      </div>
                       <div className="col-span-2 sm:col-span-1">
                         <label className="block text-xs font-semibold text-dark-500 mb-1">Route Name</label>
                         <input type="text" value={editData.routeName}
@@ -459,6 +482,31 @@ const AdminBusManagement = () => {
                       </div>
                     </div>
 
+                    {/* Supervisors */}
+                    <div>
+                      <label className="block text-xs font-semibold text-dark-500 mb-1">Assign Supervisors</label>
+                      <div className="flex flex-wrap gap-2">
+                        {supervisors.map(s => {
+                          const isSelected = editData.supervisors.includes(s._id);
+                          return (
+                            <button key={s._id} type="button"
+                              onClick={() => {
+                                setEditData({ ...editData, supervisors: isSelected 
+                                  ? editData.supervisors.filter(id => id !== s._id)
+                                  : [...editData.supervisors, s._id] 
+                                });
+                              }}
+                              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                                isSelected ? 'bg-primary-600 text-white' : 'bg-dark-100 text-dark-500 hover:bg-dark-200'
+                              }`}>
+                              {s.name}
+                            </button>
+                          );
+                        })}
+                        {supervisors.length === 0 && <span className="text-xs text-dark-400">No supervisors available</span>}
+                      </div>
+                    </div>
+
                     {/* Editable Stops */}
                     <div>
                       <div className="flex items-center justify-between mb-2">
@@ -507,8 +555,10 @@ const AdminBusManagement = () => {
                   <div>
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">
                       <div>
-                        <p className="text-xs text-dark-400 font-medium">Supervisor</p>
-                        <p className="text-sm font-semibold text-dark-800">{bus.supervisor?.name || 'Unassigned'}</p>
+                        <p className="text-xs text-dark-400 font-medium">Supervisors</p>
+                        <p className="text-sm font-semibold text-dark-800">
+                          {bus.supervisors?.length > 0 ? bus.supervisors.map(s => s.name).join(', ') : 'Unassigned'}
+                        </p>
                       </div>
                       <div>
                         <p className="text-xs text-dark-400 font-medium">Days</p>

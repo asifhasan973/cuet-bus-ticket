@@ -67,7 +67,7 @@ router.post('/register', [
       studentId: role === 'student' ? studentId : undefined,
       employeeId: role === 'supervisor' ? employeeId : undefined,
       department,
-      points: 0,
+      points: role === 'student' ? 5 : 0,
     });
 
     await user.save();
@@ -203,7 +203,7 @@ router.post('/google', async (req, res) => {
         role: assignedRole,
         studentId,
         employeeId,
-        points: 0,
+        points: assignedRole === 'student' ? 5 : 0,
       });
       await user.save();
     }
