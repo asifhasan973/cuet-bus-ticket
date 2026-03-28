@@ -105,7 +105,7 @@ const seedData = async () => {
         },
         totalSeats: 40,
         seats: generateSeats(40),
-        supervisor: supervisor1._id,
+        supervisors: [supervisor1._id],
         status: 'active',
       },
       {
@@ -127,7 +127,7 @@ const seedData = async () => {
         },
         totalSeats: 40,
         seats: generateSeats(40),
-        supervisor: supervisor1._id,
+        supervisors: [supervisor1._id],
         status: 'active',
       },
       {
@@ -148,7 +148,7 @@ const seedData = async () => {
         },
         totalSeats: 36,
         seats: generateSeats(36),
-        supervisor: supervisor2._id,
+        supervisors: [supervisor2._id],
         status: 'active',
       },
       {
@@ -170,7 +170,7 @@ const seedData = async () => {
         },
         totalSeats: 40,
         seats: generateSeats(40),
-        supervisor: supervisor2._id,
+        supervisors: [supervisor2._id],
         status: 'active',
       },
     ];

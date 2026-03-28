@@ -125,6 +125,10 @@ const RoutePage = () => {
                     </span>
                   ))}
                 </div>
+                <div className="flex items-center gap-2 text-sm text-dark-500 w-full mt-2">
+                  <span className="font-semibold text-dark-700">Supervisors:</span> 
+                  {bus.supervisors?.length > 0 ? bus.supervisors.map(s => s.name).join(', ') : 'None assigned'}
+                </div>
               </div>
             </div>
           </div>

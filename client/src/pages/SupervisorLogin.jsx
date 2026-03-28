@@ -4,12 +4,13 @@ import { useAuth } from '../context/AuthContext';
 import { auth, googleProvider } from '../firebase';
 import { signInWithPopup } from 'firebase/auth';
 import { FaBus, FaGoogle } from 'react-icons/fa';
-import { HiMail, HiLockClosed, HiArrowRight } from 'react-icons/hi';
+import { HiMail, HiLockClosed, HiArrowRight, HiEye, HiEyeOff } from 'react-icons/hi';
 import toast from 'react-hot-toast';
 
 const SupervisorLogin = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const { login, googleLogin } = useAuth();
   const navigate = useNavigate();
@@ -101,8 +102,12 @@ const SupervisorLogin = () => {
               <label className="block text-sm font-semibold text-dark-700 mb-1.5">Password</label>
               <div className="relative">
                 <HiLockClosed className="absolute left-3.5 top-1/2 -translate-y-1/2 text-dark-400" />
-                <input type="password" value={password} onChange={(e) => setPassword(e.target.value)}
-                  className="input-field !pl-10" placeholder="Enter your password" required />
+                <input type={showPassword ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)}
+                  className="input-field !pl-10 !pr-10" placeholder="Enter your password" required />
+                <button type="button" onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-dark-400 hover:text-dark-600 z-10 p-1">
+                  {showPassword ? <HiEyeOff className="text-lg" /> : <HiEye className="text-lg" />}
+                </button>
               </div>
             </div>
             <button type="submit" disabled={loading}

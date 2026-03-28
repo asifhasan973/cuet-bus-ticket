@@ -90,21 +90,50 @@ router.delete('/users/:id', auth, roleCheck('admin'), async (req, res) => {
   }
 });
 
-// @route   PUT /api/admin/users/:id/tokens
-// @desc    Update user token balance
+// @route   PUT /api/admin/users/:id
+// @desc    Update user profile (points, role)
 // @access  Admin
-router.put('/users/:id/tokens', auth, roleCheck('admin'), async (req, res) => {
+router.put('/users/:id', auth, roleCheck('admin'), async (req, res) => {
   try {
-    const { points } = req.body;
+    const { points, role } = req.body;
+    const updateData = {};
+    if (points !== undefined) updateData.points = points;
+    if (role !== undefined) updateData.role = role;
+
     const user = await User.findByIdAndUpdate(
       req.params.id,
-      { tokenBalance },
+      updateData,
       { new: true }
     );
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
     res.json(user);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// @route   POST /api/admin/users/:id/assign-buses
+// @desc    Assign multiple buses to a supervisor
+// @access  Admin
+router.post('/users/:id/assign-buses', auth, roleCheck('admin'), async (req, res) => {
+  try {
+    const { busIds } = req.body;
+    // Unassign this supervisor from all buses first to start fresh
+    await Bus.updateMany(
+      { supervisors: req.params.id },
+      { $pull: { supervisors: req.params.id } }
+    );
+    // Assign to new buses
+    if (busIds && busIds.length > 0) {
+      await Bus.updateMany(
+        { _id: { $in: busIds } },
+        { $addToSet: { supervisors: req.params.id } }
+      );
+    }
+    res.json({ message: 'Buses assigned successfully' });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server error' });

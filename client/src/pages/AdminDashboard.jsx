@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import API from '../utils/api';
 import StatsCard from '../components/ui/StatsCard';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
-import { FaBus, FaUsers, FaUserTie, FaTrash } from 'react-icons/fa';
+import { FaBus, FaUsers, FaUserTie, FaTrash, FaTimes, FaSave } from 'react-icons/fa';
 import { HiTicket, HiChartBar } from 'react-icons/hi';
 import toast from 'react-hot-toast';
 
@@ -12,11 +12,27 @@ const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
   const [userFilter, setUserFilter] = useState('');
+  
+  // Modal states for assigning buses
+  const [showBusModal, setShowBusModal] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState(null);
+  const [buses, setBuses] = useState([]);
+  const [selectedBuses, setSelectedBuses] = useState([]);
 
   useEffect(() => {
     fetchStats();
     fetchUsers();
+    fetchBuses();
   }, []);
+
+  const fetchBuses = async () => {
+    try {
+      const res = await API.get('/buses/all');
+      setBuses(res.data);
+    } catch (error) {
+      console.error('Failed to load buses');
+    }
+  };
 
   const fetchStats = async () => {
     try {
@@ -52,6 +68,43 @@ const AdminDashboard = () => {
       fetchStats();
     } catch (error) {
       toast.error(error.response?.data?.message || 'Failed to delete user');
+    }
+  };
+
+  const updatePoints = async (id, currentPoints, delta) => {
+    try {
+      await API.put(`/admin/users/${id}`, { points: currentPoints + delta });
+      toast.success('Points updated');
+      fetchUsers();
+    } catch (error) {
+      toast.error('Failed to update points');
+    }
+  };
+
+  const updateRole = async (id, newRole) => {
+    try {
+      await API.put(`/admin/users/${id}`, { role: newRole });
+      toast.success('Role updated');
+      fetchUsers();
+      if (newRole === 'supervisor') {
+        setSelectedUserId(id);
+        setSelectedBuses([]);
+        setShowBusModal(true);
+      }
+    } catch (error) {
+      toast.error('Failed to update role');
+    }
+  };
+
+  const handleAssignBuses = async () => {
+    try {
+      await API.post(`/admin/users/${selectedUserId}/assign-buses`, { busIds: selectedBuses });
+      toast.success('Buses assigned successfully');
+      setShowBusModal(false);
+      setSelectedUserId(null);
+      setSelectedBuses([]);
+    } catch (error) {
+      toast.error('Failed to assign buses');
     }
   };
 
@@ -111,7 +164,9 @@ const AdminDashboard = () => {
                       {booking.student?.name} <span className="text-dark-400">({booking.student?.studentId})</span>
                     </td>
                     <td className="px-6 py-4 text-sm text-dark-600">{booking.bus?.busNumber}</td>
-                    <td className="px-6 py-4 text-sm font-bold text-dark-900">#{booking.seatNumber}</td>
+                    <td className="px-6 py-4 text-sm font-bold text-dark-900">
+                      {String.fromCharCode(65 + Math.floor((booking.seatNumber - 1) / 5))}{((booking.seatNumber - 1) % 5) + 1}
+                    </td>
                     <td className="px-6 py-4 text-sm text-dark-500">
                       {new Date(booking.createdAt).toLocaleDateString()}
                     </td>
@@ -164,16 +219,36 @@ const AdminDashboard = () => {
                       <td className="px-6 py-4 text-sm font-semibold text-dark-900">{u.name}</td>
                       <td className="px-6 py-4 text-sm text-dark-600">{u.email}</td>
                       <td className="px-6 py-4">
-                        <span className={`px-2.5 py-1 rounded-full text-xs font-bold uppercase ${
-                          u.role === 'admin' ? 'bg-purple-100 text-purple-700' :
-                          u.role === 'supervisor' ? 'bg-accent-100 text-accent-700' :
-                          'bg-primary-100 text-primary-700'
-                        }`}>
-                          {u.role}
-                        </span>
+                        <select 
+                          value={u.role}
+                          onChange={(e) => updateRole(u._id, e.target.value)}
+                          className={`px-2 py-1 rounded-lg text-xs font-bold uppercase border-2 focus:outline-none ${
+                            u.role === 'admin' ? 'bg-purple-50 text-purple-700 border-purple-200' :
+                            u.role === 'supervisor' ? 'bg-accent-50 text-accent-700 border-accent-200' :
+                            'bg-primary-50 text-primary-700 border-primary-200'
+                          }`}
+                        >
+                          <option value="student">STUDENT</option>
+                          <option value="supervisor">SUPERVISOR</option>
+                          <option value="admin">ADMIN</option>
+                        </select>
+                        {u.role === 'supervisor' && (
+                          <button onClick={() => { setSelectedUserId(u._id); setSelectedBuses([]); setShowBusModal(true); }}
+                            className="block mt-1 text-[10px] text-primary-600 font-semibold hover:underline">
+                            Assign Buses
+                          </button>
+                        )}
                       </td>
                       <td className="px-6 py-4 text-sm text-dark-500">{u.studentId || u.employeeId || '-'}</td>
-                      <td className="px-6 py-4 text-sm font-bold text-dark-900">{u.points}</td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-1">
+                          <button onClick={() => updatePoints(u._id, u.points, -1)}
+                            className="w-6 h-6 flex items-center justify-center bg-dark-100 hover:bg-dark-200 rounded text-dark-600 font-bold">-</button>
+                          <span className="w-8 text-center text-sm font-bold text-dark-900">{u.points}</span>
+                          <button onClick={() => updatePoints(u._id, u.points, 1)}
+                            className="w-6 h-6 flex items-center justify-center bg-dark-100 hover:bg-dark-200 rounded text-dark-600 font-bold">+</button>
+                        </div>
+                      </td>
                       <td className="px-6 py-4 text-right">
                         {u.role !== 'admin' && (
                           <button
@@ -188,6 +263,60 @@ const AdminDashboard = () => {
                   ))}
                 </tbody>
               </table>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Assign Supervisor Buses Modal */}
+      {showBusModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
+            <div className="bg-gradient-to-r from-primary-600 to-primary-700 px-6 py-4 flex items-center justify-between">
+              <h2 className="font-bold text-white flex items-center gap-2">
+                <FaBus /> Assign Supervised Buses
+              </h2>
+              <button onClick={() => setShowBusModal(false)} className="text-white/80 hover:text-white">
+                <FaTimes />
+              </button>
+            </div>
+            <div className="p-6">
+              <p className="text-sm font-medium text-dark-600 mb-4">Select the buses this supervisor will manage:</p>
+              <div className="space-y-2 max-h-64 overflow-y-auto pr-2">
+                {buses.map(bus => {
+                  const isSelected = selectedBuses.includes(bus._id);
+                  return (
+                    <div key={bus._id} 
+                      onClick={() => setSelectedBuses(prev => isSelected ? prev.filter(id => id !== bus._id) : [...prev, bus._id])}
+                      className={`flex items-center justify-between p-3 rounded-xl border-2 cursor-pointer transition-all ${
+                        isSelected ? 'border-primary-500 bg-primary-50' : 'border-dark-100 hover:border-dark-300'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <FaBus className={isSelected ? 'text-primary-600' : 'text-dark-400'} />
+                        <div>
+                          <p className={`font-bold ${isSelected ? 'text-primary-900' : 'text-dark-900'}`}>{bus.busNumber}</p>
+                          <p className="text-xs text-dark-500">{bus.route?.name}</p>
+                        </div>
+                      </div>
+                      <div className={`w-5 h-5 rounded flex items-center justify-center border-2 ${
+                        isSelected ? 'bg-primary-500 border-primary-500' : 'border-dark-300'
+                      }`}>
+                        {isSelected && <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>}
+                      </div>
+                    </div>
+                  );
+                })}
+                {buses.length === 0 && <p className="text-sm text-dark-400 text-center py-4">No buses currently active.</p>}
+              </div>
+              <div className="flex justify-end gap-3 mt-6">
+                <button onClick={() => setShowBusModal(false)} className="px-4 py-2 rounded-xl text-sm font-semibold bg-dark-100 text-dark-600 hover:bg-dark-200">
+                  Cancel
+                </button>
+                <button onClick={handleAssignBuses} className="btn-primary flex items-center gap-2 text-sm !px-4 !py-2">
+                  <FaSave /> Save Assignments
+                </button>
+              </div>
             </div>
           </div>
         </div>

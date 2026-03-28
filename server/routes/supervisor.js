@@ -11,7 +11,7 @@ const roleCheck = require('../middleware/roleCheck');
 // @access  Supervisor
 router.get('/buses', auth, roleCheck('supervisor'), async (req, res) => {
   try {
-    const buses = await Bus.find({ supervisor: req.user._id });
+    const buses = await Bus.find({ supervisors: req.user._id });
     // If no buses assigned, return all active buses
     const result = buses.length > 0 ? buses : await Bus.find({ status: 'active' });
     res.json(result);
@@ -54,6 +54,11 @@ router.post('/attendance', auth, roleCheck('supervisor'), async (req, res) => {
       return res.status(400).json({ message: 'Attendance already marked for this booking' });
     }
 
+    const bus = await Bus.findById(booking.bus);
+    if (!bus.supervisors.includes(req.user._id)) {
+      return res.status(403).json({ message: 'Not authorized for this bus' });
+    }
+
     // Update attendance
     booking.attendance = status;
     await booking.save();
@@ -87,6 +92,9 @@ router.post('/attendance/bulk', auth, roleCheck('supervisor'), async (req, res) 
       const booking = await Booking.findById(item.bookingId).populate('student');
       if (!booking || booking.attendance !== 'pending') continue;
 
+      const bus = await Bus.findById(booking.bus);
+      if (!bus.supervisors.includes(req.user._id)) continue;
+
       booking.attendance = item.status;
       await booking.save();
 
@@ -118,6 +126,10 @@ router.put('/route/:id', auth, roleCheck('supervisor'), async (req, res) => {
     const bus = await Bus.findById(req.params.id);
     if (!bus) {
       return res.status(404).json({ message: 'Bus not found' });
+    }
+    
+    if (!bus.supervisors.includes(req.user._id)) {
+      return res.status(403).json({ message: 'Not authorized for this bus' });
     }
 
     const { route, schedule } = req.body;

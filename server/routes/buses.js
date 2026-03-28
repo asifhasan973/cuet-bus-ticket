@@ -9,7 +9,7 @@ const roleCheck = require('../middleware/roleCheck');
 // @access  Public
 router.get('/', async (req, res) => {
   try {
-    const buses = await Bus.find({ status: 'active' }).populate('supervisor', 'name email');
+    const buses = await Bus.find({ status: 'active' }).populate('supervisors', 'name email');
     res.json(buses);
   } catch (error) {
     console.error(error);
@@ -22,7 +22,7 @@ router.get('/', async (req, res) => {
 // @access  Admin
 router.get('/all', auth, roleCheck('admin'), async (req, res) => {
   try {
-    const buses = await Bus.find().populate('supervisor', 'name email');
+    const buses = await Bus.find().populate('supervisors', 'name email');
     res.json(buses);
   } catch (error) {
     console.error(error);
@@ -35,7 +35,7 @@ router.get('/all', auth, roleCheck('admin'), async (req, res) => {
 // @access  Public
 router.get('/:id', async (req, res) => {
   try {
-    const bus = await Bus.findById(req.params.id).populate('supervisor', 'name email');
+    const bus = await Bus.findById(req.params.id).populate('supervisors', 'name email');
     if (!bus) {
       return res.status(404).json({ message: 'Bus not found' });
     }
@@ -51,7 +51,7 @@ router.get('/:id', async (req, res) => {
 // @access  Admin
 router.post('/', auth, roleCheck('admin'), async (req, res) => {
   try {
-    const { busNumber, route, schedule, totalSeats, supervisor } = req.body;
+    const { busNumber, route, schedule, totalSeats, supervisors } = req.body;
 
     const existingBus = await Bus.findOne({ busNumber });
     if (existingBus) {
@@ -71,7 +71,7 @@ router.post('/', auth, roleCheck('admin'), async (req, res) => {
       schedule,
       totalSeats: seatCount,
       seats,
-      supervisor,
+      supervisors,
     });
 
     await bus.save();
@@ -92,10 +92,20 @@ router.put('/:id', auth, roleCheck('admin', 'supervisor'), async (req, res) => {
       return res.status(404).json({ message: 'Bus not found' });
     }
 
-    const { route, schedule, status, totalSeats } = req.body;
+    const { busNumber, route, schedule, status, totalSeats, supervisors } = req.body;
+
+    if (busNumber && busNumber !== bus.busNumber && req.user.role === 'admin') {
+      const existingBus = await Bus.findOne({ busNumber });
+      if (existingBus && existingBus._id.toString() !== req.params.id) {
+        return res.status(400).json({ message: 'Bus number already exists' });
+      }
+      bus.busNumber = busNumber;
+    }
+
     if (route) bus.route = route;
     if (schedule) bus.schedule = schedule;
     if (status) bus.status = status;
+    if (supervisors && req.user.role === 'admin') bus.supervisors = supervisors;
 
     if (totalSeats !== undefined && req.user.role === 'admin') {
       const newTotal = parseInt(totalSeats, 10);
