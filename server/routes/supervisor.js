@@ -22,15 +22,20 @@ router.get('/buses', auth, roleCheck('supervisor'), async (req, res) => {
 });
 
 // @route   GET /api/supervisor/bus/:id/students
-// @desc    Get booked students for a bus
+// @desc    Get booked students for a bus (filterable by date and shift)
 // @access  Supervisor
 router.get('/bus/:id/students', auth, roleCheck('supervisor'), async (req, res) => {
   try {
-    const bookings = await Booking.find({ 
-      bus: req.params.id, 
-      status: 'confirmed' 
-    }).populate('student', 'name email studentId department points');
-    
+    const { date, shift } = req.query;
+    const filter = {
+      bus: req.params.id,
+      status: 'confirmed'
+    };
+    if (date) filter.travelDate = date;
+    if (shift) filter.shift = parseInt(shift);
+
+    const bookings = await Booking.find(filter).populate('student', 'name email studentId department points');
+
     res.json(bookings);
   } catch (error) {
     console.error(error);
@@ -119,7 +124,7 @@ router.post('/attendance/bulk', auth, roleCheck('supervisor'), async (req, res) 
 });
 
 // @route   PUT /api/supervisor/route/:id
-// @desc    Update bus route/schedule
+// @desc    Update bus route
 // @access  Supervisor
 router.put('/route/:id', auth, roleCheck('supervisor'), async (req, res) => {
   try {
@@ -127,14 +132,13 @@ router.put('/route/:id', auth, roleCheck('supervisor'), async (req, res) => {
     if (!bus) {
       return res.status(404).json({ message: 'Bus not found' });
     }
-    
+
     if (!bus.supervisors.includes(req.user._id)) {
       return res.status(403).json({ message: 'Not authorized for this bus' });
     }
 
-    const { route, schedule } = req.body;
+    const { route } = req.body;
     if (route) bus.route = route;
-    if (schedule) bus.schedule = schedule;
 
     await bus.save();
     res.json({ message: 'Route updated successfully', bus });

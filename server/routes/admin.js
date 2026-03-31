@@ -18,7 +18,7 @@ router.get('/stats', auth, roleCheck('admin'), async (req, res) => {
     const totalBookings = await Booking.countDocuments({ status: 'confirmed' });
     const recentBookings = await Booking.find()
       .populate('student', 'name studentId')
-      .populate('bus', 'busNumber')
+      .populate('bus', 'busName')
       .sort({ createdAt: -1 })
       .limit(10);
 
@@ -65,22 +65,10 @@ router.delete('/users/:id', auth, roleCheck('admin'), async (req, res) => {
     }
 
     // Cancel any active bookings
-    const bookings = await Booking.find({ student: user._id, status: 'confirmed' });
-    for (const booking of bookings) {
-      const bus = await Bus.findById(booking.bus);
-      if (bus) {
-        const seat = bus.seats.find(s => s.number === booking.seatNumber);
-        if (seat) {
-          seat.isBooked = false;
-          seat.bookedBy = null;
-          seat.studentId = '';
-          seat.studentName = '';
-          await bus.save();
-        }
-      }
-      booking.status = 'cancelled';
-      await booking.save();
-    }
+    await Booking.updateMany(
+      { student: user._id, status: 'confirmed' },
+      { status: 'cancelled' }
+    );
 
     await user.deleteOne();
     res.json({ message: 'User removed successfully' });
@@ -121,7 +109,7 @@ router.put('/users/:id', auth, roleCheck('admin'), async (req, res) => {
 router.post('/users/:id/assign-buses', auth, roleCheck('admin'), async (req, res) => {
   try {
     const { busIds } = req.body;
-    // Unassign this supervisor from all buses first to start fresh
+    // Unassign this supervisor from all buses first
     await Bus.updateMany(
       { supervisors: req.params.id },
       { $pull: { supervisors: req.params.id } }

@@ -29,202 +29,312 @@ const seedData = async () => {
     console.log('✅ Admin: admin@cuet.ac.bd / admin123');
 
     // ─── Create Supervisors ───
-    const supervisor1 = await User.create({
-      name: 'Dr. Rahman',
-      email: 'rahman@cuet.ac.bd',
-      password: 'super123',
-      role: 'supervisor',
-      employeeId: 'EMP001',
-      department: 'CSE',
-      points: 0,
-    });
+    const supervisorData = [
+      { name: 'Dr. Rahman', email: 'rahman@cuet.ac.bd', employeeId: 'EMP001', department: 'CSE' },
+      { name: 'Prof. Kabir', email: 'kabir@cuet.ac.bd', employeeId: 'EMP002', department: 'EEE' },
+      { name: 'Dr. Hossain', email: 'hossain@cuet.ac.bd', employeeId: 'EMP003', department: 'ME' },
+      { name: 'Prof. Alam', email: 'alam@cuet.ac.bd', employeeId: 'EMP004', department: 'CE' },
+      { name: 'Dr. Chowdhury', email: 'chowdhury@cuet.ac.bd', employeeId: 'EMP005', department: 'URP' },
+      { name: 'Prof. Uddin', email: 'uddin@cuet.ac.bd', employeeId: 'EMP006', department: 'Arch' },
+    ];
 
-    const supervisor2 = await User.create({
-      name: 'Prof. Kabir',
-      email: 'kabir@cuet.ac.bd',
-      password: 'super123',
-      role: 'supervisor',
-      employeeId: 'EMP002',
-      department: 'EEE',
-      points: 0,
-    });
-    console.log('✅ Supervisors: rahman@cuet.ac.bd, kabir@cuet.ac.bd / super123');
+    const supervisors = [];
+    for (const s of supervisorData) {
+      const sup = await User.create({
+        ...s,
+        password: 'super123',
+        role: 'supervisor',
+        points: 0,
+      });
+      supervisors.push(sup);
+    }
+    console.log(`✅ ${supervisors.length} Supervisors created (password: super123)`);
 
     // ─── Create Students ───
     const students = [];
-    const studentData = [
-      { name: 'Asif Hasan', email: 'asif@student.cuet.ac.bd', studentId: '2004001', department: 'CSE', points: 47 },
-      { name: 'Rafiq Islam', email: 'rafiq@student.cuet.ac.bd', studentId: '2004002', department: 'CSE', points: 50 },
-      { name: 'Nadia Akter', email: 'nadia@student.cuet.ac.bd', studentId: '2004003', department: 'EEE', points: 44 },
-      { name: 'Tanvir Ahmed', email: 'tanvir@student.cuet.ac.bd', studentId: '2004004', department: 'ME', points: 50 },
-      { name: 'Sadia Khan', email: 'sadia@student.cuet.ac.bd', studentId: '2004005', department: 'CE', points: 48 },
-      { name: 'Hasan Mahmud', email: 'hasan@student.cuet.ac.bd', studentId: '2004006', department: 'CSE', points: 45 },
-      { name: 'Fatema Begum', email: 'fatema@student.cuet.ac.bd', studentId: '2004007', department: 'URP', points: 50 },
-      { name: 'Kawser Rahman', email: 'kawser@student.cuet.ac.bd', studentId: '2004008', department: 'Arch', points: 46 },
-      { name: 'Mim Akter', email: 'mim@student.cuet.ac.bd', studentId: '2004009', department: 'EEE', points: 50 },
-      { name: 'Sakib Hossain', email: 'sakib@student.cuet.ac.bd', studentId: '2004010', department: 'PME', points: 49 },
-    ];
-
-    for (const s of studentData) {
+    const mainStudent = await User.create({
+      name: 'Asif Hasan', email: 'asif@student.cuet.ac.bd', studentId: '2004001', department: 'CSE', points: 47,
+      password: 'student123', role: 'student',
+    });
+    students.push(mainStudent);
+    
+    for (let i = 2; i <= 500; i++) {
       const student = await User.create({
-        ...s,
-        password: 'student123',
-        role: 'student',
+        name: `Student ${i}`, email: `student${i}@student.cuet.ac.bd`, studentId: `2004${i.toString().padStart(3, '0')}`,
+        department: 'CSE', points: 50, password: 'student123', role: 'student',
       });
       students.push(student);
     }
     console.log(`✅ ${students.length} Students created (password: student123)`);
 
-    // ─── Helper: Generate Seats ───
-    const generateSeats = (count) => {
-      const seats = [];
-      for (let i = 1; i <= count; i++) {
-        seats.push({ number: i, isBooked: false, bookedBy: null, studentId: '', studentName: '' });
-      }
-      return seats;
-    };
-
-    // ─── Create Buses ───
+    // ─── Create 14 Buses ───
     const busesData = [
+      // Flyover Buses
       {
-        busNumber: 'CUET-01',
+        busName: 'Halda',
+        busType: 'flyover',
         route: {
-          name: 'Chittagong City → CUET',
+          name: 'CUET → Bahaddarhat Flyover → Lalkhan Bazar → New Market',
           stops: [
-            { name: 'GEC Circle', time: '7:00 AM', order: 1 },
-            { name: 'Muradpur', time: '7:15 AM', order: 2 },
-            { name: 'Oxygen', time: '7:25 AM', order: 3 },
-            { name: '2 No. Gate', time: '7:35 AM', order: 4 },
-            { name: 'CUET Campus', time: '7:50 AM', order: 5 },
+            { name: 'CUET', order: 1 },
+            { name: 'Bahaddarhat Flyover', order: 2 },
+            { name: 'Lalkhan Bazar', order: 3 },
+            { name: 'New Market', order: 4 },
           ],
         },
-        schedule: {
-          departure: '7:00 AM',
-          arrival: '7:50 AM',
-          days: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday'],
-        },
-        totalSeats: 40,
-        seats: generateSeats(40),
-        supervisors: [supervisor1._id],
-        status: 'active',
+        totalSeats: 50,
+        supervisors: [supervisors[0]._id],
       },
       {
-        busNumber: 'CUET-02',
+        busName: 'Shangu',
+        busType: 'flyover',
         route: {
-          name: 'Agrabad → CUET',
+          name: 'CUET → Bahaddarhat Flyover → Lalkhan Bazar → New Market',
           stops: [
-            { name: 'Agrabad', time: '7:00 AM', order: 1 },
-            { name: 'Kazir Dewri', time: '7:10 AM', order: 2 },
-            { name: 'Bahaddarhat', time: '7:25 AM', order: 3 },
-            { name: 'Pahartali', time: '7:35 AM', order: 4 },
-            { name: 'CUET Campus', time: '7:55 AM', order: 5 },
+            { name: 'CUET', order: 1 },
+            { name: 'Bahaddarhat Flyover', order: 2 },
+            { name: 'Lalkhan Bazar', order: 3 },
+            { name: 'New Market', order: 4 },
           ],
         },
-        schedule: {
-          departure: '7:00 AM',
-          arrival: '7:55 AM',
-          days: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday'],
+        totalSeats: 50,
+        supervisors: [supervisors[0]._id],
+      },
+      // Turag — unique route
+      {
+        busName: 'Turag',
+        busType: 'regular',
+        route: {
+          name: 'CUET → Quaish → Oxygen → 2 No Gate → New Market → Agrabad',
+          stops: [
+            { name: 'CUET', order: 1 },
+            { name: 'Quaish', order: 2 },
+            { name: 'Oxygen', order: 3 },
+            { name: '2 No Gate', order: 4 },
+            { name: 'New Market', order: 5 },
+            { name: 'Agrabad', order: 6 },
+          ],
         },
-        totalSeats: 40,
-        seats: generateSeats(40),
-        supervisors: [supervisor1._id],
-        status: 'active',
+        totalSeats: 50,
+        supervisors: [supervisors[1]._id],
+      },
+      // Jamuna — unique route
+      {
+        busName: 'Jamuna',
+        busType: 'regular',
+        route: {
+          name: 'CUET → Bahaddarhat → Chawkbazar → New Market',
+          stops: [
+            { name: 'CUET', order: 1 },
+            { name: 'Bahaddarhat', order: 2 },
+            { name: 'Chawkbazar', order: 3 },
+            { name: 'New Market', order: 4 },
+          ],
+        },
+        totalSeats: 50,
+        supervisors: [supervisors[1]._id],
+      },
+      // Standard route buses (CUET → Bahaddarhat → GEC → Lalkhan Bazar → New Market)
+      {
+        busName: 'Buriganga',
+        busType: 'regular',
+        route: {
+          name: 'CUET → Bahaddarhat → GEC → Lalkhan Bazar → New Market',
+          stops: [
+            { name: 'CUET', order: 1 },
+            { name: 'Bahaddarhat', order: 2 },
+            { name: 'GEC', order: 3 },
+            { name: 'Lalkhan Bazar', order: 4 },
+            { name: 'New Market', order: 5 },
+          ],
+        },
+        totalSeats: 50,
+        supervisors: [supervisors[2]._id],
       },
       {
-        busNumber: 'CUET-03',
+        busName: 'Gomti',
+        busType: 'regular',
         route: {
-          name: 'Hathazari → CUET',
+          name: 'CUET → Bahaddarhat → GEC → Lalkhan Bazar → New Market',
           stops: [
-            { name: 'Hathazari', time: '7:00 AM', order: 1 },
-            { name: 'Fatikchhari', time: '7:20 AM', order: 2 },
-            { name: 'Nazir Hat', time: '7:35 AM', order: 3 },
-            { name: 'CUET Campus', time: '7:50 AM', order: 4 },
+            { name: 'CUET', order: 1 },
+            { name: 'Bahaddarhat', order: 2 },
+            { name: 'GEC', order: 3 },
+            { name: 'Lalkhan Bazar', order: 4 },
+            { name: 'New Market', order: 5 },
           ],
         },
-        schedule: {
-          departure: '7:00 AM',
-          arrival: '7:50 AM',
-          days: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday'],
-        },
-        totalSeats: 36,
-        seats: generateSeats(36),
-        supervisors: [supervisor2._id],
-        status: 'active',
+        totalSeats: 50,
+        supervisors: [supervisors[2]._id],
       },
       {
-        busNumber: 'CUET-04',
+        busName: 'Rupsha',
+        busType: 'regular',
         route: {
-          name: 'CUET → Chittagong City (Return)',
+          name: 'CUET → Bahaddarhat → GEC → Lalkhan Bazar → New Market',
           stops: [
-            { name: 'CUET Campus', time: '5:00 PM', order: 1 },
-            { name: '2 No. Gate', time: '5:10 PM', order: 2 },
-            { name: 'Oxygen', time: '5:20 PM', order: 3 },
-            { name: 'Muradpur', time: '5:35 PM', order: 4 },
-            { name: 'GEC Circle', time: '5:50 PM', order: 5 },
+            { name: 'CUET', order: 1 },
+            { name: 'Bahaddarhat', order: 2 },
+            { name: 'GEC', order: 3 },
+            { name: 'Lalkhan Bazar', order: 4 },
+            { name: 'New Market', order: 5 },
           ],
         },
-        schedule: {
-          departure: '5:00 PM',
-          arrival: '5:50 PM',
-          days: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday'],
+        totalSeats: 50,
+        supervisors: [supervisors[3]._id],
+      },
+      {
+        busName: 'Isamoti',
+        busType: 'regular',
+        route: {
+          name: 'CUET → Bahaddarhat → GEC → Lalkhan Bazar → New Market',
+          stops: [
+            { name: 'CUET', order: 1 },
+            { name: 'Bahaddarhat', order: 2 },
+            { name: 'GEC', order: 3 },
+            { name: 'Lalkhan Bazar', order: 4 },
+            { name: 'New Market', order: 5 },
+          ],
         },
-        totalSeats: 40,
-        seats: generateSeats(40),
-        supervisors: [supervisor2._id],
-        status: 'active',
+        totalSeats: 50,
+        supervisors: [supervisors[3]._id],
+      },
+      {
+        busName: 'Shurma',
+        busType: 'regular',
+        route: {
+          name: 'CUET → Bahaddarhat → GEC → Lalkhan Bazar → New Market',
+          stops: [
+            { name: 'CUET', order: 1 },
+            { name: 'Bahaddarhat', order: 2 },
+            { name: 'GEC', order: 3 },
+            { name: 'Lalkhan Bazar', order: 4 },
+            { name: 'New Market', order: 5 },
+          ],
+        },
+        totalSeats: 50,
+        supervisors: [supervisors[4]._id],
+      },
+      {
+        busName: 'Matamuhuri',
+        busType: 'regular',
+        route: {
+          name: 'CUET → Bahaddarhat → GEC → Lalkhan Bazar → New Market',
+          stops: [
+            { name: 'CUET', order: 1 },
+            { name: 'Bahaddarhat', order: 2 },
+            { name: 'GEC', order: 3 },
+            { name: 'Lalkhan Bazar', order: 4 },
+            { name: 'New Market', order: 5 },
+          ],
+        },
+        totalSeats: 50,
+        supervisors: [supervisors[4]._id],
+      },
+      {
+        busName: 'Tista',
+        busType: 'regular',
+        route: {
+          name: 'CUET → Bahaddarhat → GEC → Lalkhan Bazar → New Market',
+          stops: [
+            { name: 'CUET', order: 1 },
+            { name: 'Bahaddarhat', order: 2 },
+            { name: 'GEC', order: 3 },
+            { name: 'Lalkhan Bazar', order: 4 },
+            { name: 'New Market', order: 5 },
+          ],
+        },
+        totalSeats: 50,
+        supervisors: [supervisors[5]._id],
+      },
+      {
+        busName: 'Padma',
+        busType: 'regular',
+        route: {
+          name: 'CUET → Bahaddarhat → GEC → Lalkhan Bazar → New Market',
+          stops: [
+            { name: 'CUET', order: 1 },
+            { name: 'Bahaddarhat', order: 2 },
+            { name: 'GEC', order: 3 },
+            { name: 'Lalkhan Bazar', order: 4 },
+            { name: 'New Market', order: 5 },
+          ],
+        },
+        totalSeats: 50,
+        supervisors: [supervisors[5]._id],
+      },
+      {
+        busName: 'BRTC-1',
+        busType: 'regular',
+        route: {
+          name: 'CUET → Bahaddarhat → GEC → Lalkhan Bazar → New Market',
+          stops: [
+            { name: 'CUET', order: 1 },
+            { name: 'Bahaddarhat', order: 2 },
+            { name: 'GEC', order: 3 },
+            { name: 'Lalkhan Bazar', order: 4 },
+            { name: 'New Market', order: 5 },
+          ],
+        },
+        totalSeats: 50,
+        supervisors: [supervisors[2]._id, supervisors[3]._id],
+      },
+      {
+        busName: 'BRTC-2',
+        busType: 'regular',
+        route: {
+          name: 'CUET → Bahaddarhat → GEC → Lalkhan Bazar → New Market',
+          stops: [
+            { name: 'CUET', order: 1 },
+            { name: 'Bahaddarhat', order: 2 },
+            { name: 'GEC', order: 3 },
+            { name: 'Lalkhan Bazar', order: 4 },
+            { name: 'New Market', order: 5 },
+          ],
+        },
+        totalSeats: 50,
+        supervisors: [supervisors[4]._id, supervisors[5]._id],
       },
     ];
 
     const buses = await Bus.insertMany(busesData);
     console.log(`✅ ${buses.length} Buses created`);
 
-    // ─── Create Demo Bookings (some seats booked on CUET-01 and CUET-02) ───
-    const bookingPairs = [
-      // Active bookings on CUET-01
-      { studentIndex: 0, busIndex: 0, seat: 5, status: 'confirmed', attendance: 'pending' },
-      { studentIndex: 2, busIndex: 0, seat: 12, status: 'confirmed', attendance: 'pending' },
-      { studentIndex: 4, busIndex: 0, seat: 18, status: 'confirmed', attendance: 'pending' },
-      { studentIndex: 5, busIndex: 0, seat: 22, status: 'confirmed', attendance: 'pending' },
-      // Active bookings on CUET-02
-      { studentIndex: 6, busIndex: 1, seat: 3, status: 'confirmed', attendance: 'pending' },
-      { studentIndex: 7, busIndex: 1, seat: 8, status: 'confirmed', attendance: 'pending' },
-      // Past completed bookings (for history)
-      { studentIndex: 0, busIndex: 0, seat: 10, status: 'completed', attendance: 'present' },
-      { studentIndex: 2, busIndex: 1, seat: 15, status: 'completed', attendance: 'present' },
-      { studentIndex: 4, busIndex: 0, seat: 7, status: 'completed', attendance: 'absent' },
-    ];
-
-    for (const bp of bookingPairs) {
-      const student = students[bp.studentIndex];
-      const bus = buses[bp.busIndex];
-
-      // Create booking
-      const booking = await Booking.create({
-        student: student._id,
-        bus: bus._id,
-        seatNumber: bp.seat,
-        status: bp.status,
-        attendance: bp.attendance,
-      });
-
-      // If active confirmed booking, update the seat on the bus and the student
-      if (bp.status === 'confirmed') {
-        const busDoc = await Bus.findById(bus._id);
-        const seat = busDoc.seats.find(s => s.number === bp.seat);
-        if (seat) {
-          seat.isBooked = true;
-          seat.bookedBy = student._id;
-          seat.studentId = student.studentId;
-          seat.studentName = student.name;
-          await busDoc.save();
+    // ─── Create Demo Bookings ───
+    const bookingsToInsert = [];
+    const today = new Date();
+    
+    // Create bookings for the next 3 days
+    for (let dayOffset = 1; dayOffset <= 3; dayOffset++) {
+      const travelDate = new Date(today);
+      travelDate.setDate(today.getDate() + dayOffset);
+      const travelDateStr = travelDate.toISOString().split('T')[0];
+      
+      const isWeekend = travelDate.getDay() === 5 || travelDate.getDay() === 6; // Fri or Sat
+      const validShifts = isWeekend ? [2, 4] : [1, 2, 3, 4];
+      
+      for (const shift of validShifts) {
+        let studentIndex = 0; // Use a different student for each seat across all buses in this shift
+        for (const bus of buses) {
+          // Book 26 out of 50 seats (>50%)
+          for (let seat = 1; seat <= 26; seat++) {
+            bookingsToInsert.push({
+              student: students[studentIndex % students.length]._id,
+              bus: bus._id,
+              seatNumber: seat,
+              shift,
+              travelDate: travelDateStr,
+              status: 'confirmed',
+              attendance: 'pending',
+            });
+            studentIndex++;
+          }
         }
-        // Update student's bookedSeat
-        await User.findByIdAndUpdate(student._id, {
-          bookedSeat: { bus: bus._id, seatNumber: bp.seat },
-        });
       }
     }
-    console.log(`✅ ${bookingPairs.length} Bookings created (6 active, 3 historical)`);
+    
+    await Booking.insertMany(bookingsToInsert);
+    console.log(`✅ ${bookingsToInsert.length} Bookings created (>50% of seats for next 3 days)`);
 
     console.log('\n════════════════════════════════════');
     console.log('        SEED COMPLETE! 🎉');
@@ -234,11 +344,16 @@ const seedData = async () => {
     console.log('Admin:      admin@cuet.ac.bd      / admin123');
     console.log('Supervisor: rahman@cuet.ac.bd     / super123');
     console.log('Supervisor: kabir@cuet.ac.bd      / super123');
+    console.log('Supervisor: hossain@cuet.ac.bd    / super123');
+    console.log('Supervisor: alam@cuet.ac.bd       / super123');
+    console.log('Supervisor: chowdhury@cuet.ac.bd  / super123');
+    console.log('Supervisor: uddin@cuet.ac.bd      / super123');
     console.log('Student:    asif@student.cuet.ac.bd / student123');
     console.log('  (All 10 students share password: student123)');
     console.log('────────────────────────────────────');
-    console.log('\n🚌 Buses: CUET-01, CUET-02, CUET-03, CUET-04');
-    console.log('🎫 Active Bookings: 6 students have booked seats');
+    console.log('\n🚌 14 Buses: Halda, Shangu, Turag, Jamuna, Buriganga, Gomti,');
+    console.log('   Rupsha, Isamoti, Shurma, Matamuhuri, Tista, Padma, BRTC-1, BRTC-2');
+    console.log('🎫 Active Bookings: 7 students have booked seats');
     console.log('📋 History: 3 past completed/absent bookings\n');
 
     process.exit(0);
