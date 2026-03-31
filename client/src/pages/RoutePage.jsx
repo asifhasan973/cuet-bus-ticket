@@ -3,7 +3,19 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import API from '../utils/api';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
-import { FaBus, FaClock, FaMapMarkerAlt } from 'react-icons/fa';
+import { FaBus, FaMapMarkerAlt } from 'react-icons/fa';
+
+const ROUTE_GROUPS = [
+  { label: 'Flyover Route', type: 'flyover' },
+  { label: 'Regular Routes', type: 'regular' },
+];
+
+const SHIFT_SCHEDULE = [
+  { shift: 1, icon: '', label: 'Morning', weekday: '6:30 AM → 8:00 AM', weekend: '—', dir: 'CUET-bound', desc: 'Each bus from its own route endpoint' },
+  { shift: 2, icon: '', label: 'Afternoon', weekday: '2:00 PM → 3:00 PM', weekend: '2:30 PM → 3:30 PM', dir: 'Outbound', desc: 'All buses → Kaptai Rastar Matha' },
+  { shift: 3, icon: '', label: 'Evening', weekday: '5:00 PM → 7:00 PM', weekend: '—', dir: 'Outbound', desc: 'Each bus follows own normal route' },
+  { shift: 4, icon: '', label: 'Night', weekday: '9:00 PM → 10:30 PM', weekend: '8:30 PM → 10:00 PM', dir: 'CUET-bound', desc: 'All buses from New Market' },
+];
 
 const RoutePage = () => {
   const [buses, setBuses] = useState([]);
@@ -39,108 +51,188 @@ const RoutePage = () => {
 
   if (loading) return <LoadingSpinner />;
 
+  const flyoverBuses = buses.filter(b => b.busType === 'flyover');
+  const regularBuses = buses.filter(b => b.busType === 'regular');
+
+  // Group regular buses by route name
+  const routeGroups = {};
+  regularBuses.forEach(bus => {
+    const routeName = bus.route?.name || 'Unknown Route';
+    if (!routeGroups[routeName]) {
+      routeGroups[routeName] = [];
+    }
+    routeGroups[routeName].push(bus);
+  });
+
   return (
     <div className="max-w-5xl mx-auto px-4 py-8">
       <div className="text-center mb-10">
         <h1 className="text-3xl font-extrabold text-dark-900">Routes & Schedule</h1>
-        <p className="text-dark-500 mt-2">All available bus routes and timings</p>
+        <p className="text-dark-500 mt-2">All bus routes and shift schedule</p>
       </div>
 
-      <div className="space-y-6">
-        {buses.map(bus => (
-          <div 
-            key={bus._id} 
-            className="card !p-0 overflow-hidden cursor-pointer hover:shadow-lg transition-all"
-            onClick={() => handleBusClick(bus._id)}
-          >
-            <div className="bg-gradient-to-r from-primary-600 to-primary-700 px-6 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-              <div className="flex items-center gap-3">
-                <FaBus className="text-white text-lg" />
-                <div>
-                  <h2 className="font-bold text-white text-lg">{bus.busNumber}</h2>
-                  <p className="text-white/70 text-sm">{bus.route?.name}</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-4 text-white/80 text-sm">
-                <span className="flex items-center gap-1.5">
-                  <FaClock className="text-xs" />
-                  {bus.schedule?.departure} → {bus.schedule?.arrival}
-                </span>
-              </div>
-            </div>
-
-            <div className="p-6">
-              {/* Route timeline */}
-              <div className="relative">
-                {bus.route?.stops?.map((stop, index) => (
-                  <div key={index} className="flex gap-4 mb-0">
-                    <div className="flex flex-col items-center">
-                      <div className={`w-4 h-4 rounded-full border-2 z-10 ${
-                        index === 0 ? 'bg-accent-500 border-accent-500' :
-                        index === bus.route.stops.length - 1 ? 'bg-primary-500 border-primary-500' :
-                        'bg-white border-dark-300'
-                      }`} />
-                      {index < bus.route.stops.length - 1 && (
-                        <div className="w-0.5 h-10 bg-dark-200" />
-                      )}
-                    </div>
-                    <div className="pb-6 flex-1">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="font-semibold text-dark-900">{stop.name}</p>
-                          {index === 0 && (
-                            <span className="text-[10px] bg-accent-100 text-accent-700 px-2 py-0.5 rounded-full font-bold uppercase">
-                              Starting Point
-                            </span>
-                          )}
-                          {index === bus.route.stops.length - 1 && (
-                            <span className="text-[10px] bg-primary-100 text-primary-700 px-2 py-0.5 rounded-full font-bold uppercase">
-                              Destination
-                            </span>
-                          )}
-                        </div>
-                        <span className="text-sm font-medium text-dark-500 bg-dark-50 px-3 py-1 rounded-lg">
-                          {stop.time}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
+      {/* Shift Schedule Table */}
+      <div className="card !p-0 overflow-hidden mb-8">
+        <div className="bg-gradient-to-r from-dark-800 to-dark-900 px-6 py-4">
+          <h2 className="font-bold text-white text-lg">Shift Schedule</h2>
+          <p className="text-white/60 text-sm mt-1">All buses follow the same shift timings</p>
+        </div>
+        <div className="p-4">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b-2 border-dark-100">
+                  <th className="text-left py-3 px-4 text-xs font-bold text-dark-500 uppercase">Shift</th>
+                  <th className="text-left py-3 px-4 text-xs font-bold text-dark-500 uppercase">Weekday (Sun-Thu)</th>
+                  <th className="text-left py-3 px-4 text-xs font-bold text-dark-500 uppercase">Weekend (Fri-Sat)</th>
+                  <th className="text-left py-3 px-4 text-xs font-bold text-dark-500 uppercase">Direction</th>
+                  <th className="text-left py-3 px-4 text-xs font-bold text-dark-500 uppercase">Note</th>
+                </tr>
+              </thead>
+              <tbody>
+                {SHIFT_SCHEDULE.map(s => (
+                  <tr key={s.shift} className="border-b border-dark-50 hover:bg-dark-50 transition-colors">
+                    <td className="py-3 px-4 font-bold text-dark-900">
+                      <span className="mr-1.5">{s.icon}</span>
+                      Shift {s.shift} — {s.label}
+                    </td>
+                    <td className="py-3 px-4 font-semibold text-dark-700">{s.weekday}</td>
+                    <td className="py-3 px-4 font-semibold text-dark-500">{s.weekend}</td>
+                    <td className="py-3 px-4">
+                      <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${
+                        s.dir === 'CUET-bound' ? 'bg-accent-100 text-accent-700' : 'bg-teal-100 text-teal-700'
+                      }`}>
+                        {s.dir}
+                      </span>
+                    </td>
+                    <td className="py-3 px-4 text-xs text-dark-500">{s.desc}</td>
+                  </tr>
                 ))}
-              </div>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
 
-              {/* Schedule Info */}
-              <div className="mt-2 pt-4 border-t border-dark-100 flex flex-wrap gap-4">
-                <div className="flex items-center gap-2 text-sm text-dark-500">
-                  <FaMapMarkerAlt className="text-dark-400" />
-                  {bus.route?.stops?.length} stops
+      {/* Flyover Buses */}
+      {flyoverBuses.length > 0 && (
+        <div className="mb-8">
+          <h2 className="text-lg font-bold text-dark-900 mb-4 flex items-center gap-2">
+           Flyover Buses
+            <span className="text-xs font-normal text-dark-400">({flyoverBuses.length} buses)</span>
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {flyoverBuses.map(bus => (
+              <div 
+                key={bus._id}
+                className="card !p-0 overflow-hidden cursor-pointer hover:shadow-lg transition-all group"
+                onClick={() => handleBusClick(bus._id)}
+              >
+                <div className="bg-gradient-to-r from-violet-500 to-violet-700 px-5 py-3 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <FaBus className="text-white" />
+                    <h3 className="font-bold text-white">{bus.busName}</h3>
+                  </div>
+                  <span className="bg-white/20 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">FLYOVER</span>
                 </div>
-                <div className="flex items-center gap-2 text-sm text-dark-500">
-                  <FaBus className="text-dark-400" />
-                  {bus.totalSeats} seats ({bus.availableSeats ?? bus.totalSeats} available)
+                <div className="p-4">
+                  <p className="text-sm text-dark-600 font-medium mb-3">{bus.route?.name}</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {bus.route?.stops?.map((stop, i) => (
+                      <span key={i} className="text-xs bg-dark-50 text-dark-600 px-2 py-1 rounded-md font-medium border border-dark-100">
+                        {stop.name}
+                      </span>
+                    ))}
+                  </div>
+                  <div className="mt-3 flex items-center justify-between text-xs text-dark-400">
+                    <span className="flex items-center gap-1"><FaMapMarkerAlt /> {bus.route?.stops?.length} stops</span>
+                    <span className="font-bold text-dark-600">{bus.totalSeats} seats</span>
+                  </div>
                 </div>
-                <div className="flex flex-wrap gap-1">
-                  {bus.schedule?.days?.map(day => (
-                    <span key={day} className="text-[10px] bg-dark-100 text-dark-600 px-2 py-0.5 rounded font-medium">
-                      {day.substring(0, 3)}
-                    </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Regular Buses grouped by route */}
+      <div>
+        <h2 className="text-lg font-bold text-dark-900 mb-4 flex items-center gap-2">
+         Regular Buses
+          <span className="text-xs font-normal text-dark-400">({regularBuses.length} buses)</span>
+        </h2>
+        {Object.entries(routeGroups).map(([routeName, routeBuses]) => (
+          <div key={routeName} className="mb-6">
+            <div className="card !p-0 overflow-hidden">
+              <div className="bg-gradient-to-r from-primary-600 to-primary-700 px-6 py-4">
+                <div className="flex items-center gap-2">
+                  <FaBus className="text-white" />
+                  <div>
+                    <h3 className="font-bold text-white">{routeName}</h3>
+                    <p className="text-white/60 text-xs">{routeBuses.length} buses on this route</p>
+                  </div>
+                </div>
+              </div>
+              <div className="p-5">
+                {/* Route stops timeline */}
+                <div className="mb-5">
+                  <p className="text-xs font-bold text-dark-500 uppercase mb-3">Route Stops</p>
+                  <div className="flex flex-wrap items-center gap-2">
+                    {routeBuses[0]?.route?.stops?.map((stop, i) => (
+                      <div key={i} className="flex items-center">
+                        <div className="flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-lg border border-dark-100">
+                          <div className={`w-2.5 h-2.5 rounded-full ${
+                            i === 0 ? 'bg-accent-500' :
+                            i === routeBuses[0].route.stops.length - 1 ? 'bg-primary-500' :
+                            'bg-dark-300'
+                          }`} />
+                          <span className="text-sm font-medium text-dark-800">{stop.name}</span>
+                        </div>
+                        {i < routeBuses[0].route.stops.length - 1 && (
+                          <span className="text-dark-300 mx-1">→</span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Bus names */}
+                <p className="text-xs font-bold text-dark-500 uppercase mb-2">Buses</p>
+                <div className="flex flex-wrap gap-2">
+                  {routeBuses.map(bus => (
+                    <button
+                      key={bus._id}
+                      onClick={() => handleBusClick(bus._id)}
+                      className="flex items-center gap-2 bg-dark-50 hover:bg-primary-50 hover:border-primary-200 px-3 py-2 rounded-xl border border-dark-100 transition-all group"
+                    >
+                      <FaBus className="text-dark-400 group-hover:text-primary-600 text-xs" />
+                      <span className="text-sm font-bold text-dark-700 group-hover:text-primary-700">{bus.busName}</span>
+                      <span className="text-[10px] text-dark-400">{bus.totalSeats}s</span>
+                    </button>
                   ))}
                 </div>
-                <div className="flex items-center gap-2 text-sm text-dark-500 w-full mt-2">
-                  <span className="font-semibold text-dark-700">Supervisors:</span> 
-                  {bus.supervisors?.length > 0 ? bus.supervisors.map(s => s.name).join(', ') : 'None assigned'}
-                </div>
+
+                {/* Supervisor info */}
+                {routeBuses.some(b => b.supervisors?.length > 0) && (
+                  <div className="mt-4 pt-3 border-t border-dark-100">
+                    <span className="text-xs font-bold text-dark-500">Supervisors: </span>
+                    <span className="text-xs text-dark-600">
+                      {[...new Set(routeBuses.flatMap(b => b.supervisors?.map(s => s.name) || []))].join(', ') || 'None assigned'}
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
           </div>
         ))}
-
-        {buses.length === 0 && (
-          <div className="text-center py-12">
-            <FaBus className="text-4xl text-dark-300 mx-auto mb-3" />
-            <p className="text-dark-500">No routes available at the moment</p>
-          </div>
-        )}
       </div>
+
+      {buses.length === 0 && (
+        <div className="text-center py-12">
+          <FaBus className="text-4xl text-dark-300 mx-auto mb-3" />
+          <p className="text-dark-500">No routes available at the moment</p>
+        </div>
+      )}
     </div>
   );
 };

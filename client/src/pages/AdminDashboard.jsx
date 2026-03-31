@@ -3,8 +3,17 @@ import API from '../utils/api';
 import StatsCard from '../components/ui/StatsCard';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 import { FaBus, FaUsers, FaUserTie, FaTrash, FaTimes, FaSave } from 'react-icons/fa';
-import { HiTicket, HiChartBar } from 'react-icons/hi';
+import { HiTicket } from 'react-icons/hi';
 import toast from 'react-hot-toast';
+
+const SHIFT_ICONS = { 1: '', 2: '', 3: '', 4: '' };
+const SHIFT_LABELS = { 1: 'Morning', 2: 'Afternoon', 3: 'Evening', 4: 'Night' };
+const SHIFT_COLORS = {
+  1: 'bg-teal-100 text-teal-700',
+  2: 'bg-sky-100 text-sky-700',
+  3: 'bg-indigo-100 text-indigo-700',
+  4: 'bg-slate-200 text-slate-700',
+};
 
 const AdminDashboard = () => {
   const [stats, setStats] = useState(null);
@@ -103,6 +112,7 @@ const AdminDashboard = () => {
       setShowBusModal(false);
       setSelectedUserId(null);
       setSelectedBuses([]);
+      fetchBuses();
     } catch (error) {
       toast.error('Failed to assign buses');
     }
@@ -113,7 +123,7 @@ const AdminDashboard = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-extrabold text-dark-900">Admin Dashboard 🛡️</h1>
+        <h1 className="text-2xl font-extrabold text-dark-900">Admin Dashboard</h1>
         <p className="text-dark-500 text-sm mt-1">System overview and management</p>
       </div>
 
@@ -153,6 +163,7 @@ const AdminDashboard = () => {
                 <tr>
                   <th className="text-left px-6 py-3 text-xs font-bold text-dark-500 uppercase">Student</th>
                   <th className="text-left px-6 py-3 text-xs font-bold text-dark-500 uppercase">Bus</th>
+                  <th className="text-left px-6 py-3 text-xs font-bold text-dark-500 uppercase">Shift</th>
                   <th className="text-left px-6 py-3 text-xs font-bold text-dark-500 uppercase">Seat</th>
                   <th className="text-left px-6 py-3 text-xs font-bold text-dark-500 uppercase">Date</th>
                 </tr>
@@ -163,18 +174,23 @@ const AdminDashboard = () => {
                     <td className="px-6 py-4 text-sm font-medium text-dark-900">
                       {booking.student?.name} <span className="text-dark-400">({booking.student?.studentId})</span>
                     </td>
-                    <td className="px-6 py-4 text-sm text-dark-600">{booking.bus?.busNumber}</td>
+                    <td className="px-6 py-4 text-sm text-dark-600">{booking.bus?.busName}</td>
+                    <td className="px-6 py-4">
+                      <span className={`px-2 py-1 rounded-full text-[10px] font-bold ${SHIFT_COLORS[booking.shift]}`}>
+                        {SHIFT_ICONS[booking.shift]} {SHIFT_LABELS[booking.shift]}
+                      </span>
+                    </td>
                     <td className="px-6 py-4 text-sm font-bold text-dark-900">
                       {String.fromCharCode(65 + Math.floor((booking.seatNumber - 1) / 5))}{((booking.seatNumber - 1) % 5) + 1}
                     </td>
-                    <td className="px-6 py-4 text-sm text-dark-500">
-                      {new Date(booking.createdAt).toLocaleDateString()}
+                    <td className="px-6 py-4 text-sm font-semibold text-accent-700">
+                      {new Date(booking.travelDate + 'T00:00:00').toLocaleDateString()}
                     </td>
                   </tr>
                 ))}
                 {(!stats?.recentBookings || stats.recentBookings.length === 0) && (
                   <tr>
-                    <td colSpan="4" className="px-6 py-8 text-center text-dark-400 text-sm">No recent bookings</td>
+                    <td colSpan="5" className="px-6 py-8 text-center text-dark-400 text-sm">No recent bookings</td>
                   </tr>
                 )}
               </tbody>
@@ -233,10 +249,23 @@ const AdminDashboard = () => {
                           <option value="admin">ADMIN</option>
                         </select>
                         {u.role === 'supervisor' && (
-                          <button onClick={() => { setSelectedUserId(u._id); setSelectedBuses([]); setShowBusModal(true); }}
-                            className="block mt-1 text-[10px] text-primary-600 font-semibold hover:underline">
-                            Assign Buses
-                          </button>
+                          <div className="mt-2">
+                            <div className="flex flex-wrap gap-1 mb-1">
+                              {buses.filter(b => b.supervisors?.some(s => (s._id || s) === u._id)).map(bus => (
+                                <span key={bus._id} className="text-[10px] bg-dark-100 text-dark-600 px-1.5 py-0.5 rounded font-semibold">
+                                  {bus.busName}
+                                </span>
+                              ))}
+                            </div>
+                            <button onClick={() => { 
+                                setSelectedUserId(u._id); 
+                                setSelectedBuses(buses.filter(b => b.supervisors?.some(s => (s._id || s) === u._id)).map(b => b._id)); 
+                                setShowBusModal(true); 
+                              }}
+                              className="text-[10px] text-primary-600 font-bold hover:underline">
+                              + Manage Buses
+                            </button>
+                          </div>
                         )}
                       </td>
                       <td className="px-6 py-4 text-sm text-dark-500">{u.studentId || u.employeeId || '-'}</td>
@@ -295,7 +324,7 @@ const AdminDashboard = () => {
                       <div className="flex items-center gap-3">
                         <FaBus className={isSelected ? 'text-primary-600' : 'text-dark-400'} />
                         <div>
-                          <p className={`font-bold ${isSelected ? 'text-primary-900' : 'text-dark-900'}`}>{bus.busNumber}</p>
+                          <p className={`font-bold ${isSelected ? 'text-primary-900' : 'text-dark-900'}`}>{bus.busName}</p>
                           <p className="text-xs text-dark-500">{bus.route?.name}</p>
                         </div>
                       </div>

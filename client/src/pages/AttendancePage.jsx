@@ -5,6 +5,9 @@ import LoadingSpinner from '../components/ui/LoadingSpinner';
 import { FaBus, FaUser, FaCheck, FaTimes } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 
+const SHIFT_ICONS = { 1: '', 2: '', 3: '', 4: '' };
+const SHIFT_LABELS = { 1: 'Morning', 2: 'Afternoon', 3: 'Evening', 4: 'Night' };
+
 const AttendancePage = () => {
   const [searchParams] = useSearchParams();
   const busIdFromQuery = searchParams.get('bus');
@@ -14,16 +17,27 @@ const AttendancePage = () => {
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState({});
+  const [shifts, setShifts] = useState([]);
+  const [selectedShift, setSelectedShift] = useState('');
+  const [selectedDate, setSelectedDate] = useState(() => {
+    return new Date().toISOString().split('T')[0];
+  });
 
   useEffect(() => {
     fetchBuses();
   }, []);
 
   useEffect(() => {
-    if (selectedBus) {
-      fetchStudents(selectedBus);
+    fetchShifts(selectedDate);
+  }, [selectedDate]);
+
+  useEffect(() => {
+    if (selectedBus && selectedShift) {
+      fetchStudents(selectedBus, selectedDate, selectedShift);
+    } else {
+      setStudents([]);
     }
-  }, [selectedBus]);
+  }, [selectedBus, selectedDate, selectedShift]);
 
   const fetchBuses = async () => {
     try {
@@ -38,10 +52,23 @@ const AttendancePage = () => {
     }
   };
 
-  const fetchStudents = async (busId) => {
+  const fetchShifts = async (dateStr) => {
+    try {
+      const res = await API.get(`/shifts?date=${dateStr}`);
+      setShifts(res.data);
+      // Auto-select first shift if none selected
+      if (res.data.length > 0 && !selectedShift) {
+        setSelectedShift(res.data[0].shift);
+      }
+    } catch (error) {
+      console.error('Failed to load shifts');
+    }
+  };
+
+  const fetchStudents = async (busId, dateStr, shift) => {
     try {
       setLoading(true);
-      const res = await API.get(`/supervisor/bus/${busId}/students`);
+      const res = await API.get(`/supervisor/bus/${busId}/students?date=${dateStr}&shift=${shift}`);
       setStudents(res.data);
     } catch (error) {
       toast.error('Failed to load students');
@@ -55,7 +82,9 @@ const AttendancePage = () => {
     try {
       const res = await API.post('/supervisor/attendance', { bookingId, status });
       toast.success(res.data.message);
-      fetchStudents(selectedBus);
+      if (selectedBus && selectedShift) {
+        fetchStudents(selectedBus, selectedDate, selectedShift);
+      }
     } catch (error) {
       toast.error(error.response?.data?.message || 'Failed to mark attendance');
     } finally {
@@ -74,7 +103,9 @@ const AttendancePage = () => {
       }));
       await API.post('/supervisor/attendance/bulk', { attendanceList });
       toast.success('All students marked present');
-      fetchStudents(selectedBus);
+      if (selectedBus && selectedShift) {
+        fetchStudents(selectedBus, selectedDate, selectedShift);
+      }
     } catch (error) {
       toast.error('Failed to mark attendance');
     }
@@ -86,26 +117,61 @@ const AttendancePage = () => {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-extrabold text-dark-900">Attendance Management</h1>
-        <p className="text-dark-500 text-sm mt-1">Mark student attendance and manage token deductions</p>
+        <p className="text-dark-500 text-sm mt-1">Mark student attendance by date, shift, and bus</p>
       </div>
 
-      {/* Bus selector */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-        <div className="flex items-center gap-2">
-          <FaBus className="text-primary-500" />
-          <select
-            value={selectedBus}
-            onChange={(e) => setSelectedBus(e.target.value)}
-            className="input-field !w-auto"
-          >
-            {buses.map(bus => (
-              <option key={bus._id} value={bus._id}>{bus.busNumber} - {bus.route?.name}</option>
-            ))}
-          </select>
+      {/* Filters */}
+      <div className="card !p-4">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+          {/* Date */}
+          <div className="flex items-center gap-2">
+            <label className="text-sm font-bold text-dark-600">Date:</label>
+            <input 
+              type="date"
+              value={selectedDate}
+              onChange={(e) => { setSelectedDate(e.target.value); setSelectedShift(''); }}
+              className="input-field !py-1.5 !px-2 w-auto min-w-[140px] text-sm font-semibold text-primary-700 bg-primary-50 border-none cursor-pointer"
+            />
+          </div>
+
+          {/* Bus */}
+          <div className="flex items-center gap-2">
+            <FaBus className="text-primary-500" />
+            <select
+              value={selectedBus}
+              onChange={(e) => setSelectedBus(e.target.value)}
+              className="input-field !w-auto !py-1.5 text-sm"
+            >
+              {buses.map(bus => (
+                <option key={bus._id} value={bus._id}>{bus.busName} — {bus.route?.name}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Shift */}
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-bold text-dark-600">Shift:</span>
+            <div className="flex gap-1.5">
+              {shifts.map(s => (
+                <button
+                  key={s.shift}
+                  onClick={() => setSelectedShift(s.shift)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                    selectedShift === s.shift
+                      ? 'bg-primary-600 text-white'
+                      : 'bg-dark-100 text-dark-500 hover:bg-dark-200'
+                  }`}
+                >
+                  {SHIFT_ICONS[s.shift]} {s.shift}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <button onClick={markAllPresent} className="btn-success text-sm !px-4 !py-2 flex items-center gap-2 ml-auto">
+            <FaCheck /> Mark All Present
+          </button>
         </div>
-        <button onClick={markAllPresent} className="btn-success text-sm !px-4 !py-2 flex items-center gap-2">
-          <FaCheck /> Mark All Present
-        </button>
       </div>
 
       {/* Info cards */}
@@ -129,7 +195,11 @@ const AttendancePage = () => {
       </div>
 
       {/* Student list */}
-      {loading ? <LoadingSpinner size="sm" /> : (
+      {!selectedShift ? (
+        <div className="card text-center py-10">
+          <p className="text-dark-400 text-sm">Please select a shift to view booked students</p>
+        </div>
+      ) : loading ? <LoadingSpinner size="sm" /> : (
         <div className="card !p-0 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
@@ -138,6 +208,7 @@ const AttendancePage = () => {
                   <th className="text-left px-6 py-3 text-xs font-bold text-dark-500 uppercase">Student</th>
                   <th className="text-left px-6 py-3 text-xs font-bold text-dark-500 uppercase">ID</th>
                   <th className="text-left px-6 py-3 text-xs font-bold text-dark-500 uppercase">Seat</th>
+                  <th className="text-left px-6 py-3 text-xs font-bold text-dark-500 uppercase">Shift</th>
                   <th className="text-left px-6 py-3 text-xs font-bold text-dark-500 uppercase">Tokens</th>
                   <th className="text-left px-6 py-3 text-xs font-bold text-dark-500 uppercase">Status</th>
                   <th className="text-right px-6 py-3 text-xs font-bold text-dark-500 uppercase">Actions</th>
@@ -159,6 +230,9 @@ const AttendancePage = () => {
                     </td>
                     <td className="px-6 py-4 text-sm font-medium text-dark-600">{booking.student?.studentId}</td>
                     <td className="px-6 py-4 text-sm font-bold text-dark-900">#{booking.seatNumber}</td>
+                    <td className="px-6 py-4 text-sm">
+                      {SHIFT_ICONS[booking.shift]} {SHIFT_LABELS[booking.shift]}
+                    </td>
                     <td className="px-6 py-4 text-sm font-bold text-primary-600">{booking.student?.points}</td>
                     <td className="px-6 py-4">
                       <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${
@@ -197,9 +271,9 @@ const AttendancePage = () => {
                 ))}
                 {students.length === 0 && (
                   <tr>
-                    <td colSpan="6" className="px-6 py-12 text-center text-dark-400">
+                    <td colSpan="7" className="px-6 py-12 text-center text-dark-400">
                       <FaUser className="text-3xl mx-auto mb-2 text-dark-300" />
-                      No students booked for this bus
+                      No students booked for this bus on this shift
                     </td>
                   </tr>
                 )}

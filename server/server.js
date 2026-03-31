@@ -25,6 +25,7 @@ app.use('/api/buses', require('./routes/buses'));
 app.use('/api/bookings', require('./routes/bookings'));
 app.use('/api/supervisor', require('./routes/supervisor'));
 app.use('/api/admin', require('./routes/admin'));
+app.use('/api/shifts', require('./routes/shifts'));
 
 // Health check
 app.get('/api/health', (req, res) => {

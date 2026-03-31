@@ -5,6 +5,13 @@ import { HiArrowRight } from 'react-icons/hi';
 import { useAuth } from '../context/AuthContext';
 import API from '../utils/api';
 
+const SHIFT_SCHEDULE = [
+  { shift: 1, icon: '', label: 'Morning', time: '6:30 AM → 8:00 AM', dir: 'CUET-bound', note: 'Weekdays', color: 'from-teal-400 to-teal-600' },
+  { shift: 2, icon: '', label: 'Afternoon', time: '2:00 PM → 3:00 PM', dir: 'Outbound', note: 'All days', color: 'from-sky-400 to-blue-500' },
+  { shift: 3, icon: '', label: 'Evening', time: '5:00 PM → 7:00 PM', dir: 'Outbound', note: 'Weekdays', color: 'from-indigo-400 to-purple-500' },
+  { shift: 4, icon: '', label: 'Night', time: '9:00 PM → 10:30 PM', dir: 'CUET-bound', note: 'All days', color: 'from-slate-600 to-slate-800' },
+];
+
 const Home = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -40,19 +47,19 @@ const Home = () => {
     {
       icon: FaTicketAlt,
       title: 'Easy Seat Booking',
-      desc: 'Book your bus seat in seconds with our interactive seat map. Choose your preferred seat.',
+      desc: 'Book your bus seat in seconds. Select date, shift, bus, and seat — all in a smooth flow.',
       color: 'from-primary-500 to-primary-600',
     },
     {
       icon: FaRoute,
-      title: 'Live Routes',
-      desc: 'View all available routes, stops, and schedules. Never miss your bus again.',
+      title: '4 Daily Shifts',
+      desc: 'Morning, Afternoon, Evening, and Night shifts cover your entire day of commuting.',
       color: 'from-accent-500 to-accent-600',
     },
     {
       icon: FaShieldAlt,
       title: 'Secure & Reliable',
-      desc: 'JWT-based authentication keeps your data safe. One-student-one-seat policy.',
+      desc: 'JWT-based authentication keeps your data safe. One-student-one-seat-per-shift policy.',
       color: 'from-violet-500 to-violet-600',
     },
     {
@@ -69,8 +76,8 @@ const Home = () => {
     },
     {
       icon: FaBus,
-      title: 'Multiple Buses',
-      desc: 'Choose from a fleet of buses covering multiple routes across Chittagong.',
+      title: '14 University Buses',
+      desc: 'Choose from a fleet of 14 buses covering multiple routes across Chittagong.',
       color: 'from-teal-500 to-teal-600',
     },
   ];
@@ -79,7 +86,6 @@ const Home = () => {
     <div className="min-h-screen">
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-br from-dark-900 via-primary-900 to-dark-900">
-        {/* Background pattern */}
         <div className="absolute inset-0 opacity-10">
           <div className="absolute inset-0" style={{
             backgroundImage: `radial-gradient(circle at 25% 25%, rgba(59,130,246,0.3) 0%, transparent 50%),
@@ -91,7 +97,7 @@ const Home = () => {
           <div className="text-center max-w-3xl mx-auto">
             <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 py-1.5 mb-6">
               <div className="w-2 h-2 bg-accent-400 rounded-full animate-pulse" />
-              <span className="text-sm text-white/80 font-medium">University Bus Service</span>
+              <span className="text-sm text-white/80 font-medium">CUET University Bus Service</span>
             </div>
             
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white leading-tight tracking-tight">
@@ -101,8 +107,7 @@ const Home = () => {
             </h1>
             
             <p className="mt-6 text-lg text-white/60 max-w-2xl mx-auto leading-relaxed">
-              Fast, easy, and reliable bus seat booking for CUET students. 
-              Choose your seat, track your route, and travel hassle-free.
+              14 buses, 4 daily shifts, seamless booking. Choose your date, shift, bus, and seat — travel hassle-free.
             </p>
 
             <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -130,9 +135,9 @@ const Home = () => {
             {/* Quick Stats */}
             <div className="mt-16 grid grid-cols-3 gap-8 max-w-md mx-auto">
               {[
-                { value: '4+', label: 'Active Buses' },
-                { value: '150+', label: 'Seats Available' },
-                { value: '10+', label: 'Routes' },
+                { value: '14', label: 'Buses' },
+                { value: '4', label: 'Daily Shifts' },
+                { value: '700+', label: 'Seats' },
               ].map((stat, i) => (
                 <div key={i} className="text-center">
                   <p className="text-2xl sm:text-3xl font-extrabold text-white">{stat.value}</p>
@@ -143,7 +148,6 @@ const Home = () => {
           </div>
         </div>
 
-        {/* Wave divider */}
         <div className="absolute bottom-0 left-0 right-0">
           <svg viewBox="0 0 1440 80" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M0,40 C360,80 720,0 1080,40 C1260,60 1380,60 1440,40 L1440,80 L0,80 Z" fill="var(--color-dark-50)" />
@@ -151,8 +155,56 @@ const Home = () => {
         </div>
       </section>
 
+      {/* Shift Schedule Section */}
+      <section className="py-16 bg-dark-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-10">
+            <h2 className="text-3xl font-extrabold text-dark-900 tracking-tight">
+              Daily Shift Schedule
+            </h2>
+            <p className="mt-3 text-dark-500 max-w-lg mx-auto">
+              4 shifts covering morning to night — plan your commute
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {SHIFT_SCHEDULE.map(s => (
+              <div key={s.shift} className="card !p-0 overflow-hidden hover:scale-[1.02] transition-all">
+                <div className={`bg-gradient-to-r ${s.color} px-5 py-4 text-white`}>
+                  <span className="text-3xl">{s.icon}</span>
+                  <h3 className="font-bold text-lg mt-2">Shift {s.shift}</h3>
+                  <p className="text-sm text-white/80">{s.label}</p>
+                </div>
+                <div className="p-4 space-y-2">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-dark-500">Time</span>
+                    <span className="font-bold text-dark-900">{s.time}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-dark-500">Direction</span>
+                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                      s.dir === 'CUET-bound' ? 'bg-accent-100 text-accent-700' : 'bg-teal-100 text-teal-700'
+                    }`}>
+                      {s.dir}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-dark-500">Days</span>
+                    <span className="font-semibold text-dark-700">{s.note}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <p className="text-center text-sm text-dark-400 mt-4">
+           On weekends (Fri-Sat): Only Shifts 2 & 4 operate. Timings adjusted by ±30 min.
+          </p>
+        </div>
+      </section>
+
       {/* Features Section */}
-      <section className="py-20 bg-dark-50">
+      <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-14">
             <h2 className="text-3xl font-extrabold text-dark-900 tracking-tight">
@@ -185,10 +237,10 @@ const Home = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-14">
             <h2 className="text-3xl font-extrabold text-dark-900 tracking-tight">
-              Available Bus Routes
+              Our Bus Fleet
             </h2>
             <p className="mt-3 text-dark-500 max-w-lg mx-auto">
-              Check out our buses and their schedules
+              14 buses serving multiple routes across Chittagong
             </p>
           </div>
 
@@ -197,56 +249,39 @@ const Home = () => {
               <div className="w-10 h-10 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin" />
             </div>
           ) : buses.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {buses.map(bus => (
                 <div 
                   key={bus._id} 
                   className="card !p-0 overflow-hidden cursor-pointer hover:shadow-xl transition-all hover:-translate-y-1 group bg-white border border-dark-100"
                   onClick={() => handleBusClick(bus._id)}
                 >
-                  <div className="bg-gradient-to-r from-primary-600 to-primary-700 px-6 py-4 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <FaBus className="text-white text-xl" />
-                      <div>
-                        <h3 className="font-bold text-white text-lg">{bus.busNumber}</h3>
-                      </div>
+                  <div className="bg-gradient-to-r from-primary-600 to-primary-700 px-5 py-3 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <FaBus className="text-white" />
+                      <h3 className="font-bold text-white">{bus.busName}</h3>
                     </div>
-                    <span className="bg-white/20 text-white text-xs font-bold px-3 py-1 rounded-full backdrop-blur-sm">
-                      {bus.availableSeats ?? bus.totalSeats} Seats Left
+                    <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${
+                      bus.busType === 'flyover' ? 'bg-white/30 text-white' : 'bg-white/20 text-white/90'
+                    }`}>
+                      {bus.busType}
                     </span>
                   </div>
-                  <div className="p-6">
-                    <h4 className="font-bold text-dark-900 mb-4 text-lg">{bus.route?.name}</h4>
-                    
-                    <div className="space-y-3 mb-6">
-                      <div className="flex items-center gap-3 text-dark-600 text-sm">
-                        <FaClock className="text-primary-500" />
-                        <span className="font-medium">{bus.schedule?.departure} - {bus.schedule?.arrival}</span>
-                      </div>
-                      <div className="flex items-center gap-3 text-dark-600 text-sm">
-                        <FaMapMarkerAlt className="text-primary-500" />
-                        <span className="font-medium">{bus.route?.stops?.length || 0} Stops</span>
-                      </div>
-                    </div>
-
-                    <div className="flex flex-wrap gap-1.5">
-                      {bus.schedule?.days?.slice(0, 3).map(day => (
-                        <span key={day} className="text-[10px] bg-dark-50 text-dark-600 px-2 py-1 rounded-md font-bold uppercase tracking-wide border border-dark-100">
-                          {day.substring(0, 3)}
-                        </span>
-                      ))}
-                      {(bus.schedule?.days?.length || 0) > 3 && (
-                        <span className="text-[10px] bg-dark-50 text-dark-600 px-2 py-1 rounded-md font-bold uppercase tracking-wide border border-dark-100">
-                          +{bus.schedule.days.length - 3} More
-                        </span>
-                      )}
+                  <div className="p-4">
+                    <p className="text-xs text-dark-500 mb-3 line-clamp-2">{bus.route?.name}</p>
+                    <div className="flex items-center justify-between text-xs text-dark-400">
+                      <span className="flex items-center gap-1">
+                        <FaMapMarkerAlt className="text-[10px]" />
+                        {bus.route?.stops?.length} stops
+                      </span>
+                      <span className="font-bold text-accent-600">{bus.totalSeats} seats</span>
                     </div>
                   </div>
-                  <div className="px-6 py-4 border-t border-dark-100 bg-dark-50/50 group-hover:bg-primary-50 transition-colors flex items-center justify-between">
-                    <span className="text-sm font-semibold text-primary-600">
+                  <div className="px-4 py-3 border-t border-dark-100 bg-dark-50/50 group-hover:bg-primary-50 transition-colors flex items-center justify-between">
+                    <span className="text-xs font-semibold text-primary-600">
                       {user ? 'View Details' : 'Login to Book'}
                     </span>
-                    <HiArrowRight className="text-primary-600 group-hover:translate-x-1 transition-transform" />
+                    <HiArrowRight className="text-primary-600 group-hover:translate-x-1 transition-transform text-sm" />
                   </div>
                 </div>
               ))}
