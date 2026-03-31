@@ -26,6 +26,15 @@ app.use('/api/supervisor', require('./routes/supervisor'));
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/shifts', require('./routes/shifts'));
 
+// Root and API Welcome Routes
+app.get('/', (req, res) => {
+  res.send('Welcome to CUET Bus Ticket System API!');
+});
+
+app.get('/api', (req, res) => {
+  res.send('Welcome to CUET Bus Ticket System API!');
+});
+
 // Health check
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', message: 'CUET Bus API is running' });
