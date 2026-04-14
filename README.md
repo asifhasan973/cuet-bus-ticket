@@ -39,7 +39,6 @@ Follow these steps to get the project up and running on your local machine.
 ### Prerequisites
 Before you begin, ensure you have the following installed:
 - [Node.js](https://nodejs.org/en/) (v18 or higher)
-- [MongoDB](https://www.mongodb.com/try/download/community) (Running locally or a MongoDB Atlas URI)
 - Git
 
 ### 1. Clone the repository
@@ -55,24 +54,8 @@ npm run install-all
 ```
 *(Alternatively, you can manually run `npm install` inside the root, `client`, and `server` directories).*
 
-### 3. Configure Environment Variables
-You must configure the environment variables for the backend to run properly. 
-Create a `.env` file in the `server` directory (you can copy `.env.example` if it exists):
-```bash
-cd server
-touch .env
-```
-Add the following configurations to the `server/.env` file:
-```env
-# MongoDB Connection String (Replace with Atlas URI if remote)
-MONGO_URI=mongodb://localhost:27017/cuet-bus
-
-# Secret key for JWT Authentication
-JWT_SECRET=your_super_secret_key_change_me
-
-# Backend Port
-PORT=5001
-```
+### 3. Environment Variables Confgured
+For ease of setup, all necessary `.env` files (including MongoDB connection string, JWT secret, and Firebase config) have been included directly in the repository. No manual configuration is required!
 
 ### 4. Seed the Database (Optional but Recommended)
 To quickly test the application with dummy data and pre-configured accounts, run the seed script:
