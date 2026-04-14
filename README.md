@@ -32,53 +32,43 @@ The CUET Bus Ticket system is a dedicated digital solution for streamlining bus 
 
 ---
 
-## 💻 Installation & Setup Process
+## 💻 Installation & Setup
 
-Follow these steps to get the project up and running on your local machine.
+Because all environment variables and database keys are pre-configured in the repository, you can set up the project in just a few clicks!
 
 ### Prerequisites
-Before you begin, ensure you have the following installed:
-- [Node.js](https://nodejs.org/en/) (v18 or higher)
+- Node.js (v18 or higher)
 - Git
 
-### 1. Clone the repository
-```bash
-git clone <repository-url>
-cd "CUET Bus Ticket"
-```
+### Quick Start
 
-### 2. Install Dependencies
-We have a root-level script that automatically installs dependencies for both the `client` and `server` folders.
-```bash
-npm run install-all
-```
-*(Alternatively, you can manually run `npm install` inside the root, `client`, and `server` directories).*
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd "CUET Bus Ticket"
+   ```
 
-### 3. Environment Variables Confgured
-For ease of setup, all necessary `.env` files (including MongoDB connection string, JWT secret, and Firebase config) have been included directly in the repository. No manual configuration is required!
+2. **Install all dependencies & start the app**
+   ```bash
+   npm run install-all
+   npm run dev
+   ```
 
-### 4. Seed the Database (Optional but Recommended)
-To quickly test the application with dummy data and pre-configured accounts, run the seed script:
-```bash
-# From the root directory:
-npm run seed
-```
-**Seed Accounts Created:**
-| Role | Email | Password |
-|------|-------|----------|
-| **Admin** | admin@cuet.ac.bd | admin123 |
-| **Supervisor** | rahman@cuet.ac.bd | super123 |
-| **Student** | asif@student.cuet.ac.bd | student123 |
-
-### 5. Run the Application
-You can run both the client and server concurrently from the root directory using:
-```bash
-npm run dev
-```
+That's it! Both the frontend and backend will now start concurrently.
 
 **Access URLs:**
-- **Frontend (Client):** http://localhost:5173
-- **Backend (Server API):** http://localhost:5001
+- **Frontend App:** http://localhost:5173
+- **Backend API:** http://localhost:5001
+
+### Optional: Seed Database
+To test with dummy data, you can populate the database by opening a new terminal in the root directory and running:
+```bash
+npm run seed
+```
+**Test Accounts:**
+- **Admin:** admin@cuet.ac.bd | admin123
+- **Supervisor:** rahman@cuet.ac.bd | super123
+- **Student:** asif@student.cuet.ac.bd | student123
 
 ---
 
