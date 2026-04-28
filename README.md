@@ -68,7 +68,9 @@ npm run seed
 **Test Accounts:**
 - **Admin:** admin@cuet.ac.bd | admin123
 - **Supervisor:** rahman@cuet.ac.bd | super123
+- **Supervisor:** kabir@cuet.ac.bd | super123
 - **Student:** asif@student.cuet.ac.bd | student123
+- **Student:** student2@student.cuet.ac.bd | student123
 
 ---
 

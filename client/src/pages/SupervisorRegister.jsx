@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { auth, googleProvider } from '../firebase';
-import { signInWithPopup } from 'firebase/auth';
+import { signInWithPopup, signOut } from 'firebase/auth';
+import { ALLOWED_EMAIL_MESSAGE, isAllowedInstitutionEmail, normalizeEmail } from '../utils/emailDomain';
 import { FaBus, FaGoogle } from 'react-icons/fa';
 import { HiMail, HiLockClosed, HiUser, HiIdentification, HiAcademicCap, HiArrowRight, HiEye, HiEyeOff } from 'react-icons/hi';
 import toast from 'react-hot-toast';
@@ -27,9 +28,15 @@ const SupervisorRegister = () => {
     if (formData.password !== formData.confirmPassword) {
       return toast.error('Passwords do not match');
     }
+
+    const normalizedEmail = normalizeEmail(formData.email);
+    if (!isAllowedInstitutionEmail(normalizedEmail)) {
+      return toast.error(ALLOWED_EMAIL_MESSAGE);
+    }
+
     setLoading(true);
     try {
-      await register({ ...formData, role: 'supervisor' });
+      await register({ ...formData, email: normalizedEmail, role: 'supervisor' });
       toast.success('Registration successful!');
       navigate('/supervisor/dashboard');
     } catch (error) {
@@ -43,8 +50,13 @@ const SupervisorRegister = () => {
     try {
       setLoading(true);
       const result = await signInWithPopup(auth, googleProvider);
+      if (!isAllowedInstitutionEmail(result.user.email)) {
+        await signOut(auth);
+        toast.error(ALLOWED_EMAIL_MESSAGE);
+        return;
+      }
       const credential = await result.user.getIdToken();
-      const user = await googleLogin(credential, 'supervisor');
+      await googleLogin(credential, 'supervisor');
       toast.success('Welcome! Account created successfully');
       navigate('/supervisor/dashboard');
     } catch (error) {

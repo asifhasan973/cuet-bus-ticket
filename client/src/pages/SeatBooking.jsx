@@ -5,6 +5,7 @@ import API from '../utils/api';
 import SeatGrid from '../components/ui/SeatGrid';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 import Modal from '../components/ui/Modal';
+import { toLocalDateInputValue } from '../utils/date';
 import { FaBus, FaClock, FaMapMarkerAlt, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { HiArrowRight, HiArrowNarrowRight, HiSun, HiMoon } from 'react-icons/hi';
 import toast from 'react-hot-toast';
@@ -59,7 +60,7 @@ const SeatBooking = () => {
     for (let i = 0; i < 14; i++) {
       const d = new Date();
       d.setDate(d.getDate() + i);
-      const dateStr = d.toISOString().split('T')[0];
+      const dateStr = toLocalDateInputValue(d);
       const dayName = d.toLocaleDateString('en-US', { weekday: 'short' });
       const dayNum = d.getDate();
       const monthName = d.toLocaleDateString('en-US', { month: 'short' });
