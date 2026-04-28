@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const { ALLOWED_EMAIL_MESSAGE, isAllowedInstitutionEmail } = require('../utils/emailDomain');
 
 const auth = async (req, res, next) => {
   try {
@@ -14,6 +15,10 @@ const auth = async (req, res, next) => {
     
     if (!user) {
       return res.status(401).json({ message: 'Token is not valid' });
+    }
+
+    if (!isAllowedInstitutionEmail(user.email)) {
+      return res.status(401).json({ message: ALLOWED_EMAIL_MESSAGE });
     }
 
     req.user = user;

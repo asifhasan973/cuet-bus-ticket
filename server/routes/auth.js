@@ -4,6 +4,11 @@ const jwt = require('jsonwebtoken');
 const { body, validationResult } = require('express-validator');
 const User = require('../models/User');
 const auth = require('../middleware/auth');
+const {
+  ALLOWED_EMAIL_MESSAGE,
+  isAllowedInstitutionEmail,
+  normalizeEmail,
+} = require('../utils/emailDomain');
 
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '30d' });
@@ -44,9 +49,14 @@ router.post('/register', [
     }
 
     const { name, email, password, role, studentId, employeeId, department } = req.body;
+    const normalizedEmail = normalizeEmail(email);
+
+    if (!isAllowedInstitutionEmail(normalizedEmail)) {
+      return res.status(403).json({ message: ALLOWED_EMAIL_MESSAGE });
+    }
 
     // Check if user already exists
-    let user = await User.findOne({ email });
+    let user = await User.findOne({ email: normalizedEmail });
     if (user) {
       return res.status(400).json({ message: 'User already exists with this email' });
     }
@@ -61,7 +71,7 @@ router.post('/register', [
 
     user = new User({
       name,
-      email,
+      email: normalizedEmail,
       password,
       role,
       studentId: role === 'student' ? studentId : undefined,
@@ -107,8 +117,13 @@ router.post('/login', [
     }
 
     const { email, password } = req.body;
+    const normalizedEmail = normalizeEmail(email);
 
-    const user = await User.findOne({ email }).select('+password');
+    if (!isAllowedInstitutionEmail(normalizedEmail)) {
+      return res.status(403).json({ message: ALLOWED_EMAIL_MESSAGE });
+    }
+
+    const user = await User.findOne({ email: normalizedEmail }).select('+password');
     if (!user) {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
@@ -186,19 +201,28 @@ router.post('/google', async (req, res) => {
 
     // Verify Firebase token
     const decodedToken = await admin.auth().verifyIdToken(credential);
-    const { email, name, uid } = decodedToken;
+    const { email, name, uid, email_verified: emailVerified } = decodedToken;
+    const normalizedEmail = normalizeEmail(email);
+
+    if (!email || emailVerified === false) {
+      return res.status(401).json({ message: 'Google account email must be verified' });
+    }
+
+    if (!isAllowedInstitutionEmail(normalizedEmail)) {
+      return res.status(403).json({ message: ALLOWED_EMAIL_MESSAGE });
+    }
     
-    let user = await User.findOne({ email });
+    let user = await User.findOne({ email: normalizedEmail });
     
     if (!user) {
       // Auto-register
-      const assignedRole = role || 'student';
-      const studentId = assignedRole === 'student' ? email.split('@')[0] : undefined;
+      const assignedRole = ['student', 'supervisor'].includes(role) ? role : 'student';
+      const studentId = assignedRole === 'student' ? normalizedEmail.split('@')[0] : undefined;
       const employeeId = assignedRole === 'supervisor' ? 'EMP-' + Date.now().toString().slice(-4) : undefined;
       
       user = new User({
-        name: name || email.split('@')[0],
-        email,
+        name: name || normalizedEmail.split('@')[0],
+        email: normalizedEmail,
         password: uid, // Use Firebase UID as random password
         role: assignedRole,
         studentId,
