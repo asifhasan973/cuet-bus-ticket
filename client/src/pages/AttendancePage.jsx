@@ -2,11 +2,20 @@ import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import API from '../utils/api';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
+import { toLocalDateInputValue } from '../utils/date';
 import { FaBus, FaUser, FaCheck, FaTimes } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 
 const SHIFT_ICONS = { 1: '', 2: '', 3: '', 4: '' };
 const SHIFT_LABELS = { 1: 'Morning', 2: 'Afternoon', 3: 'Evening', 4: 'Night' };
+
+const getSeatLabel = (number) => {
+  if (!number) return '';
+  const rowIndex = Math.floor((number - 1) / 5);
+  const columnNumber = ((number - 1) % 5) + 1;
+  const rowLetter = String.fromCharCode(65 + rowIndex);
+  return `${rowLetter}${columnNumber}`;
+};
 
 const AttendancePage = () => {
   const [searchParams] = useSearchParams();
@@ -19,9 +28,7 @@ const AttendancePage = () => {
   const [processing, setProcessing] = useState({});
   const [shifts, setShifts] = useState([]);
   const [selectedShift, setSelectedShift] = useState('');
-  const [selectedDate, setSelectedDate] = useState(() => {
-    return new Date().toISOString().split('T')[0];
-  });
+  const [selectedDate, setSelectedDate] = useState(() => toLocalDateInputValue());
 
   useEffect(() => {
     fetchBuses();
@@ -122,55 +129,60 @@ const AttendancePage = () => {
 
       {/* Filters */}
       <div className="card !p-4">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-          {/* Date */}
-          <div className="flex items-center gap-2">
-            <label className="text-sm font-bold text-dark-600">Date:</label>
-            <input 
-              type="date"
-              value={selectedDate}
-              onChange={(e) => { setSelectedDate(e.target.value); setSelectedShift(''); }}
-              className="input-field !py-1.5 !px-2 w-auto min-w-[140px] text-sm font-semibold text-primary-700 bg-primary-50 border-none cursor-pointer"
-            />
-          </div>
+        <div className="space-y-4">
+          <div className="grid grid-cols-1 lg:grid-cols-[minmax(180px,220px)_minmax(0,1fr)] gap-4">
+            <label className="block">
+              <span className="block text-xs font-bold text-dark-500 uppercase mb-1">Travel Date</span>
+              <input
+                type="date"
+                value={selectedDate}
+                onChange={(e) => { setSelectedDate(e.target.value); setSelectedShift(''); }}
+                className="input-field !py-2 !px-3 text-sm font-semibold text-primary-700 bg-primary-50 border-primary-100 cursor-pointer"
+              />
+            </label>
 
-          {/* Bus */}
-          <div className="flex items-center gap-2">
-            <FaBus className="text-primary-500" />
-            <select
-              value={selectedBus}
-              onChange={(e) => setSelectedBus(e.target.value)}
-              className="input-field !w-auto !py-1.5 text-sm"
-            >
-              {buses.map(bus => (
-                <option key={bus._id} value={bus._id}>{bus.busName} — {bus.route?.name}</option>
-              ))}
-            </select>
-          </div>
-
-          {/* Shift */}
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-bold text-dark-600">Shift:</span>
-            <div className="flex gap-1.5">
-              {shifts.map(s => (
-                <button
-                  key={s.shift}
-                  onClick={() => setSelectedShift(s.shift)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                    selectedShift === s.shift
-                      ? 'bg-primary-600 text-white'
-                      : 'bg-dark-100 text-dark-500 hover:bg-dark-200'
-                  }`}
+            <label className="block">
+              <span className="block text-xs font-bold text-dark-500 uppercase mb-1">Bus</span>
+              <div className="relative">
+                <FaBus className="absolute left-3 top-1/2 -translate-y-1/2 text-primary-500" />
+                <select
+                  value={selectedBus}
+                  onChange={(e) => setSelectedBus(e.target.value)}
+                  className="input-field !py-2 !pl-9 text-sm"
                 >
-                  {SHIFT_ICONS[s.shift]} {s.shift}
-                </button>
-              ))}
-            </div>
+                  {buses.map(bus => (
+                    <option key={bus._id} value={bus._id}>{bus.busName} - {bus.route?.name}</option>
+                  ))}
+                </select>
+              </div>
+            </label>
           </div>
 
-          <button onClick={markAllPresent} className="btn-success text-sm !px-4 !py-2 flex items-center gap-2 ml-auto">
-            <FaCheck /> Mark All Present
-          </button>
+          <div className="flex flex-col lg:flex-row lg:items-end gap-4">
+            <div className="flex-1 min-w-0">
+              <span className="block text-xs font-bold text-dark-500 uppercase mb-1">Shift</span>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                {shifts.map(s => (
+                  <button
+                    key={s.shift}
+                    onClick={() => setSelectedShift(s.shift)}
+                    className={`px-3 py-2 rounded-lg text-xs font-bold transition-all text-center ${
+                      selectedShift === s.shift
+                        ? 'bg-primary-600 text-white'
+                        : 'bg-dark-100 text-dark-600 hover:bg-dark-200'
+                    }`}
+                  >
+                    <span className="block">Shift {s.shift}</span>
+                    <span className="block text-[10px] font-semibold opacity-80">{SHIFT_LABELS[s.shift]}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <button onClick={markAllPresent} className="btn-success text-sm !px-4 !py-2.5 flex items-center justify-center gap-2 lg:min-w-[170px]">
+              <FaCheck /> Mark All Present
+            </button>
+          </div>
         </div>
       </div>
 
@@ -229,7 +241,7 @@ const AttendancePage = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4 text-sm font-medium text-dark-600">{booking.student?.studentId}</td>
-                    <td className="px-6 py-4 text-sm font-bold text-dark-900">#{booking.seatNumber}</td>
+                    <td className="px-6 py-4 text-sm font-bold text-dark-900">{getSeatLabel(booking.seatNumber)}</td>
                     <td className="px-6 py-4 text-sm">
                       {SHIFT_ICONS[booking.shift]} {SHIFT_LABELS[booking.shift]}
                     </td>

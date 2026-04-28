@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { auth, googleProvider } from '../firebase';
-import { signInWithPopup } from 'firebase/auth';
+import { signInWithPopup, signOut } from 'firebase/auth';
+import { ALLOWED_EMAIL_MESSAGE, isAllowedInstitutionEmail, normalizeEmail } from '../utils/emailDomain';
 import { FaBus, FaGoogle } from 'react-icons/fa';
 import { HiMail, HiLockClosed, HiArrowRight, HiEye, HiEyeOff } from 'react-icons/hi';
 import toast from 'react-hot-toast';
@@ -17,9 +18,15 @@ const SupervisorLogin = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const normalizedEmail = normalizeEmail(email);
+
+    if (!isAllowedInstitutionEmail(normalizedEmail)) {
+      return toast.error(ALLOWED_EMAIL_MESSAGE);
+    }
+
     setLoading(true);
     try {
-      const user = await login(email, password);
+      const user = await login(normalizedEmail, password);
       if (user.role === 'admin') {
         toast.success('Welcome back, Admin!');
         navigate('/admin/dashboard');
@@ -40,6 +47,11 @@ const SupervisorLogin = () => {
     try {
       setLoading(true);
       const result = await signInWithPopup(auth, googleProvider);
+      if (!isAllowedInstitutionEmail(result.user.email)) {
+        await signOut(auth);
+        toast.error(ALLOWED_EMAIL_MESSAGE);
+        return;
+      }
       const credential = await result.user.getIdToken();
       const user = await googleLogin(credential, 'supervisor');
       if (user.role === 'admin') {
