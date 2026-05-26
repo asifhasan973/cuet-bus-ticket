@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { HiMenu, HiX } from 'react-icons/hi';
 import { FaBus, FaUserCircle } from 'react-icons/fa';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const Navbar = () => {
   const { user, logout } = useAuth();
@@ -28,9 +29,13 @@ const Navbar = () => {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2.5 group" onClick={() => setIsOpen(false)}>
-            <div className="bg-gradient-to-br from-primary-500 to-primary-700 p-2 rounded-xl shadow-sm group-hover:shadow-md transition-shadow">
+            <motion.div
+              className="bg-gradient-to-br from-primary-500 to-primary-700 p-2 rounded-xl shadow-sm group-hover:shadow-md transition-shadow"
+              whileHover={{ rotate: [0, -10, 10, 0] }}
+              transition={{ duration: 0.5 }}
+            >
               <FaBus className="text-white text-lg" />
-            </div>
+            </motion.div>
             <div>
               <span className="font-bold text-lg text-dark-900 tracking-tight">CUET Bus</span>
               <span className="text-[10px] block text-dark-400 -mt-1 font-medium">Seat Booking</span>
@@ -79,56 +84,75 @@ const Navbar = () => {
           </div>
 
           {/* Mobile menu button */}
-          <button
+          <motion.button
             onClick={() => setIsOpen(!isOpen)}
             className="md:hidden p-2 rounded-lg text-dark-600 hover:bg-dark-100 transition-colors"
+            whileTap={{ scale: 0.9 }}
           >
-            {isOpen ? <HiX className="text-xl" /> : <HiMenu className="text-xl" />}
-          </button>
+            <AnimatePresence mode="wait">
+              {isOpen ? (
+                <motion.div key="close" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }} transition={{ duration: 0.15 }}>
+                  <HiX className="text-xl" />
+                </motion.div>
+              ) : (
+                <motion.div key="menu" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }} transition={{ duration: 0.15 }}>
+                  <HiMenu className="text-xl" />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.button>
         </div>
       </div>
 
       {/* Mobile Menu */}
-      {isOpen && (
-        <div className="md:hidden border-t border-dark-100 bg-white/95 backdrop-blur-xl">
-          <div className="px-4 py-3 space-y-1">
-            <Link to="/" onClick={() => setIsOpen(false)} className="block px-4 py-2.5 text-dark-600 hover:text-primary-600 rounded-lg hover:bg-primary-50 transition-all text-sm font-medium">
-              Home
-            </Link>
-            <Link to="/routes" onClick={() => setIsOpen(false)} className="block px-4 py-2.5 text-dark-600 hover:text-primary-600 rounded-lg hover:bg-primary-50 transition-all text-sm font-medium">
-              Routes
-            </Link>
-            {user ? (
-              <>
-                <Link to={getDashboardLink()} onClick={() => setIsOpen(false)} className="block px-4 py-2.5 text-dark-600 hover:text-primary-600 rounded-lg hover:bg-primary-50 transition-all text-sm font-medium">
-                  Dashboard
-                </Link>
-                <div className="border-t border-dark-100 my-2" />
-                <div className="px-4 py-2 flex items-center gap-2">
-                  <FaUserCircle className="text-primary-500" />
-                  <span className="text-sm font-medium text-dark-700">{user.name}</span>
-                  <span className="text-[10px] bg-primary-100 text-primary-700 px-2 py-0.5 rounded-full font-semibold uppercase">
-                    {user.role}
-                  </span>
-                </div>
-                <button onClick={handleLogout} className="w-full text-left px-4 py-2.5 text-danger-500 hover:bg-danger-50 rounded-lg transition-all text-sm font-medium">
-                  Logout
-                </button>
-              </>
-            ) : (
-              <>
-                <div className="border-t border-dark-100 my-2" />
-                <Link to="/student/login" onClick={() => setIsOpen(false)} className="block px-4 py-2.5 text-dark-600 hover:text-primary-600 rounded-lg hover:bg-primary-50 transition-all text-sm font-medium">
-                  Student Login
-                </Link>
-                <Link to="/supervisor/login" onClick={() => setIsOpen(false)} className="block px-4 py-2.5 text-dark-600 hover:text-primary-600 rounded-lg hover:bg-primary-50 transition-all text-sm font-medium">
-                  Supervisor Login
-                </Link>
-              </>
-            )}
-          </div>
-        </div>
-      )}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            className="md:hidden border-t border-dark-100 bg-white/95 backdrop-blur-xl overflow-hidden"
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <div className="px-4 py-3 space-y-1">
+              <Link to="/" onClick={() => setIsOpen(false)} className="block px-4 py-2.5 text-dark-600 hover:text-primary-600 rounded-lg hover:bg-primary-50 transition-all text-sm font-medium">
+                Home
+              </Link>
+              <Link to="/routes" onClick={() => setIsOpen(false)} className="block px-4 py-2.5 text-dark-600 hover:text-primary-600 rounded-lg hover:bg-primary-50 transition-all text-sm font-medium">
+                Routes
+              </Link>
+              {user ? (
+                <>
+                  <Link to={getDashboardLink()} onClick={() => setIsOpen(false)} className="block px-4 py-2.5 text-dark-600 hover:text-primary-600 rounded-lg hover:bg-primary-50 transition-all text-sm font-medium">
+                    Dashboard
+                  </Link>
+                  <div className="border-t border-dark-100 my-2" />
+                  <div className="px-4 py-2 flex items-center gap-2">
+                    <FaUserCircle className="text-primary-500" />
+                    <span className="text-sm font-medium text-dark-700">{user.name}</span>
+                    <span className="text-[10px] bg-primary-100 text-primary-700 px-2 py-0.5 rounded-full font-semibold uppercase">
+                      {user.role}
+                    </span>
+                  </div>
+                  <button onClick={handleLogout} className="w-full text-left px-4 py-2.5 text-danger-500 hover:bg-danger-50 rounded-lg transition-all text-sm font-medium">
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <>
+                  <div className="border-t border-dark-100 my-2" />
+                  <Link to="/student/login" onClick={() => setIsOpen(false)} className="block px-4 py-2.5 text-dark-600 hover:text-primary-600 rounded-lg hover:bg-primary-50 transition-all text-sm font-medium">
+                    Student Login
+                  </Link>
+                  <Link to="/supervisor/login" onClick={() => setIsOpen(false)} className="block px-4 py-2.5 text-dark-600 hover:text-primary-600 rounded-lg hover:bg-primary-50 transition-all text-sm font-medium">
+                    Supervisor Login
+                  </Link>
+                </>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </nav>
   );
 };
