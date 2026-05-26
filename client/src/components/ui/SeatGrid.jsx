@@ -51,7 +51,7 @@ const SeatGrid = ({ seats = [], onSelectSeat, selectedSeat, readOnly = false }) 
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
       >
-        <div className="bg-dark-200 text-dark-500 text-xs font-bold px-8 py-2 rounded-t-xl tracking-wider uppercase">
+        <div className="bg-dark-200 dark:bg-dark-800 text-dark-500 dark:text-dark-400 text-xs font-bold px-8 py-2 rounded-t-xl tracking-wider uppercase transition-colors">
           Front (Driver)
         </div>
       </motion.div>
@@ -64,22 +64,22 @@ const SeatGrid = ({ seats = [], onSelectSeat, selectedSeat, readOnly = false }) 
         transition={{ delay: 0.2 }}
       >
         <div className="flex items-center gap-2">
-          <div className="w-4 h-4 rounded bg-gradient-to-br from-accent-400 to-accent-500" />
-          <span className="text-xs text-dark-500 font-medium">Available</span>
+          <div className="w-4 h-4 rounded bg-gradient-to-br from-accent-400 to-accent-500 shadow-sm" />
+          <span className="text-xs text-dark-500 dark:text-dark-400 font-medium">Available</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-4 h-4 rounded bg-gradient-to-br from-danger-400 to-danger-500" />
-          <span className="text-xs text-dark-500 font-medium">Booked</span>
+          <div className="w-4 h-4 rounded bg-gradient-to-br from-danger-400 to-danger-500 shadow-sm" />
+          <span className="text-xs text-dark-500 dark:text-dark-400 font-medium">Booked</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-4 h-4 rounded bg-gradient-to-br from-primary-400 to-primary-600" />
-          <span className="text-xs text-dark-500 font-medium">Selected</span>
+          <div className="w-4 h-4 rounded bg-gradient-to-br from-primary-400 to-primary-600 shadow-sm" />
+          <span className="text-xs text-dark-500 dark:text-dark-400 font-medium">Selected</span>
         </div>
       </motion.div>
 
       {/* Bus body */}
       <motion.div
-        className="bg-dark-50 border-2 border-dark-200 rounded-2xl p-4 space-y-2"
+        className="bg-dark-50 dark:bg-dark-900 border-2 border-dark-200 dark:border-dark-800/80 rounded-2xl p-4 space-y-2 transition-colors duration-250"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.1 }}
@@ -125,7 +125,7 @@ const SeatGrid = ({ seats = [], onSelectSeat, selectedSeat, readOnly = false }) 
 
             {/* Aisle */}
             <div className="w-8 flex items-center justify-center">
-              <div className="w-px h-8 bg-dark-200" />
+              <div className="w-px h-8 bg-dark-200 dark:bg-dark-800" />
             </div>
 
             {/* Right group (3 seats) */}
@@ -178,11 +178,11 @@ const SeatGrid = ({ seats = [], onSelectSeat, selectedSeat, readOnly = false }) 
             exit={{ opacity: 0, y: 5 }}
             transition={{ duration: 0.15 }}
           >
-            <div className="inline-flex items-center gap-2 bg-dark-800 text-white px-4 py-2 rounded-lg text-sm">
+            <div className="inline-flex items-center gap-2 bg-dark-800 dark:bg-dark-900 border dark:border-dark-800 text-white px-4 py-2 rounded-lg text-sm shadow-md">
               <FaUser className="text-xs" />
               <span>{hoveredSeat.studentName || 'Student'}</span>
               {hoveredSeat.studentId && (
-                <span className="text-dark-300">| ID: {hoveredSeat.studentId}</span>
+                <span className="text-dark-300 dark:text-dark-400">| ID: {hoveredSeat.studentId}</span>
               )}
             </div>
           </motion.div>
@@ -196,7 +196,7 @@ const SeatGrid = ({ seats = [], onSelectSeat, selectedSeat, readOnly = false }) 
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5 }}
       >
-        <div className="bg-dark-200 text-dark-500 text-xs font-bold px-8 py-2 rounded-b-xl tracking-wider uppercase">
+        <div className="bg-dark-200 dark:bg-dark-800 text-dark-500 dark:text-dark-400 text-xs font-bold px-8 py-2 rounded-b-xl tracking-wider uppercase transition-colors">
           Rear
         </div>
       </motion.div>

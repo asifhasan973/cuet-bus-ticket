@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import API from '../utils/api';
 import SeatGrid from '../components/ui/SeatGrid';
-import LoadingSpinner from '../components/ui/LoadingSpinner';
+import { SkeletonSeatBooking } from '../components/ui/Skeleton';
 import Modal from '../components/ui/Modal';
 import { toLocalDateInputValue } from '../utils/date';
 import { FaBus, FaClock, FaMapMarkerAlt, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
@@ -178,7 +178,7 @@ const SeatBooking = () => {
     }
   };
 
-  if (loading) return <LoadingSpinner />;
+  if (loading) return <SkeletonSeatBooking />;
 
   // Step-based rendering
   const step = selectedBus ? 3 : selectedShift ? 2 : 1;
@@ -187,8 +187,8 @@ const SeatBooking = () => {
     <div className="space-y-5">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-extrabold text-dark-900">Book a Seat</h1>
-        <p className="text-dark-500 text-sm mt-1">Select date → shift → bus → seat</p>
+        <h1 className="text-2xl font-extrabold text-dark-900 dark:text-white">Book a Seat</h1>
+        <p className="text-dark-500 dark:text-dark-400 text-sm mt-1">Select date → shift → bus → seat</p>
       </div>
 
       {/* ═══ DATE PAGINATION (Shohoz-style) ═══ */}
@@ -196,7 +196,7 @@ const SeatBooking = () => {
         <div className="flex items-center gap-2">
           <button
             onClick={() => scrollDates(-1)}
-            className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full bg-white border border-dark-200 text-dark-500 hover:bg-dark-50 hover:text-dark-700 transition-all shadow-sm"
+            className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full bg-white dark:bg-dark-900 border border-dark-200 dark:border-dark-800/80 text-dark-500 dark:text-dark-400 hover:bg-dark-50 dark:hover:bg-dark-800 hover:text-dark-700 dark:hover:text-dark-200 transition-colors shadow-sm cursor-pointer"
           >
             <FaChevronLeft className="text-xs" />
           </button>
@@ -212,19 +212,19 @@ const SeatBooking = () => {
                 <button
                   key={d.dateStr}
                   onClick={() => setSelectedDate(d.dateStr)}
-                  className={`flex-shrink-0 flex flex-col items-center px-4 py-3 rounded-xl border-2 transition-all duration-200 min-w-[72px] ${
+                  className={`flex-shrink-0 flex flex-col items-center px-4 py-3 rounded-xl border-2 transition-all duration-200 min-w-[72px] cursor-pointer ${
                     isSelected
                       ? 'bg-primary-600 border-primary-600 text-white shadow-lg shadow-primary-600/25 scale-105'
-                      : 'bg-white border-dark-100 text-dark-600 hover:border-primary-300 hover:bg-primary-50'
+                      : 'bg-white dark:bg-dark-900 border-dark-100 dark:border-dark-800/80 text-dark-600 dark:text-dark-300 hover:border-primary-300 hover:bg-primary-50 dark:hover:bg-primary-950/20'
                   }`}
                 >
-                  <span className={`text-[10px] font-bold uppercase tracking-wider ${isSelected ? 'text-white/80' : 'text-dark-400'}`}>
+                  <span className={`text-[10px] font-bold uppercase tracking-wider ${isSelected ? 'text-white/80' : 'text-dark-400 dark:text-dark-500'}`}>
                     {d.isToday ? 'Today' : d.dayName}
                   </span>
-                  <span className={`text-xl font-black ${isSelected ? 'text-white' : 'text-dark-900'}`}>
+                  <span className={`text-xl font-black ${isSelected ? 'text-white' : 'text-dark-900 dark:text-dark-100'}`}>
                     {d.dayNum}
                   </span>
-                  <span className={`text-[10px] font-semibold ${isSelected ? 'text-white/70' : 'text-dark-400'}`}>
+                  <span className={`text-[10px] font-semibold ${isSelected ? 'text-white/70' : 'text-dark-400 dark:text-dark-500'}`}>
                     {d.monthName}
                   </span>
                 </button>
@@ -234,7 +234,7 @@ const SeatBooking = () => {
 
           <button
             onClick={() => scrollDates(1)}
-            className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full bg-white border border-dark-200 text-dark-500 hover:bg-dark-50 hover:text-dark-700 transition-all shadow-sm"
+            className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full bg-white dark:bg-dark-900 border border-dark-200 dark:border-dark-800/80 text-dark-500 dark:text-dark-400 hover:bg-dark-50 dark:hover:bg-dark-800 hover:text-dark-700 dark:hover:text-dark-200 transition-colors shadow-sm cursor-pointer"
           >
             <FaChevronRight className="text-xs" />
           </button>

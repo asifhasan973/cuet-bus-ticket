@@ -11,10 +11,10 @@ const DashboardLayout = () => {
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       <main className="flex-1 overflow-x-hidden">
         {/* Mobile sidebar toggle */}
-        <div className="lg:hidden p-4 border-b border-dark-100">
+        <div className="lg:hidden p-4 border-b border-dark-100 dark:border-dark-800">
           <button
             onClick={() => setSidebarOpen(true)}
-            className="p-2 rounded-lg text-dark-600 hover:bg-dark-100 transition-colors"
+            className="p-2 rounded-lg text-dark-600 dark:text-dark-300 hover:bg-dark-100 dark:hover:bg-dark-800 transition-colors"
           >
             <HiMenuAlt2 className="text-xl" />
           </button>
