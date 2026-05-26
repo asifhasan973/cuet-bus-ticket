@@ -26,10 +26,10 @@ const SHIFT_GRADIENTS = {
 };
 
 const SHIFT_BG = {
-  1: 'bg-teal-50 border-teal-200 hover:border-amber-400',
-  2: 'bg-sky-50 border-sky-200 hover:border-sky-400',
-  3: 'bg-indigo-50 border-indigo-200 hover:border-indigo-400',
-  4: 'bg-slate-50 border-slate-200 hover:border-slate-400',
+  1: 'bg-teal-50 dark:bg-teal-950/20 border-teal-200 dark:border-teal-900/40 hover:border-amber-400',
+  2: 'bg-sky-50 dark:bg-sky-950/20 border-sky-200 dark:border-sky-900/40 hover:border-sky-400',
+  3: 'bg-indigo-50 dark:bg-indigo-950/20 border-indigo-200 dark:border-indigo-900/40 hover:border-indigo-400',
+  4: 'bg-slate-50 dark:bg-dark-800/40 border-slate-200 dark:border-dark-700 hover:border-slate-400',
 };
 
 const SHIFT_SELECTED = {
@@ -267,8 +267,8 @@ const SeatBooking = () => {
                     isSelected 
                       ? 'bg-white/20 text-white'
                       : shift.direction === 'inbound' 
-                        ? 'bg-accent-100 text-accent-700' 
-                        : 'bg-teal-100 text-teal-700'
+                        ? 'bg-accent-100 dark:bg-accent-950/40 text-accent-700 dark:text-accent-300' 
+                        : 'bg-teal-100 dark:bg-teal-950/40 text-teal-700 dark:text-teal-300'
                   }`}>
                     {shift.directionLabel}
                   </span>
@@ -276,12 +276,12 @@ const SeatBooking = () => {
                 <h3 className={`font-bold text-sm ${isSelected ? 'text-white' : 'text-dark-900 dark:text-dark-100'}`}>
                   Shift {shift.shift} — {shift.label}
                 </h3>
-                <div className={`flex items-center gap-1 mt-1.5 text-xs font-semibold ${isSelected ? 'text-white/80' : 'text-dark-500'}`}>
+                <div className={`flex items-center gap-1 mt-1.5 text-xs font-semibold ${isSelected ? 'text-white/80' : 'text-dark-500 dark:text-dark-400'}`}>
                   <FaClock className="text-[10px]" />
                   {shift.departure} → {shift.arrival}
                 </div>
                 {shift.specialRoute && (
-                  <p className={`mt-2 text-[11px] font-medium ${isSelected ? 'text-white/70' : 'text-dark-400'}`}>
+                  <p className={`mt-2 text-[11px] font-medium ${isSelected ? 'text-white/70' : 'text-dark-500 dark:text-dark-400'}`}>
                     {shift.specialRoute}
                   </p>
                 )}
@@ -332,13 +332,13 @@ const SeatBooking = () => {
                   </span>
                 </div>
                 <div className="p-4">
-                  <p className="text-xs text-dark-500 mb-2 line-clamp-1">{bus.route?.name}</p>
+                  <p className="text-xs text-dark-500 dark:text-dark-400 mb-2 line-clamp-1">{bus.route?.name}</p>
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1 text-xs text-dark-400">
+                    <div className="flex items-center gap-1 text-xs text-dark-400 dark:text-dark-500">
                       <FaMapMarkerAlt className="text-[10px]" />
                       {bus.route?.stops?.length} stops
                     </div>
-                    <span className="text-xs font-bold text-accent-600">
+                    <span className="text-xs font-bold text-accent-600 dark:text-accent-400">
                       {bus.availableSeats !== undefined ? `${bus.availableSeats}/${bus.totalSeats} empty` : `${bus.totalSeats} seats`}
                     </span>
                   </div>
@@ -362,7 +362,7 @@ const SeatBooking = () => {
           <div className="flex items-center gap-3 mb-4">
             <button
               onClick={() => { setSelectedBus(null); setSelectedSeat(null); }}
-              className="text-sm text-primary-600 hover:text-primary-700 font-semibold flex items-center gap-1 bg-primary-50 px-3 py-1.5 rounded-lg"
+              className="text-sm text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 font-semibold flex items-center gap-1 bg-primary-50 dark:bg-primary-950/20 px-3 py-1.5 rounded-lg"
             >
               ← Change Bus
             </button>
@@ -416,7 +416,7 @@ const SeatBooking = () => {
                   </div>
                   <div className="flex justify-between py-2">
                     <span className="text-dark-500 dark:text-dark-400">Available</span>
-                    <span className="font-bold text-accent-600">{selectedBus.availableSeats}</span>
+                    <span className="font-bold text-accent-600 dark:text-accent-400">{selectedBus.availableSeats}</span>
                   </div>
                 </div>
 
@@ -426,9 +426,9 @@ const SeatBooking = () => {
                     {selectedShift.specialRoute ? '🌟 Special Route' : '📍 Route'}
                   </p>
                   {selectedShift.specialRoute ? (
-                    <div className="bg-teal-50 border border-teal-200 rounded-xl p-3">
-                      <p className="text-sm font-semibold text-amber-800">{selectedShift.specialRoute}</p>
-                      <p className="text-xs text-amber-600 mt-1">{selectedShift.description}</p>
+                    <div className="bg-teal-50 dark:bg-teal-950/20 border border-teal-200 dark:border-teal-900/40 rounded-xl p-3">
+                      <p className="text-sm font-semibold text-amber-800 dark:text-amber-300">{selectedShift.specialRoute}</p>
+                      <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">{selectedShift.description}</p>
                     </div>
                   ) : (
                     <div className="space-y-2">
@@ -520,14 +520,14 @@ const SeatBooking = () => {
               </div>
             </div>
           </div>
-          <div className="bg-dark-50 dark:bg-dark-600/50 rounded-xl p-4">
+          <div className="bg-dark-50 dark:bg-dark-800/40 rounded-xl p-4">
             <div className="grid grid-cols-2 gap-3 text-sm">
-              <div><span className="text-dark-400 dark:text-dark-400">Bus:</span> <span className="font-bold dark:text-dark-100">{selectedBus?.busName}</span></div>
-              <div><span className="text-dark-400 dark:text-dark-400">Seat:</span> <span className="font-bold dark:text-dark-100">{getSeatLabel(selectedSeat)}</span></div>
-              <div><span className="text-dark-400 dark:text-dark-400">Route:</span> <span className="font-bold text-xs dark:text-dark-100">{selectedShift?.specialRoute || selectedBus?.route?.name}</span></div>
-              <div><span className="text-dark-400 dark:text-dark-400">Date:</span> <span className="font-bold text-accent-600 dark:text-accent-400">{new Date(selectedDate + 'T00:00:00').toLocaleDateString()}</span></div>
-              <div><span className="text-dark-400 dark:text-dark-400">Direction:</span> <span className="font-bold dark:text-dark-100">{selectedShift?.directionLabel}</span></div>
-              <div><span className="text-dark-400 dark:text-dark-400">Points:</span> <span className="font-bold text-primary-600 dark:text-primary-400">{user?.points ?? 0} remaining</span></div>
+              <div><span className="text-dark-500 dark:text-dark-400">Bus:</span> <span className="font-bold dark:text-dark-100">{selectedBus?.busName}</span></div>
+              <div><span className="text-dark-500 dark:text-dark-400">Seat:</span> <span className="font-bold dark:text-dark-100">{getSeatLabel(selectedSeat)}</span></div>
+              <div><span className="text-dark-500 dark:text-dark-400">Route:</span> <span className="font-bold text-xs dark:text-dark-100">{selectedShift?.specialRoute || selectedBus?.route?.name}</span></div>
+              <div><span className="text-dark-500 dark:text-dark-400">Date:</span> <span className="font-bold text-accent-600 dark:text-accent-400">{new Date(selectedDate + 'T00:00:00').toLocaleDateString()}</span></div>
+              <div><span className="text-dark-500 dark:text-dark-400">Direction:</span> <span className="font-bold dark:text-dark-100">{selectedShift?.directionLabel}</span></div>
+              <div><span className="text-dark-500 dark:text-dark-400">Points:</span> <span className="font-bold text-primary-600 dark:text-primary-400">{user?.points ?? 0} remaining</span></div>
             </div>
           </div>
           <p className="text-sm text-dark-500 dark:text-dark-400">
