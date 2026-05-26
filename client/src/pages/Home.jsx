@@ -259,7 +259,7 @@ const Home = () => {
       </section>
 
       {/* Features Section */}
-      <section className="py-20 bg-white dark:bg-dark-950 transition-colors duration-250">
+      <section className="py-20 bg-white dark:bg-dark-900 transition-colors duration-250">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <FadeIn>
             <div className="text-center mb-14">
@@ -347,7 +347,7 @@ const Home = () => {
                         <span className="font-bold text-accent-600 dark:text-accent-400">{bus.totalSeats} seats</span>
                       </div>
                     </div>
-                    <div className="px-4 py-3 border-t border-dark-100 dark:border-dark-800/80 bg-dark-50/50 dark:bg-dark-950/40 group-hover:bg-primary-50 dark:group-hover:bg-primary-950/20 transition-colors flex items-center justify-between">
+                    <div className="px-4 py-3 border-t border-dark-100 dark:border-dark-800/80 bg-dark-50/50 dark:bg-dark-900/40 group-hover:bg-primary-50 dark:group-hover:bg-primary-950/20 transition-colors flex items-center justify-between">
                       <span className="text-xs font-semibold text-primary-600 dark:text-primary-400">
                         {user ? 'View Details' : 'Login to Book'}
                       </span>
@@ -376,7 +376,7 @@ const Home = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-white dark:bg-dark-950 transition-colors duration-250">
+      <section className="py-20 bg-white dark:bg-dark-900 transition-colors duration-250">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <FadeIn>
             <motion.div

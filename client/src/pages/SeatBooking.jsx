@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import API from '../utils/api';
 import SeatGrid from '../components/ui/SeatGrid';
 import { SkeletonSeatBooking } from '../components/ui/Skeleton';
+import LoadingSpinner from '../components/ui/LoadingSpinner';
 import Modal from '../components/ui/Modal';
 import { toLocalDateInputValue } from '../utils/date';
 import { FaBus, FaClock, FaMapMarkerAlt, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
