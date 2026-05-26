@@ -197,20 +197,20 @@ const Home = () => {
 
         <div className="absolute bottom-0 left-0 right-0">
           <svg viewBox="0 0 1440 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M0,40 C360,80 720,0 1080,40 C1260,60 1380,60 1440,40 L1440,80 L0,80 Z" fill="var(--color-dark-50)" />
+            <path d="M0,40 C360,80 720,0 1080,40 C1260,60 1380,60 1440,40 L1440,80 L0,80 Z" className="fill-dark-50 dark:fill-dark-800" />
           </svg>
         </div>
       </section>
 
       {/* Shift Schedule Section */}
-      <section className="py-16 bg-dark-50">
+      <section className="py-16 bg-dark-50 dark:bg-dark-800/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <FadeIn>
             <div className="text-center mb-10">
-              <h2 className="text-3xl font-extrabold text-dark-900 tracking-tight">
+              <h2 className="text-3xl font-extrabold text-dark-900 dark:text-white tracking-tight">
                 Daily Shift Schedule
               </h2>
-              <p className="mt-3 text-dark-500 max-w-lg mx-auto">
+              <p className="mt-3 text-dark-500 dark:text-dark-400 max-w-lg mx-auto">
                 4 shifts covering morning to night — plan your commute
               </p>
             </div>
@@ -228,11 +228,11 @@ const Home = () => {
                     </div>
                     <div className="p-4 space-y-2">
                       <div className="flex items-center justify-between text-sm">
-                        <span className="text-dark-500">Time</span>
-                        <span className="font-bold text-dark-900">{s.time}</span>
+                        <span className="text-dark-500 dark:text-dark-400">Time</span>
+                        <span className="font-bold text-dark-900 dark:text-dark-100">{s.time}</span>
                       </div>
                       <div className="flex items-center justify-between text-sm">
-                        <span className="text-dark-500">Direction</span>
+                        <span className="text-dark-500 dark:text-dark-400">Direction</span>
                         <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
                           s.dir === 'CUET-bound' ? 'bg-accent-100 text-accent-700' : 'bg-teal-100 text-teal-700'
                         }`}>
@@ -240,8 +240,8 @@ const Home = () => {
                         </span>
                       </div>
                       <div className="flex items-center justify-between text-sm">
-                        <span className="text-dark-500">Days</span>
-                        <span className="font-semibold text-dark-700">{s.note}</span>
+                        <span className="text-dark-500 dark:text-dark-400">Days</span>
+                        <span className="font-semibold text-dark-700 dark:text-dark-200">{s.note}</span>
                       </div>
                     </div>
                   </div>
@@ -251,7 +251,7 @@ const Home = () => {
           </StaggerContainer>
 
           <FadeIn delay={0.4}>
-            <p className="text-center text-sm text-dark-400 mt-4">
+            <p className="text-center text-sm text-dark-400 dark:text-dark-500 mt-4">
              On weekends (Fri-Sat): Only Shifts 2 & 4 operate. Timings adjusted by ±30 min.
             </p>
           </FadeIn>

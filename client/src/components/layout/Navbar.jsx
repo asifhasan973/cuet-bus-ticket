@@ -26,7 +26,7 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-white/80 dark:bg-dark-900/80 backdrop-blur-xl border-b border-dark-100 dark:border-dark-800/80 sticky top-0 z-50 transition-colors duration-250">
+    <nav className="bg-white/90 dark:bg-dark-800/90 backdrop-blur-xl border-b border-dark-100 dark:border-dark-700/60 sticky top-0 z-50 transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
@@ -123,7 +123,7 @@ const Navbar = () => {
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            className="md:hidden border-t border-dark-100 dark:border-dark-800 bg-white/95 dark:bg-dark-900/95 backdrop-blur-xl overflow-hidden"
+            className="md:hidden border-t border-dark-100 dark:border-dark-700 bg-white/95 dark:bg-dark-800/95 backdrop-blur-xl overflow-hidden"
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}

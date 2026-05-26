@@ -67,8 +67,8 @@ const RoutePage = () => {
   return (
     <div className="max-w-5xl mx-auto px-4 py-8">
       <div className="text-center mb-10">
-        <h1 className="text-3xl font-extrabold text-dark-900">Routes & Schedule</h1>
-        <p className="text-dark-500 mt-2">All bus routes and shift schedule</p>
+        <h1 className="text-3xl font-extrabold text-dark-900 dark:text-white">Routes & Schedule</h1>
+        <p className="text-dark-500 dark:text-dark-400 mt-2">All bus routes and shift schedule</p>
       </div>
 
       {/* Shift Schedule Table */}
@@ -81,23 +81,23 @@ const RoutePage = () => {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b-2 border-dark-100">
-                  <th className="text-left py-3 px-4 text-xs font-bold text-dark-500 uppercase">Shift</th>
-                  <th className="text-left py-3 px-4 text-xs font-bold text-dark-500 uppercase">Weekday (Sun-Thu)</th>
-                  <th className="text-left py-3 px-4 text-xs font-bold text-dark-500 uppercase">Weekend (Fri-Sat)</th>
-                  <th className="text-left py-3 px-4 text-xs font-bold text-dark-500 uppercase">Direction</th>
-                  <th className="text-left py-3 px-4 text-xs font-bold text-dark-500 uppercase">Note</th>
+                <tr className="border-b-2 border-dark-100 dark:border-dark-600">
+                  <th className="text-left py-3 px-4 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">Shift</th>
+                  <th className="text-left py-3 px-4 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">Weekday (Sun-Thu)</th>
+                  <th className="text-left py-3 px-4 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">Weekend (Fri-Sat)</th>
+                  <th className="text-left py-3 px-4 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">Direction</th>
+                  <th className="text-left py-3 px-4 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">Note</th>
                 </tr>
               </thead>
               <tbody>
                 {SHIFT_SCHEDULE.map(s => (
-                  <tr key={s.shift} className="border-b border-dark-50 hover:bg-dark-50 transition-colors">
-                    <td className="py-3 px-4 font-bold text-dark-900">
+                  <tr key={s.shift} className="border-b border-dark-50 dark:border-dark-600/50 hover:bg-dark-50 dark:hover:bg-dark-600/30 transition-colors">
+                    <td className="py-3 px-4 font-bold text-dark-900 dark:text-dark-100">
                       <span className="mr-1.5">{s.icon}</span>
                       Shift {s.shift} — {s.label}
                     </td>
-                    <td className="py-3 px-4 font-semibold text-dark-700">{s.weekday}</td>
-                    <td className="py-3 px-4 font-semibold text-dark-500">{s.weekend}</td>
+                    <td className="py-3 px-4 font-semibold text-dark-700 dark:text-dark-200">{s.weekday}</td>
+                    <td className="py-3 px-4 font-semibold text-dark-500 dark:text-dark-400">{s.weekend}</td>
                     <td className="py-3 px-4">
                       <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${
                         s.dir === 'CUET-bound' ? 'bg-accent-100 text-accent-700' : 'bg-teal-100 text-teal-700'
@@ -105,7 +105,7 @@ const RoutePage = () => {
                         {s.dir}
                       </span>
                     </td>
-                    <td className="py-3 px-4 text-xs text-dark-500">{s.desc}</td>
+                    <td className="py-3 px-4 text-xs text-dark-500 dark:text-dark-400">{s.desc}</td>
                   </tr>
                 ))}
               </tbody>
@@ -117,9 +117,9 @@ const RoutePage = () => {
       {/* Flyover Buses */}
       {flyoverBuses.length > 0 && (
         <div className="mb-8">
-          <h2 className="text-lg font-bold text-dark-900 mb-4 flex items-center gap-2">
+          <h2 className="text-lg font-bold text-dark-900 dark:text-white mb-4 flex items-center gap-2">
            Flyover Buses
-            <span className="text-xs font-normal text-dark-400">({flyoverBuses.length} buses)</span>
+            <span className="text-xs font-normal text-dark-400 dark:text-dark-500">({flyoverBuses.length} buses)</span>
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {flyoverBuses.map(bus => (
@@ -136,17 +136,17 @@ const RoutePage = () => {
                   <span className="bg-white/20 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">FLYOVER</span>
                 </div>
                 <div className="p-4">
-                  <p className="text-sm text-dark-600 font-medium mb-3">{bus.route?.name}</p>
+                  <p className="text-sm text-dark-600 dark:text-dark-300 font-medium mb-3">{bus.route?.name}</p>
                   <div className="flex flex-wrap gap-1.5">
                     {bus.route?.stops?.map((stop, i) => (
-                      <span key={i} className="text-xs bg-dark-50 text-dark-600 px-2 py-1 rounded-md font-medium border border-dark-100">
+                      <span key={i} className="text-xs bg-dark-50 dark:bg-dark-600/50 text-dark-600 dark:text-dark-300 px-2 py-1 rounded-md font-medium border border-dark-100 dark:border-dark-600">
                         {stop.name}
                       </span>
                     ))}
                   </div>
-                  <div className="mt-3 flex items-center justify-between text-xs text-dark-400">
+                  <div className="mt-3 flex items-center justify-between text-xs text-dark-400 dark:text-dark-500">
                     <span className="flex items-center gap-1"><FaMapMarkerAlt /> {bus.route?.stops?.length} stops</span>
-                    <span className="font-bold text-dark-600">{bus.totalSeats} seats</span>
+                    <span className="font-bold text-dark-600 dark:text-dark-300">{bus.totalSeats} seats</span>
                   </div>
                 </div>
               </div>
@@ -157,9 +157,9 @@ const RoutePage = () => {
 
       {/* Regular Buses grouped by route */}
       <div>
-        <h2 className="text-lg font-bold text-dark-900 mb-4 flex items-center gap-2">
+        <h2 className="text-lg font-bold text-dark-900 dark:text-white mb-4 flex items-center gap-2">
          Regular Buses
-          <span className="text-xs font-normal text-dark-400">({regularBuses.length} buses)</span>
+          <span className="text-xs font-normal text-dark-400 dark:text-dark-500">({regularBuses.length} buses)</span>
         </h2>
         {Object.entries(routeGroups).map(([routeName, routeBuses]) => (
           <div key={routeName} className="mb-6">
@@ -176,20 +176,20 @@ const RoutePage = () => {
               <div className="p-5">
                 {/* Route stops timeline */}
                 <div className="mb-5">
-                  <p className="text-xs font-bold text-dark-500 uppercase mb-3">Route Stops</p>
+                   <p className="text-xs font-bold text-dark-500 dark:text-dark-400 uppercase mb-3">Route Stops</p>
                   <div className="flex flex-wrap items-center gap-2">
                     {routeBuses[0]?.route?.stops?.map((stop, i) => (
                       <div key={i} className="flex items-center">
-                        <div className="flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-lg border border-dark-100">
+                        <div className="flex items-center gap-1.5 bg-white dark:bg-dark-600/60 px-3 py-1.5 rounded-lg border border-dark-100 dark:border-dark-600">
                           <div className={`w-2.5 h-2.5 rounded-full ${
                             i === 0 ? 'bg-accent-500' :
                             i === routeBuses[0].route.stops.length - 1 ? 'bg-primary-500' :
                             'bg-dark-300'
                           }`} />
-                          <span className="text-sm font-medium text-dark-800">{stop.name}</span>
+                          <span className="text-sm font-medium text-dark-800 dark:text-dark-200">{stop.name}</span>
                         </div>
                         {i < routeBuses[0].route.stops.length - 1 && (
-                          <span className="text-dark-300 mx-1">→</span>
+                          <span className="text-dark-300 dark:text-dark-500 mx-1">→</span>
                         )}
                       </div>
                     ))}
@@ -197,26 +197,26 @@ const RoutePage = () => {
                 </div>
 
                 {/* Bus names */}
-                <p className="text-xs font-bold text-dark-500 uppercase mb-2">Buses</p>
+                 <p className="text-xs font-bold text-dark-500 dark:text-dark-400 uppercase mb-2">Buses</p>
                 <div className="flex flex-wrap gap-2">
                   {routeBuses.map(bus => (
                     <button
                       key={bus._id}
                       onClick={() => handleBusClick(bus._id)}
-                      className="flex items-center gap-2 bg-dark-50 hover:bg-primary-50 hover:border-primary-200 px-3 py-2 rounded-xl border border-dark-100 transition-all group"
+                      className="flex items-center gap-2 bg-dark-50 dark:bg-dark-600/50 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:border-primary-200 dark:hover:border-primary-800 px-3 py-2 rounded-xl border border-dark-100 dark:border-dark-600 transition-all group"
                     >
-                      <FaBus className="text-dark-400 group-hover:text-primary-600 text-xs" />
-                      <span className="text-sm font-bold text-dark-700 group-hover:text-primary-700">{bus.busName}</span>
-                      <span className="text-[10px] text-dark-400">{bus.totalSeats}s</span>
+                      <FaBus className="text-dark-400 group-hover:text-primary-600 dark:group-hover:text-primary-400 text-xs" />
+                      <span className="text-sm font-bold text-dark-700 dark:text-dark-200 group-hover:text-primary-700 dark:group-hover:text-primary-400">{bus.busName}</span>
+                      <span className="text-[10px] text-dark-400 dark:text-dark-500">{bus.totalSeats}s</span>
                     </button>
                   ))}
                 </div>
 
                 {/* Supervisor info */}
                 {routeBuses.some(b => b.supervisors?.length > 0) && (
-                  <div className="mt-4 pt-3 border-t border-dark-100">
-                    <span className="text-xs font-bold text-dark-500">Supervisors: </span>
-                    <span className="text-xs text-dark-600">
+                  <div className="mt-4 pt-3 border-t border-dark-100 dark:border-dark-600/50">
+                    <span className="text-xs font-bold text-dark-500 dark:text-dark-400">Supervisors: </span>
+                    <span className="text-xs text-dark-600 dark:text-dark-300">
                       {[...new Set(routeBuses.flatMap(b => b.supervisors?.map(s => s.name) || []))].join(', ') || 'None assigned'}
                     </span>
                   </div>

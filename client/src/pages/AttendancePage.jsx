@@ -201,7 +201,7 @@ const AttendancePage = () => {
                 <select
                   value={selectedBus}
                   onChange={(e) => setSelectedBus(e.target.value)}
-                  className="input-field !py-2 !pl-9 text-sm dark:bg-dark-900 dark:border-dark-800 dark:text-white"
+                  className="input-field !py-2 !pl-9 text-sm"
                 >
                   {buses.map(bus => (
                     <option key={bus._id} value={bus._id} className="dark:bg-dark-900">{bus.busName} - {bus.route?.name}</option>
