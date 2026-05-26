@@ -370,7 +370,7 @@ const AttendancePage = () => {
           <p className="text-sm text-dark-500 dark:text-dark-400 text-center">
             Point your camera at the student's ticket QR code.
           </p>
-          <div className="relative overflow-hidden rounded-xl bg-dark-950 border dark:border-dark-800">
+          <div className="relative overflow-hidden rounded-xl bg-dark-900 border dark:border-dark-800">
             <div id="qr-reader" className="w-full mx-auto overflow-hidden" />
           </div>
           <button

@@ -315,10 +315,10 @@ const StudentDashboard = () => {
         {selectedTicket && (
           <div className="space-y-6">
             {/* Boarding Pass Ticket Layout */}
-            <div className="border-2 border-dashed border-dark-200 dark:border-dark-800/80 rounded-2xl p-6 bg-gradient-to-b from-white to-dark-50/50 dark:from-dark-900 dark:to-dark-950/50 shadow-sm relative overflow-hidden">
+            <div className="border-2 border-dashed border-dark-200 dark:border-dark-800/80 rounded-2xl p-6 bg-gradient-to-b from-white to-dark-50/50 dark:from-dark-800 dark:to-dark-900/50 shadow-sm relative overflow-hidden">
               {/* Decorative side cutouts */}
-              <div className="absolute -left-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-dark-50 dark:bg-dark-950 border-r border-dark-200 dark:border-dark-800/80" />
-              <div className="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-dark-50 dark:bg-dark-950 border-l border-dark-200 dark:border-dark-800/80" />
+              <div className="absolute -left-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-dark-50 dark:bg-dark-900 border-r border-dark-200 dark:border-dark-800/80" />
+              <div className="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-dark-50 dark:bg-dark-900 border-l border-dark-200 dark:border-dark-800/80" />
               
               {/* Header */}
               <div className="flex justify-between items-center pb-4 border-b border-dark-100 dark:border-dark-800/80">
