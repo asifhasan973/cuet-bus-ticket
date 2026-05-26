@@ -175,14 +175,14 @@ const AdminBusManagement = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-extrabold text-dark-900">Bus Management</h1>
-          <p className="text-dark-500 text-sm mt-1">Manage {buses.length} buses • Schedules are shift-based (system-level)</p>
+          <h1 className="text-2xl font-extrabold text-dark-900 dark:text-white">Bus Management</h1>
+          <p className="text-dark-500 dark:text-dark-400 text-sm mt-1">Manage {buses.length} buses • Schedules are shift-based (system-level)</p>
         </div>
         <button
           onClick={() => setShowAddForm(!showAddForm)}
           className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-sm transition-all ${
             showAddForm
-              ? 'bg-dark-200 text-dark-700 hover:bg-dark-300'
+              ? 'bg-dark-200 dark:bg-dark-600 text-dark-700 dark:text-dark-200 hover:bg-dark-300 dark:hover:bg-dark-500'
               : 'bg-primary-600 text-white hover:bg-primary-700 shadow-sm'
           }`}
         >
@@ -198,23 +198,23 @@ const AdminBusManagement = () => {
         <div className="p-4">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
             {[
-              { shift: 1, icon: '', label: 'Morning', time: '6:30 AM → 8:00 AM', dir: 'CUET-bound', note: 'Weekdays only', color: 'bg-teal-50 border-teal-200' },
-              { shift: 2, icon: '', label: 'Afternoon', time: '2:00 PM → 3:00 PM', dir: 'Outbound', note: 'All days • Kaptai Rastar Matha', color: 'bg-sky-50 border-sky-200' },
-              { shift: 3, icon: '', label: 'Evening', time: '5:00 PM → 7:00 PM', dir: 'Outbound', note: 'Weekdays only', color: 'bg-indigo-50 border-indigo-200' },
-              { shift: 4, icon: '', label: 'Night', time: '9:00 PM → 10:30 PM', dir: 'CUET-bound', note: 'All days • From New Market', color: 'bg-slate-50 border-slate-200' },
+              { shift: 1, icon: '', label: 'Morning', time: '6:30 AM → 8:00 AM', dir: 'CUET-bound', note: 'Weekdays only', color: 'bg-teal-50 dark:bg-teal-950/20 border-teal-200 dark:border-teal-800/40 text-teal-700 dark:text-teal-300' },
+              { shift: 2, icon: '', label: 'Afternoon', time: '2:00 PM → 3:00 PM', dir: 'Outbound', note: 'All days • Kaptai Rastar Matha', color: 'bg-sky-50 dark:bg-sky-950/20 border-sky-200 dark:border-sky-800/40 text-sky-700 dark:text-sky-300' },
+              { shift: 3, icon: '', label: 'Evening', time: '5:00 PM → 7:00 PM', dir: 'Outbound', note: 'Weekdays only', color: 'bg-indigo-50 dark:bg-indigo-950/20 border-indigo-200 dark:border-indigo-800/40 text-indigo-700 dark:text-indigo-300' },
+              { shift: 4, icon: '', label: 'Night', time: '9:00 PM → 10:30 PM', dir: 'CUET-bound', note: 'All days • From New Market', color: 'bg-slate-50 dark:bg-dark-800/40 border-slate-200 dark:border-dark-700 text-slate-700 dark:text-dark-300' },
             ].map(s => (
               <div key={s.shift} className={`rounded-xl border-2 p-3 ${s.color}`}>
                 <div className="flex items-center gap-2 mb-1">
                   <span className="text-lg">{s.icon}</span>
-                  <span className="font-bold text-sm text-dark-900">Shift {s.shift}</span>
+                  <span className="font-bold text-sm text-dark-900 dark:text-white">Shift {s.shift}</span>
                 </div>
-                <p className="text-xs font-semibold text-dark-700">{s.label}</p>
-                <p className="text-[11px] text-dark-500 mt-1">{s.time}</p>
-                <p className="text-[10px] text-dark-400 mt-0.5">{s.note}</p>
+                <p className="text-xs font-semibold text-dark-700 dark:text-dark-200">{s.label}</p>
+                <p className="text-[11px] text-dark-500 dark:text-dark-400 mt-1">{s.time}</p>
+                <p className="text-[10px] text-dark-400 dark:text-dark-500 mt-0.5">{s.note}</p>
               </div>
             ))}
           </div>
-          <p className="text-[11px] text-dark-400 mt-3">
+          <p className="text-[11px] text-dark-400 dark:text-dark-500 mt-3">
            Weekend shifts (Fri-Sat): Shift 2 → 2:30 PM, Shift 4 → 8:30 PM. Shifts 1 & 3 don't run.
           </p>
         </div>
@@ -231,19 +231,21 @@ const AdminBusManagement = () => {
           <form onSubmit={handleAddBus} className="p-6 space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
               <div>
-                <label className="block text-sm font-semibold text-dark-700 mb-1.5">Bus Name *</label>
+                <label className="block text-sm font-semibold text-dark-700 dark:text-dark-200 mb-1.5">Bus Name *</label>
                 <input type="text" value={formData.busName}
                   onChange={(e) => setFormData({ ...formData, busName: e.target.value })}
                   className="input-field" placeholder="e.g. Halda" required />
               </div>
               <div>
-                <label className="block text-sm font-semibold text-dark-700 mb-1.5">Bus Type *</label>
+                <label className="block text-sm font-semibold text-dark-700 dark:text-dark-200 mb-1.5">Bus Type *</label>
                 <div className="flex gap-2 mt-1">
                   {['regular', 'flyover'].map(t => (
                     <button key={t} type="button"
                       onClick={() => setFormData({ ...formData, busType: t })}
                       className={`px-4 py-2.5 rounded-xl text-sm font-semibold capitalize transition-all flex-1 ${
-                        formData.busType === t ? 'bg-primary-600 text-white' : 'bg-dark-100 text-dark-500 hover:bg-dark-200'
+                        formData.busType === t 
+                          ? 'bg-primary-600 text-white' 
+                          : 'bg-dark-100 dark:bg-dark-800 text-dark-500 dark:text-dark-400 hover:bg-dark-200 dark:hover:bg-dark-700'
                       }`}>
                       {t}
                     </button>
@@ -251,13 +253,13 @@ const AdminBusManagement = () => {
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-semibold text-dark-700 mb-1.5">Route Name *</label>
+                <label className="block text-sm font-semibold text-dark-700 dark:text-dark-200 mb-1.5">Route Name *</label>
                 <input type="text" value={formData.routeName}
                   onChange={(e) => setFormData({ ...formData, routeName: e.target.value })}
                   className="input-field" placeholder="e.g. CUET → GEC → New Market" required />
               </div>
               <div>
-                <label className="block text-sm font-semibold text-dark-700 mb-1.5">Total Seats</label>
+                <label className="block text-sm font-semibold text-dark-700 dark:text-dark-200 mb-1.5">Total Seats</label>
                 <input type="number" value={formData.totalSeats} min="10" max="80"
                   onChange={(e) => setFormData({ ...formData, totalSeats: parseInt(e.target.value) })}
                   className="input-field" />
@@ -266,7 +268,7 @@ const AdminBusManagement = () => {
 
             {/* Supervisors */}
             <div>
-              <label className="block text-sm font-semibold text-dark-700 mb-1.5">Assign Supervisors</label>
+              <label className="block text-sm font-semibold text-dark-700 dark:text-dark-200 mb-1.5">Assign Supervisors</label>
               <div className="flex flex-wrap gap-2">
                 {supervisors.map(s => {
                   const isSelected = formData.supervisors.includes(s._id);
@@ -279,29 +281,31 @@ const AdminBusManagement = () => {
                         });
                       }}
                       className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                        isSelected ? 'bg-primary-600 text-white' : 'bg-dark-100 text-dark-500 hover:bg-dark-200'
+                        isSelected 
+                          ? 'bg-primary-600 text-white' 
+                          : 'bg-dark-100 dark:bg-dark-800 text-dark-500 dark:text-dark-400 hover:bg-dark-200 dark:hover:bg-dark-700'
                       }`}>
                       {s.name}
                     </button>
                   );
                 })}
-                {supervisors.length === 0 && <span className="text-xs text-dark-400">No supervisors available</span>}
+                {supervisors.length === 0 && <span className="text-xs text-dark-400 dark:text-dark-500">No supervisors available</span>}
               </div>
             </div>
 
             {/* Stops */}
             <div>
               <div className="flex items-center justify-between mb-2">
-                <label className="block text-sm font-semibold text-dark-700">Route Stops</label>
+                <label className="block text-sm font-semibold text-dark-700 dark:text-dark-200">Route Stops</label>
                 <button type="button" onClick={addStop}
-                  className="text-xs text-primary-600 font-semibold hover:text-primary-700 flex items-center gap-1">
+                  className="text-xs text-primary-600 dark:text-primary-400 font-semibold hover:text-primary-700 flex items-center gap-1">
                   <FaPlus className="text-[10px]" /> Add Stop
                 </button>
               </div>
               <div className="space-y-2">
                 {formData.stops.map((stop, i) => (
                   <div key={i} className="flex items-center gap-2">
-                    <span className="w-6 h-6 flex items-center justify-center bg-primary-100 text-primary-700 rounded-full text-xs font-bold flex-shrink-0">
+                    <span className="w-6 h-6 flex items-center justify-center bg-primary-100 dark:bg-primary-950/40 text-primary-700 dark:text-primary-300 rounded-full text-xs font-bold flex-shrink-0">
                       {i + 1}
                     </span>
                     <input type="text" value={stop.name} placeholder="Stop name"
@@ -320,7 +324,7 @@ const AdminBusManagement = () => {
 
             <div className="flex justify-end gap-3 pt-2">
               <button type="button" onClick={() => setShowAddForm(false)}
-                className="px-5 py-2.5 rounded-xl text-sm font-semibold bg-dark-100 text-dark-600 hover:bg-dark-200 transition-all">
+                className="px-5 py-2.5 rounded-xl text-sm font-semibold bg-dark-100 dark:bg-dark-800 text-dark-600 dark:text-dark-300 hover:bg-dark-200 dark:hover:bg-dark-700 transition-all">
                 Cancel
               </button>
               <button type="submit"
@@ -335,7 +339,7 @@ const AdminBusManagement = () => {
       {/* Bus List */}
       <div className="space-y-3">
         {buses.map(bus => (
-          <div key={bus._id} className="card !p-0 overflow-hidden">
+          <div key={bus._id} className="card !p-0 overflow-hidden border border-dark-100 dark:border-dark-600/50">
             {/* Header Row */}
             <div className="flex items-center justify-between px-5 py-4">
               <div
@@ -343,47 +347,49 @@ const AdminBusManagement = () => {
                 onClick={() => setExpandedBus(expandedBus === bus._id ? null : bus._id)}
               >
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-                  bus.status === 'active' ? 'bg-accent-100 text-accent-600' :
-                  bus.status === 'maintenance' ? 'bg-warning-50 text-warning-500' :
-                  'bg-dark-100 text-dark-400'
+                  bus.status === 'active' ? 'bg-accent-100 dark:bg-accent-950/40 text-accent-600 dark:text-accent-400' :
+                  bus.status === 'maintenance' ? 'bg-warning-50 dark:bg-warning-950/20 text-warning-500 dark:text-warning-400' :
+                  'bg-dark-100 dark:bg-dark-800 text-dark-400 dark:text-dark-500'
                 }`}>
                   <FaBus />
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <h3 className="font-bold text-dark-900">{bus.busName}</h3>
+                    <h3 className="font-bold text-dark-900 dark:text-white">{bus.busName}</h3>
                     <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
-                      bus.busType === 'flyover' ? 'bg-violet-100 text-violet-700' : 'bg-dark-100 text-dark-500'
+                      bus.busType === 'flyover' 
+                        ? 'bg-violet-100 dark:bg-violet-950/40 text-violet-700 dark:text-violet-300' 
+                        : 'bg-dark-100 dark:bg-dark-600 text-dark-500 dark:text-dark-300'
                     }`}>
                       {bus.busType}
                     </span>
                     <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
-                      bus.status === 'active' ? 'bg-accent-100 text-accent-700' :
-                      bus.status === 'maintenance' ? 'bg-warning-50 text-warning-600' :
-                      'bg-dark-100 text-dark-500'
+                      bus.status === 'active' ? 'bg-accent-100 dark:bg-accent-950/40 text-accent-700 dark:text-accent-300' :
+                      bus.status === 'maintenance' ? 'bg-warning-50 dark:bg-warning-950/30 text-warning-600 dark:text-warning-400' :
+                      'bg-dark-100 dark:bg-dark-600 text-dark-500 dark:text-dark-300'
                     }`}>
                       {bus.status}
                     </span>
                   </div>
-                  <p className="text-sm text-dark-500 line-clamp-1">{bus.route?.name}</p>
+                  <p className="text-sm text-dark-500 dark:text-dark-400 line-clamp-1">{bus.route?.name}</p>
                 </div>
               </div>
 
               <div className="flex items-center gap-4">
-                <div className="hidden sm:flex items-center gap-4 text-sm text-dark-500 mr-4">
+                <div className="hidden sm:flex items-center gap-4 text-sm text-dark-500 dark:text-dark-400 mr-4">
                   <span>{bus.totalSeats} seats</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <button onClick={() => startEdit(bus)}
-                    className="p-2 rounded-lg text-dark-400 hover:text-primary-600 hover:bg-primary-50 transition-all">
+                    className="p-2 rounded-lg text-dark-400 dark:text-dark-500 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-950/20 transition-all">
                     <FaEdit />
                   </button>
                   <button onClick={() => handleDeleteBus(bus._id, bus.busName)}
-                    className="p-2 rounded-lg text-dark-400 hover:text-danger-500 hover:bg-danger-50 transition-all">
+                    className="p-2 rounded-lg text-dark-400 dark:text-dark-500 hover:text-danger-500 dark:hover:text-danger-400 hover:bg-danger-50 dark:hover:bg-danger-950/20 transition-all">
                     <FaTrash />
                   </button>
                   <button onClick={() => setExpandedBus(expandedBus === bus._id ? null : bus._id)}
-                    className="p-2 rounded-lg text-dark-400 hover:text-dark-600 hover:bg-dark-100 transition-all">
+                    className="p-2 rounded-lg text-dark-400 dark:text-dark-500 hover:text-dark-600 dark:hover:text-dark-300 hover:bg-dark-100 dark:hover:bg-dark-800 transition-all">
                     {expandedBus === bus._id ? <HiChevronUp /> : <HiChevronDown />}
                   </button>
                 </div>
@@ -392,25 +398,27 @@ const AdminBusManagement = () => {
 
             {/* Expanded Section */}
             {expandedBus === bus._id && (
-              <div className="border-t border-dark-100 px-5 py-4 bg-dark-50/50">
+              <div className="border-t border-dark-100 dark:border-dark-600/50 px-5 py-4 bg-dark-50/50 dark:bg-dark-800/30">
                 {editingBus === bus._id ? (
                   /* ─── Edit Mode ─── */
                   <div className="space-y-4">
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                       <div>
-                        <label className="block text-xs font-semibold text-dark-500 mb-1">Bus Name</label>
+                        <label className="block text-xs font-semibold text-dark-500 dark:text-dark-400 mb-1">Bus Name</label>
                         <input type="text" value={editData.busName}
                           onChange={(e) => setEditData({ ...editData, busName: e.target.value })}
                           className="input-field text-sm" />
                       </div>
                       <div>
-                        <label className="block text-xs font-semibold text-dark-500 mb-1">Bus Type</label>
+                        <label className="block text-xs font-semibold text-dark-500 dark:text-dark-400 mb-1">Bus Type</label>
                         <div className="flex gap-2">
                           {['regular', 'flyover'].map(t => (
                             <button key={t} type="button"
                               onClick={() => setEditData({ ...editData, busType: t })}
                               className={`px-3 py-2 rounded-lg text-xs font-semibold capitalize transition-all flex-1 ${
-                                editData.busType === t ? 'bg-primary-600 text-white' : 'bg-dark-100 text-dark-500 hover:bg-dark-200'
+                                editData.busType === t 
+                                  ? 'bg-primary-600 text-white' 
+                                  : 'bg-dark-100 dark:bg-dark-800 text-dark-500 dark:text-dark-400 hover:bg-dark-200 dark:hover:bg-dark-700'
                               }`}>
                               {t}
                             </button>
@@ -418,13 +426,13 @@ const AdminBusManagement = () => {
                         </div>
                       </div>
                       <div>
-                        <label className="block text-xs font-semibold text-dark-500 mb-1">Route Name</label>
+                        <label className="block text-xs font-semibold text-dark-500 dark:text-dark-400 mb-1">Route Name</label>
                         <input type="text" value={editData.routeName}
                           onChange={(e) => setEditData({ ...editData, routeName: e.target.value })}
                           className="input-field text-sm" />
                       </div>
                       <div>
-                        <label className="block text-xs font-semibold text-dark-500 mb-1">Total Seats</label>
+                        <label className="block text-xs font-semibold text-dark-500 dark:text-dark-400 mb-1">Total Seats</label>
                         <input type="number" min="10" max="80" value={editData.totalSeats}
                           onChange={(e) => setEditData({ ...editData, totalSeats: parseInt(e.target.value) })}
                           className="input-field text-sm" />
@@ -433,7 +441,7 @@ const AdminBusManagement = () => {
 
                     {/* Status */}
                     <div>
-                      <label className="block text-xs font-semibold text-dark-500 mb-1">Status</label>
+                      <label className="block text-xs font-semibold text-dark-500 dark:text-dark-400 mb-1">Status</label>
                       <div className="flex gap-2">
                         {['active', 'inactive', 'maintenance'].map(s => (
                           <button key={s} type="button"
@@ -443,7 +451,7 @@ const AdminBusManagement = () => {
                                 ? s === 'active' ? 'bg-accent-600 text-white'
                                 : s === 'maintenance' ? 'bg-warning-500 text-white'
                                 : 'bg-dark-600 text-white'
-                                : 'bg-dark-100 text-dark-500 hover:bg-dark-200'
+                                : 'bg-dark-100 dark:bg-dark-800 text-dark-500 dark:text-dark-400 hover:bg-dark-200 dark:hover:bg-dark-700'
                             }`}>
                             {s}
                           </button>
@@ -453,7 +461,7 @@ const AdminBusManagement = () => {
 
                     {/* Supervisors */}
                     <div>
-                      <label className="block text-xs font-semibold text-dark-500 mb-1">Assign Supervisors</label>
+                      <label className="block text-xs font-semibold text-dark-500 dark:text-dark-400 mb-1">Assign Supervisors</label>
                       <div className="flex flex-wrap gap-2">
                         {supervisors.map(s => {
                           const isSelected = editData.supervisors.includes(s._id);
@@ -466,7 +474,9 @@ const AdminBusManagement = () => {
                                 });
                               }}
                               className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                                isSelected ? 'bg-primary-600 text-white' : 'bg-dark-100 text-dark-500 hover:bg-dark-200'
+                                isSelected 
+                                  ? 'bg-primary-600 text-white' 
+                                  : 'bg-dark-100 dark:bg-dark-800 text-dark-500 dark:text-dark-400 hover:bg-dark-200 dark:hover:bg-dark-700'
                               }`}>
                               {s.name}
                             </button>
@@ -478,16 +488,16 @@ const AdminBusManagement = () => {
                     {/* Editable Stops */}
                     <div>
                       <div className="flex items-center justify-between mb-2">
-                        <label className="block text-xs font-semibold text-dark-500">Route Stops</label>
+                        <label className="block text-xs font-semibold text-dark-500 dark:text-dark-400">Route Stops</label>
                         <button type="button" onClick={addEditStop}
-                          className="text-xs text-primary-600 font-semibold hover:text-primary-700 flex items-center gap-1">
+                          className="text-xs text-primary-600 dark:text-primary-400 font-semibold hover:text-primary-700 flex items-center gap-1">
                           <FaPlus className="text-[10px]" /> Add Stop
                         </button>
                       </div>
                       <div className="space-y-2">
                         {editData.stops.map((stop, i) => (
                           <div key={i} className="flex items-center gap-2">
-                            <span className="w-5 h-5 flex items-center justify-center bg-primary-100 text-primary-700 rounded-full text-[10px] font-bold flex-shrink-0">
+                            <span className="w-5 h-5 flex items-center justify-center bg-primary-100 dark:bg-primary-950/40 text-primary-700 dark:text-primary-300 rounded-full text-[10px] font-bold flex-shrink-0">
                               {i + 1}
                             </span>
                             <input type="text" value={stop.name} placeholder="Stop name"
@@ -510,7 +520,7 @@ const AdminBusManagement = () => {
                         <FaSave /> Save Changes
                       </button>
                       <button onClick={() => setEditingBus(null)}
-                        className="px-4 py-2 rounded-xl text-sm font-semibold bg-dark-100 text-dark-600 hover:bg-dark-200 transition-all">
+                        className="px-4 py-2 rounded-xl text-sm font-semibold bg-dark-100 dark:bg-dark-800 text-dark-600 dark:text-dark-300 hover:bg-dark-200 dark:hover:bg-dark-700 transition-all">
                         Cancel
                       </button>
                     </div>
@@ -520,29 +530,29 @@ const AdminBusManagement = () => {
                   <div>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-4">
                       <div>
-                        <p className="text-xs text-dark-400 font-medium">Supervisors</p>
-                        <p className="text-sm font-semibold text-dark-800">
+                        <p className="text-xs text-dark-400 dark:text-dark-500 font-medium">Supervisors</p>
+                        <p className="text-sm font-semibold text-dark-800 dark:text-dark-200">
                           {bus.supervisors?.length > 0 ? bus.supervisors.map(s => s.name).join(', ') : 'Unassigned'}
                         </p>
                       </div>
                       <div>
-                        <p className="text-xs text-dark-400 font-medium">Total Seats</p>
-                        <p className="text-sm font-semibold text-dark-800">{bus.totalSeats}</p>
+                        <p className="text-xs text-dark-400 dark:text-dark-500 font-medium">Total Seats</p>
+                        <p className="text-sm font-semibold text-dark-800 dark:text-dark-200">{bus.totalSeats}</p>
                       </div>
                       <div>
-                        <p className="text-xs text-dark-400 font-medium">Type</p>
-                        <p className="text-sm font-semibold text-dark-800 capitalize">{bus.busType}</p>
+                        <p className="text-xs text-dark-400 dark:text-dark-500 font-medium">Type</p>
+                        <p className="text-sm font-semibold text-dark-800 dark:text-dark-200 capitalize">{bus.busType}</p>
                       </div>
                     </div>
                     <div>
-                      <p className="text-xs text-dark-400 font-medium mb-2">Route Stops</p>
+                      <p className="text-xs text-dark-400 dark:text-dark-500 font-medium mb-2">Route Stops</p>
                       <div className="flex flex-wrap gap-2">
                         {bus.route?.stops?.map((stop, i) => (
-                          <div key={i} className="flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-lg border border-dark-100 text-sm">
-                            <span className="w-4 h-4 flex items-center justify-center bg-primary-100 text-primary-700 rounded-full text-[9px] font-bold">
+                          <div key={i} className="flex items-center gap-1.5 bg-white dark:bg-dark-700 px-3 py-1.5 rounded-lg border border-dark-100 dark:border-dark-600 text-sm">
+                            <span className="w-4 h-4 flex items-center justify-center bg-primary-100 dark:bg-primary-950/40 text-primary-700 dark:text-primary-300 rounded-full text-[9px] font-bold">
                               {stop.order}
                             </span>
-                            <span className="font-medium text-dark-800">{stop.name}</span>
+                            <span className="font-medium text-dark-800 dark:text-dark-200">{stop.name}</span>
                           </div>
                         ))}
                       </div>
@@ -556,9 +566,9 @@ const AdminBusManagement = () => {
 
         {buses.length === 0 && (
           <div className="card text-center py-10">
-            <FaBus className="text-4xl text-dark-300 mx-auto mb-3" />
-            <h3 className="font-bold text-dark-900 text-lg">No Buses Yet</h3>
-            <p className="text-dark-500 text-sm mt-1">Click "Add New Bus" to create one</p>
+            <FaBus className="text-4xl text-dark-300 dark:text-dark-600 mx-auto mb-3" />
+            <h3 className="font-bold text-dark-900 dark:text-white text-lg">No Buses Yet</h3>
+            <p className="text-dark-500 dark:text-dark-400 text-sm mt-1">Click "Add New Bus" to create one</p>
           </div>
         )}
       </div>

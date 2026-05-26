@@ -9,10 +9,10 @@ import toast from 'react-hot-toast';
 const SHIFT_ICONS = { 1: '', 2: '', 3: '', 4: '' };
 const SHIFT_LABELS = { 1: 'Morning', 2: 'Afternoon', 3: 'Evening', 4: 'Night' };
 const SHIFT_COLORS = {
-  1: 'bg-teal-100 text-teal-700',
-  2: 'bg-sky-100 text-sky-700',
-  3: 'bg-indigo-100 text-indigo-700',
-  4: 'bg-slate-200 text-slate-700',
+  1: 'bg-teal-100 dark:bg-teal-950/40 text-teal-700 dark:text-teal-300',
+  2: 'bg-sky-100 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300',
+  3: 'bg-indigo-100 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300',
+  4: 'bg-slate-200 dark:bg-dark-600 text-slate-700 dark:text-dark-300',
 };
 
 const AdminDashboard = () => {
@@ -123,8 +123,8 @@ const AdminDashboard = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-extrabold text-dark-900">Admin Dashboard</h1>
-        <p className="text-dark-500 text-sm mt-1">System overview and management</p>
+        <h1 className="text-2xl font-extrabold text-dark-900 dark:text-white">Admin Dashboard</h1>
+        <p className="text-dark-500 dark:text-dark-400 text-sm mt-1">System overview and management</p>
       </div>
 
       {/* Stats */}
@@ -137,13 +137,15 @@ const AdminDashboard = () => {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 bg-dark-100 p-1 rounded-xl w-fit">
+      <div className="flex gap-1 bg-dark-100 dark:bg-dark-800 p-1 rounded-xl w-fit">
         {['overview', 'users'].map(tab => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all capitalize ${
-              activeTab === tab ? 'bg-white text-dark-900 shadow-sm' : 'text-dark-500 hover:text-dark-700'
+              activeTab === tab 
+                ? 'bg-white dark:bg-dark-600 text-dark-900 dark:text-white shadow-sm' 
+                : 'text-dark-500 dark:text-dark-400 hover:text-dark-700 dark:hover:text-dark-200'
             }`}
           >
             {tab}
@@ -154,43 +156,43 @@ const AdminDashboard = () => {
       {activeTab === 'overview' && (
         /* Recent Bookings */
         <div className="card !p-0 overflow-hidden">
-          <div className="px-6 py-4 border-b border-dark-100">
-            <h2 className="font-bold text-dark-900">Recent Bookings</h2>
+          <div className="px-6 py-4 border-b border-dark-100 dark:border-dark-600/50">
+            <h2 className="font-bold text-dark-900 dark:text-white">Recent Bookings</h2>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-dark-50">
+              <thead className="bg-dark-50 dark:bg-dark-800">
                 <tr>
-                  <th className="text-left px-6 py-3 text-xs font-bold text-dark-500 uppercase">Student</th>
-                  <th className="text-left px-6 py-3 text-xs font-bold text-dark-500 uppercase">Bus</th>
-                  <th className="text-left px-6 py-3 text-xs font-bold text-dark-500 uppercase">Shift</th>
-                  <th className="text-left px-6 py-3 text-xs font-bold text-dark-500 uppercase">Seat</th>
-                  <th className="text-left px-6 py-3 text-xs font-bold text-dark-500 uppercase">Date</th>
+                  <th className="text-left px-6 py-3 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">Student</th>
+                  <th className="text-left px-6 py-3 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">Bus</th>
+                  <th className="text-left px-6 py-3 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">Shift</th>
+                  <th className="text-left px-6 py-3 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">Seat</th>
+                  <th className="text-left px-6 py-3 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">Date</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-dark-100">
+              <tbody className="divide-y divide-dark-100 dark:divide-dark-600/50">
                 {stats?.recentBookings?.map(booking => (
-                  <tr key={booking._id} className="hover:bg-dark-50 transition-colors">
-                    <td className="px-6 py-4 text-sm font-medium text-dark-900">
-                      {booking.student?.name} <span className="text-dark-400">({booking.student?.studentId})</span>
+                  <tr key={booking._id} className="hover:bg-dark-50 dark:hover:bg-dark-600/20 transition-colors">
+                    <td className="px-6 py-4 text-sm font-medium text-dark-900 dark:text-dark-100">
+                      {booking.student?.name} <span className="text-dark-400 dark:text-dark-500">({booking.student?.studentId})</span>
                     </td>
-                    <td className="px-6 py-4 text-sm text-dark-600">{booking.bus?.busName}</td>
+                    <td className="px-6 py-4 text-sm text-dark-600 dark:text-dark-300">{booking.bus?.busName}</td>
                     <td className="px-6 py-4">
                       <span className={`px-2 py-1 rounded-full text-[10px] font-bold ${SHIFT_COLORS[booking.shift]}`}>
                         {SHIFT_ICONS[booking.shift]} {SHIFT_LABELS[booking.shift]}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-sm font-bold text-dark-900">
+                    <td className="px-6 py-4 text-sm font-bold text-dark-900 dark:text-dark-100">
                       {String.fromCharCode(65 + Math.floor((booking.seatNumber - 1) / 5))}{((booking.seatNumber - 1) % 5) + 1}
                     </td>
-                    <td className="px-6 py-4 text-sm font-semibold text-accent-700">
+                    <td className="px-6 py-4 text-sm font-semibold text-accent-700 dark:text-accent-400">
                       {new Date(booking.travelDate + 'T00:00:00').toLocaleDateString()}
                     </td>
                   </tr>
                 ))}
                 {(!stats?.recentBookings || stats.recentBookings.length === 0) && (
                   <tr>
-                    <td colSpan="5" className="px-6 py-8 text-center text-dark-400 text-sm">No recent bookings</td>
+                    <td colSpan="5" className="px-6 py-8 text-center text-dark-400 dark:text-dark-500 text-sm">No recent bookings</td>
                   </tr>
                 )}
               </tbody>
@@ -208,7 +210,9 @@ const AdminDashboard = () => {
                 key={filter}
                 onClick={() => setUserFilter(filter)}
                 className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all capitalize ${
-                  userFilter === filter ? 'bg-primary-600 text-white' : 'bg-dark-100 text-dark-600 hover:bg-dark-200'
+                  userFilter === filter 
+                    ? 'bg-primary-600 text-white' 
+                    : 'bg-dark-100 dark:bg-dark-800 text-dark-600 dark:text-dark-400 hover:bg-dark-200 dark:hover:bg-dark-700'
                 }`}
               >
                 {filter || 'All'}
@@ -219,29 +223,29 @@ const AdminDashboard = () => {
           <div className="card !p-0 overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-dark-50">
+                <thead className="bg-dark-50 dark:bg-dark-800">
                   <tr>
-                    <th className="text-left px-6 py-3 text-xs font-bold text-dark-500 uppercase">Name</th>
-                    <th className="text-left px-6 py-3 text-xs font-bold text-dark-500 uppercase">Email</th>
-                    <th className="text-left px-6 py-3 text-xs font-bold text-dark-500 uppercase">Role</th>
-                    <th className="text-left px-6 py-3 text-xs font-bold text-dark-500 uppercase">ID</th>
-                    <th className="text-left px-6 py-3 text-xs font-bold text-dark-500 uppercase">Points</th>
-                    <th className="text-right px-6 py-3 text-xs font-bold text-dark-500 uppercase">Actions</th>
+                    <th className="text-left px-6 py-3 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">Name</th>
+                    <th className="text-left px-6 py-3 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">Email</th>
+                    <th className="text-left px-6 py-3 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">Role</th>
+                    <th className="text-left px-6 py-3 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">ID</th>
+                    <th className="text-left px-6 py-3 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">Points</th>
+                    <th className="text-right px-6 py-3 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-dark-100">
+                <tbody className="divide-y divide-dark-100 dark:divide-dark-600/50">
                   {users.map(u => (
-                    <tr key={u._id} className="hover:bg-dark-50 transition-colors">
-                      <td className="px-6 py-4 text-sm font-semibold text-dark-900">{u.name}</td>
-                      <td className="px-6 py-4 text-sm text-dark-600">{u.email}</td>
+                    <tr key={u._id} className="hover:bg-dark-50 dark:hover:bg-dark-600/20 transition-colors">
+                      <td className="px-6 py-4 text-sm font-semibold text-dark-900 dark:text-dark-100">{u.name}</td>
+                      <td className="px-6 py-4 text-sm text-dark-600 dark:text-dark-300">{u.email}</td>
                       <td className="px-6 py-4">
                         <select 
                           value={u.role}
                           onChange={(e) => updateRole(u._id, e.target.value)}
-                          className={`px-2 py-1 rounded-lg text-xs font-bold uppercase border-2 focus:outline-none ${
-                            u.role === 'admin' ? 'bg-purple-50 text-purple-700 border-purple-200' :
-                            u.role === 'supervisor' ? 'bg-accent-50 text-accent-700 border-accent-200' :
-                            'bg-primary-50 text-primary-700 border-primary-200'
+                          className={`px-2 py-1 rounded-lg text-xs font-bold uppercase border-2 focus:outline-none bg-white dark:bg-dark-600 ${
+                            u.role === 'admin' ? 'bg-purple-50 dark:bg-purple-950/30 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-800/40' :
+                            u.role === 'supervisor' ? 'bg-accent-50 dark:bg-accent-950/30 text-accent-700 dark:text-accent-300 border-accent-200 dark:border-accent-800/40' :
+                            'bg-primary-50 dark:bg-primary-950/30 text-primary-700 dark:text-primary-300 border-primary-200 dark:border-primary-800/40'
                           }`}
                         >
                           <option value="student">STUDENT</option>
@@ -252,7 +256,7 @@ const AdminDashboard = () => {
                           <div className="mt-2">
                             <div className="flex flex-wrap gap-1 mb-1">
                               {buses.filter(b => b.supervisors?.some(s => (s._id || s) === u._id)).map(bus => (
-                                <span key={bus._id} className="text-[10px] bg-dark-100 text-dark-600 px-1.5 py-0.5 rounded font-semibold">
+                                <span key={bus._id} className="text-[10px] bg-dark-100 dark:bg-dark-600 text-dark-600 dark:text-dark-300 px-1.5 py-0.5 rounded font-semibold">
                                   {bus.busName}
                                 </span>
                               ))}
@@ -262,27 +266,27 @@ const AdminDashboard = () => {
                                 setSelectedBuses(buses.filter(b => b.supervisors?.some(s => (s._id || s) === u._id)).map(b => b._id)); 
                                 setShowBusModal(true); 
                               }}
-                              className="text-[10px] text-primary-600 font-bold hover:underline">
+                              className="text-[10px] text-primary-600 dark:text-primary-400 font-bold hover:underline">
                               + Manage Buses
                             </button>
                           </div>
                         )}
                       </td>
-                      <td className="px-6 py-4 text-sm text-dark-500">{u.studentId || u.employeeId || '-'}</td>
+                      <td className="px-6 py-4 text-sm text-dark-500 dark:text-dark-400">{u.studentId || u.employeeId || '-'}</td>
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-1">
                           <button onClick={() => updatePoints(u._id, u.points, -1)}
-                            className="w-6 h-6 flex items-center justify-center bg-dark-100 hover:bg-dark-200 rounded text-dark-600 font-bold">-</button>
-                          <span className="w-8 text-center text-sm font-bold text-dark-900">{u.points}</span>
+                            className="w-6 h-6 flex items-center justify-center bg-dark-100 dark:bg-dark-600 hover:bg-dark-200 dark:hover:bg-dark-500 rounded text-dark-600 dark:text-dark-300 font-bold">-</button>
+                          <span className="w-8 text-center text-sm font-bold text-dark-900 dark:text-dark-100">{u.points}</span>
                           <button onClick={() => updatePoints(u._id, u.points, 1)}
-                            className="w-6 h-6 flex items-center justify-center bg-dark-100 hover:bg-dark-200 rounded text-dark-600 font-bold">+</button>
+                            className="w-6 h-6 flex items-center justify-center bg-dark-100 dark:bg-dark-600 hover:bg-dark-200 dark:hover:bg-dark-500 rounded text-dark-600 dark:text-dark-300 font-bold">+</button>
                         </div>
                       </td>
                       <td className="px-6 py-4 text-right">
                         {u.role !== 'admin' && (
                           <button
                             onClick={() => deleteUser(u._id, u.name)}
-                            className="text-danger-500 hover:text-danger-600 p-2 rounded-lg hover:bg-danger-50 transition-colors"
+                            className="text-danger-500 hover:text-danger-600 p-2 rounded-lg hover:bg-danger-50 dark:hover:bg-danger-950/20 transition-colors"
                           >
                             <FaTrash className="text-sm" />
                           </button>
@@ -300,7 +304,7 @@ const AdminDashboard = () => {
       {/* Assign Supervisor Buses Modal */}
       {showBusModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
+          <div className="bg-white dark:bg-dark-700 rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
             <div className="bg-gradient-to-r from-primary-600 to-primary-700 px-6 py-4 flex items-center justify-between">
               <h2 className="font-bold text-white flex items-center gap-2">
                 <FaBus /> Assign Supervised Buses
@@ -310,7 +314,7 @@ const AdminDashboard = () => {
               </button>
             </div>
             <div className="p-6">
-              <p className="text-sm font-medium text-dark-600 mb-4">Select the buses this supervisor will manage:</p>
+              <p className="text-sm font-medium text-dark-600 dark:text-dark-300 mb-4">Select the buses this supervisor will manage:</p>
               <div className="space-y-2 max-h-64 overflow-y-auto pr-2">
                 {buses.map(bus => {
                   const isSelected = selectedBuses.includes(bus._id);
@@ -318,28 +322,30 @@ const AdminDashboard = () => {
                     <div key={bus._id} 
                       onClick={() => setSelectedBuses(prev => isSelected ? prev.filter(id => id !== bus._id) : [...prev, bus._id])}
                       className={`flex items-center justify-between p-3 rounded-xl border-2 cursor-pointer transition-all ${
-                        isSelected ? 'border-primary-500 bg-primary-50' : 'border-dark-100 hover:border-dark-300'
+                        isSelected 
+                          ? 'border-primary-500 bg-primary-50 dark:bg-primary-950/20' 
+                          : 'border-dark-100 dark:border-dark-600 hover:border-dark-300 dark:hover:border-dark-500'
                       }`}
                     >
                       <div className="flex items-center gap-3">
-                        <FaBus className={isSelected ? 'text-primary-600' : 'text-dark-400'} />
+                        <FaBus className={isSelected ? 'text-primary-600 dark:text-primary-400' : 'text-dark-400 dark:text-dark-500'} />
                         <div>
-                          <p className={`font-bold ${isSelected ? 'text-primary-900' : 'text-dark-900'}`}>{bus.busName}</p>
-                          <p className="text-xs text-dark-500">{bus.route?.name}</p>
+                          <p className={`font-bold ${isSelected ? 'text-primary-900 dark:text-primary-200' : 'text-dark-900 dark:text-dark-100'}`}>{bus.busName}</p>
+                          <p className="text-xs text-dark-500 dark:text-dark-400">{bus.route?.name}</p>
                         </div>
                       </div>
                       <div className={`w-5 h-5 rounded flex items-center justify-center border-2 ${
-                        isSelected ? 'bg-primary-500 border-primary-500' : 'border-dark-300'
+                        isSelected ? 'bg-primary-500 border-primary-500' : 'border-dark-300 dark:border-dark-500'
                       }`}>
                         {isSelected && <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>}
                       </div>
                     </div>
                   );
                 })}
-                {buses.length === 0 && <p className="text-sm text-dark-400 text-center py-4">No buses currently active.</p>}
+                {buses.length === 0 && <p className="text-sm text-dark-400 dark:text-dark-500 text-center py-4">No buses currently active.</p>}
               </div>
               <div className="flex justify-end gap-3 mt-6">
-                <button onClick={() => setShowBusModal(false)} className="px-4 py-2 rounded-xl text-sm font-semibold bg-dark-100 text-dark-600 hover:bg-dark-200">
+                <button onClick={() => setShowBusModal(false)} className="px-4 py-2 rounded-xl text-sm font-semibold bg-dark-100 dark:bg-dark-600 text-dark-600 dark:text-dark-300 hover:bg-dark-200 dark:hover:bg-dark-500">
                   Cancel
                 </button>
                 <button onClick={handleAssignBuses} className="btn-primary flex items-center gap-2 text-sm !px-4 !py-2">

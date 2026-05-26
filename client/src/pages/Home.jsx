@@ -259,7 +259,7 @@ const Home = () => {
       </section>
 
       {/* Features Section */}
-      <section className="py-20 bg-white dark:bg-dark-900 transition-colors duration-250">
+      <section className="py-20 bg-white dark:bg-dark-800 transition-colors duration-250">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <FadeIn>
             <div className="text-center mb-14">
@@ -284,8 +284,8 @@ const Home = () => {
                     >
                       <feature.icon className="text-white text-lg" />
                     </motion.div>
-                    <h3 className="font-bold text-dark-900 text-lg">{feature.title}</h3>
-                    <p className="text-dark-500 text-sm mt-2 leading-relaxed">{feature.desc}</p>
+                    <h3 className="font-bold text-dark-900 dark:text-white text-lg">{feature.title}</h3>
+                    <p className="text-dark-500 dark:text-dark-300 text-sm mt-2 leading-relaxed">{feature.desc}</p>
                   </div>
                 </ScaleOnHover>
               </StaggerItem>
@@ -295,7 +295,7 @@ const Home = () => {
       </section>
 
       {/* Available Buses Section */}
-      <section className="py-20 bg-dark-50 dark:bg-dark-900/40 border-t border-dark-100 dark:border-dark-800/80 transition-colors duration-250">
+      <section className="py-20 bg-dark-50 dark:bg-dark-800/40 border-t border-dark-100 dark:border-dark-700/60 transition-colors duration-250">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <FadeIn>
             <div className="text-center mb-14">
@@ -321,7 +321,7 @@ const Home = () => {
               {buses.map(bus => (
                 <StaggerItem key={bus._id}>
                   <motion.div 
-                    className="card !p-0 overflow-hidden cursor-pointer group bg-white dark:bg-dark-900 border border-dark-100 dark:border-dark-800/60"
+                    className="card !p-0 overflow-hidden cursor-pointer group bg-white dark:bg-dark-700 border border-dark-100 dark:border-dark-600/50"
                     onClick={() => handleBusClick(bus._id)}
                     whileHover={{ y: -4, boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1)' }}
                     transition={{ type: 'spring', stiffness: 300, damping: 20 }}
@@ -347,7 +347,7 @@ const Home = () => {
                         <span className="font-bold text-accent-600 dark:text-accent-400">{bus.totalSeats} seats</span>
                       </div>
                     </div>
-                    <div className="px-4 py-3 border-t border-dark-100 dark:border-dark-800/80 bg-dark-50/50 dark:bg-dark-900/40 group-hover:bg-primary-50 dark:group-hover:bg-primary-950/20 transition-colors flex items-center justify-between">
+                    <div className="px-4 py-3 border-t border-dark-100 dark:border-dark-600/50 bg-dark-50/50 dark:bg-dark-800/30 group-hover:bg-primary-50 dark:group-hover:bg-primary-950/20 transition-colors flex items-center justify-between">
                       <span className="text-xs font-semibold text-primary-600 dark:text-primary-400">
                         {user ? 'View Details' : 'Login to Book'}
                       </span>
@@ -358,7 +358,7 @@ const Home = () => {
               ))}
             </StaggerContainer>
           ) : (
-            <div className="text-center py-10 bg-white dark:bg-dark-900 rounded-2xl shadow-sm border border-dark-100 dark:border-dark-800">
+            <div className="text-center py-10 bg-white dark:bg-dark-700 rounded-2xl shadow-sm border border-dark-100 dark:border-dark-600/50">
               <FaBus className="text-4xl text-dark-300 dark:text-dark-600 mx-auto mb-3" />
               <p className="text-dark-500 dark:text-dark-400 font-medium">No buses available at the moment</p>
             </div>
@@ -366,7 +366,7 @@ const Home = () => {
           
           <FadeIn delay={0.3}>
             <div className="text-center mt-10">
-              <Link to="/routes" className="inline-flex items-center gap-2 bg-white dark:bg-dark-900 text-dark-900 dark:text-white border border-dark-200 dark:border-dark-800/80 px-6 py-3 rounded-xl font-bold text-sm hover:bg-dark-50 dark:hover:bg-dark-800 transition-all shadow-sm">
+              <Link to="/routes" className="inline-flex items-center gap-2 bg-white dark:bg-dark-700 text-dark-900 dark:text-white border border-dark-200 dark:border-dark-600/50 px-6 py-3 rounded-xl font-bold text-sm hover:bg-dark-50 dark:hover:bg-dark-600 transition-all shadow-sm">
                 View All Routes
                 <HiArrowRight />
               </Link>
@@ -376,7 +376,7 @@ const Home = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-white dark:bg-dark-900 transition-colors duration-250">
+      <section className="py-20 bg-white dark:bg-dark-800 transition-colors duration-250">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <FadeIn>
             <motion.div

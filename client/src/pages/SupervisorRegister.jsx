@@ -69,14 +69,14 @@ const SupervisorRegister = () => {
   };
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center bg-gradient-to-br from-dark-50 to-accent-50 p-4 py-8">
+    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center bg-gradient-to-br from-dark-50 dark:from-dark-800 to-accent-50 dark:to-dark-700 p-4 py-8">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-accent-500 to-accent-700 rounded-2xl mb-4 shadow-lg">
             <FaBus className="text-white text-2xl" />
           </div>
-          <h1 className="text-2xl font-extrabold text-dark-900">Supervisor Registration</h1>
-          <p className="text-dark-500 mt-1 text-sm">Create your supervisor account</p>
+          <h1 className="text-2xl font-extrabold text-dark-900 dark:text-white">Supervisor Registration</h1>
+          <p className="text-dark-500 dark:text-dark-400 mt-1 text-sm">Create your supervisor account</p>
         </div>
 
         <div className="card !p-8">
@@ -85,21 +85,21 @@ const SupervisorRegister = () => {
             onClick={handleGoogleSignIn}
             disabled={loading}
             type="button"
-            className="w-full flex items-center justify-center gap-3 bg-white border-2 border-dark-200 text-dark-700 hover:bg-dark-50 hover:border-dark-300 font-semibold py-3 px-4 rounded-xl transition-all shadow-sm"
+            className="w-full flex items-center justify-center gap-3 bg-white dark:bg-dark-600 border-2 border-dark-200 dark:border-dark-500 text-dark-700 dark:text-dark-200 hover:bg-dark-50 dark:hover:bg-dark-500 hover:border-dark-300 font-semibold py-3 px-4 rounded-xl transition-all shadow-sm"
           >
             <FaGoogle className="text-red-500 text-lg" />
             Sign up with Google
           </button>
 
           <div className="relative flex items-center my-6">
-            <div className="flex-grow border-t border-dark-200"></div>
-            <span className="flex-shrink-0 mx-4 text-dark-400 text-xs font-medium">OR</span>
-            <div className="flex-grow border-t border-dark-200"></div>
+            <div className="flex-grow border-t border-dark-200 dark:border-dark-600"></div>
+            <span className="flex-shrink-0 mx-4 text-dark-400 dark:text-dark-500 text-xs font-medium">OR</span>
+            <div className="flex-grow border-t border-dark-200 dark:border-dark-600"></div>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-semibold text-dark-700 mb-1.5">Full Name</label>
+              <label className="block text-sm font-semibold text-dark-700 dark:text-dark-200 mb-1.5">Full Name</label>
               <div className="relative">
                 <HiUser className="absolute left-3.5 top-1/2 -translate-y-1/2 text-dark-400" />
                 <input name="name" type="text" value={formData.name} onChange={handleChange}
@@ -107,7 +107,7 @@ const SupervisorRegister = () => {
               </div>
             </div>
             <div>
-              <label className="block text-sm font-semibold text-dark-700 mb-1.5">Email</label>
+              <label className="block text-sm font-semibold text-dark-700 dark:text-dark-200 mb-1.5">Email</label>
               <div className="relative">
                 <HiMail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-dark-400" />
                 <input name="email" type="email" value={formData.email} onChange={handleChange}
@@ -116,7 +116,7 @@ const SupervisorRegister = () => {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-semibold text-dark-700 mb-1.5">Employee ID</label>
+                <label className="block text-sm font-semibold text-dark-700 dark:text-dark-200 mb-1.5">Employee ID</label>
                 <div className="relative">
                   <HiIdentification className="absolute left-3.5 top-1/2 -translate-y-1/2 text-dark-400" />
                   <input name="employeeId" type="text" value={formData.employeeId} onChange={handleChange}
@@ -124,7 +124,7 @@ const SupervisorRegister = () => {
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-semibold text-dark-700 mb-1.5">Department</label>
+                <label className="block text-sm font-semibold text-dark-700 dark:text-dark-200 mb-1.5">Department</label>
                 <div className="relative">
                   <HiAcademicCap className="absolute left-3.5 top-1/2 -translate-y-1/2 text-dark-400" />
                   <select name="department" value={formData.department} onChange={handleChange}
@@ -138,7 +138,7 @@ const SupervisorRegister = () => {
               </div>
             </div>
             <div>
-              <label className="block text-sm font-semibold text-dark-700 mb-1.5">Password</label>
+              <label className="block text-sm font-semibold text-dark-700 dark:text-dark-200 mb-1.5">Password</label>
               <div className="relative">
                 <HiLockClosed className="absolute left-3.5 top-1/2 -translate-y-1/2 text-dark-400" />
                 <input name="password" type={showPassword ? "text" : "password"} value={formData.password} onChange={handleChange}
@@ -150,7 +150,7 @@ const SupervisorRegister = () => {
               </div>
             </div>
             <div>
-              <label className="block text-sm font-semibold text-dark-700 mb-1.5">Confirm Password</label>
+              <label className="block text-sm font-semibold text-dark-700 dark:text-dark-200 mb-1.5">Confirm Password</label>
               <div className="relative">
                 <HiLockClosed className="absolute left-3.5 top-1/2 -translate-y-1/2 text-dark-400" />
                 <input name="confirmPassword" type={showConfirmPassword ? "text" : "password"} value={formData.confirmPassword} onChange={handleChange}
@@ -170,9 +170,9 @@ const SupervisorRegister = () => {
               )}
             </button>
           </form>
-          <p className="text-center text-sm text-dark-500 mt-6">
+          <p className="text-center text-sm text-dark-500 dark:text-dark-400 mt-6">
             Already have an account?{' '}
-            <Link to="/supervisor/login" className="text-accent-600 font-semibold hover:text-accent-700">Sign in</Link>
+            <Link to="/supervisor/login" className="text-accent-600 dark:text-accent-400 font-semibold hover:text-accent-700 dark:hover:text-accent-300">Sign in</Link>
           </p>
         </div>
       </div>
