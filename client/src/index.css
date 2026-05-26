@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
+
 @theme {
   --color-primary-50: #eff6ff;
   --color-primary-100: #dbeafe;
@@ -63,6 +66,7 @@
     color: var(--color-dark-800);
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
+    @apply transition-colors duration-250 dark:bg-dark-950 dark:text-dark-100;
   }
 }
 
@@ -98,18 +102,22 @@
 
   .card {
     @apply bg-white rounded-2xl shadow-sm border border-dark-100 p-6
-           hover:shadow-md transition-shadow duration-300;
+           hover:shadow-md transition-all duration-300
+           dark:bg-dark-900 dark:border-dark-800/80;
   }
 
   .input-field {
     @apply w-full px-4 py-3 rounded-xl border border-dark-200 bg-white
            focus:border-primary-400 focus:ring-2 focus:ring-primary-100
            outline-none transition-all duration-200
-           placeholder:text-dark-400;
+           placeholder:text-dark-400
+           dark:bg-dark-900 dark:border-dark-800 dark:text-white dark:placeholder:text-dark-500
+           dark:focus:border-primary-500 dark:focus:ring-primary-900/30;
   }
 
   .glass {
-    @apply bg-white/70 backdrop-blur-xl border border-white/20;
+    @apply bg-white/70 backdrop-blur-xl border border-white/20
+           dark:bg-dark-900/70 dark:border-dark-800/40;
   }
 }
 
