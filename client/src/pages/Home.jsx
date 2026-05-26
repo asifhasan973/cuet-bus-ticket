@@ -134,7 +134,7 @@ const Home = () => {
                   animate={{ backgroundPosition: ['0%', '100%', '0%'] }}
                   transition={{ duration: 5, repeat: Infinity }}
                 >
-                  {' '}CUET Bus{' '}
+                  {' '}CUETGo{' '}
                 </motion.span>
                 Seat Online
               </h1>
@@ -259,14 +259,14 @@ const Home = () => {
       </section>
 
       {/* Features Section */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-white dark:bg-dark-950 transition-colors duration-250">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <FadeIn>
             <div className="text-center mb-14">
-              <h2 className="text-3xl font-extrabold text-dark-900 tracking-tight">
-                Why Choose CUET Bus?
+              <h2 className="text-3xl font-extrabold text-dark-900 dark:text-white tracking-tight">
+                Why Choose CUETGo?
               </h2>
-              <p className="mt-3 text-dark-500 max-w-lg mx-auto">
+              <p className="mt-3 text-dark-500 dark:text-dark-400 max-w-lg mx-auto">
                 Everything you need for a smooth bus commute to university
               </p>
             </div>
@@ -295,14 +295,14 @@ const Home = () => {
       </section>
 
       {/* Available Buses Section */}
-      <section className="py-20 bg-dark-50 border-t border-dark-100">
+      <section className="py-20 bg-dark-50 dark:bg-dark-900/40 border-t border-dark-100 dark:border-dark-800/80 transition-colors duration-250">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <FadeIn>
             <div className="text-center mb-14">
-              <h2 className="text-3xl font-extrabold text-dark-900 tracking-tight">
+              <h2 className="text-3xl font-extrabold text-dark-900 dark:text-white tracking-tight">
                 Our Bus Fleet
               </h2>
-              <p className="mt-3 text-dark-500 max-w-lg mx-auto">
+              <p className="mt-3 text-dark-500 dark:text-dark-400 max-w-lg mx-auto">
                 14 buses serving multiple routes across Chittagong
               </p>
             </div>
@@ -321,7 +321,7 @@ const Home = () => {
               {buses.map(bus => (
                 <StaggerItem key={bus._id}>
                   <motion.div 
-                    className="card !p-0 overflow-hidden cursor-pointer group bg-white border border-dark-100"
+                    className="card !p-0 overflow-hidden cursor-pointer group bg-white dark:bg-dark-900 border border-dark-100 dark:border-dark-800/60"
                     onClick={() => handleBusClick(bus._id)}
                     whileHover={{ y: -4, boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1)' }}
                     transition={{ type: 'spring', stiffness: 300, damping: 20 }}
@@ -338,35 +338,35 @@ const Home = () => {
                       </span>
                     </div>
                     <div className="p-4">
-                      <p className="text-xs text-dark-500 mb-3 line-clamp-2">{bus.route?.name}</p>
-                      <div className="flex items-center justify-between text-xs text-dark-400">
+                      <p className="text-xs text-dark-500 dark:text-dark-400 mb-3 line-clamp-2">{bus.route?.name}</p>
+                      <div className="flex items-center justify-between text-xs text-dark-400 dark:text-dark-500">
                         <span className="flex items-center gap-1">
                           <FaMapMarkerAlt className="text-[10px]" />
                           {bus.route?.stops?.length} stops
                         </span>
-                        <span className="font-bold text-accent-600">{bus.totalSeats} seats</span>
+                        <span className="font-bold text-accent-600 dark:text-accent-400">{bus.totalSeats} seats</span>
                       </div>
                     </div>
-                    <div className="px-4 py-3 border-t border-dark-100 bg-dark-50/50 group-hover:bg-primary-50 transition-colors flex items-center justify-between">
-                      <span className="text-xs font-semibold text-primary-600">
+                    <div className="px-4 py-3 border-t border-dark-100 dark:border-dark-800/80 bg-dark-50/50 dark:bg-dark-950/40 group-hover:bg-primary-50 dark:group-hover:bg-primary-950/20 transition-colors flex items-center justify-between">
+                      <span className="text-xs font-semibold text-primary-600 dark:text-primary-400">
                         {user ? 'View Details' : 'Login to Book'}
                       </span>
-                      <HiArrowRight className="text-primary-600 group-hover:translate-x-1 transition-transform text-sm" />
+                      <HiArrowRight className="text-primary-600 dark:text-primary-400 group-hover:translate-x-1 transition-transform text-sm" />
                     </div>
                   </motion.div>
                 </StaggerItem>
               ))}
             </StaggerContainer>
           ) : (
-            <div className="text-center py-10 bg-white rounded-2xl shadow-sm border border-dark-100">
-              <FaBus className="text-4xl text-dark-300 mx-auto mb-3" />
-              <p className="text-dark-500 font-medium">No buses available at the moment</p>
+            <div className="text-center py-10 bg-white dark:bg-dark-900 rounded-2xl shadow-sm border border-dark-100 dark:border-dark-800">
+              <FaBus className="text-4xl text-dark-300 dark:text-dark-600 mx-auto mb-3" />
+              <p className="text-dark-500 dark:text-dark-400 font-medium">No buses available at the moment</p>
             </div>
           )}
           
           <FadeIn delay={0.3}>
             <div className="text-center mt-10">
-              <Link to="/routes" className="inline-flex items-center gap-2 bg-white text-dark-900 border border-dark-200 px-6 py-3 rounded-xl font-bold text-sm hover:bg-dark-50 transition-all shadow-sm">
+              <Link to="/routes" className="inline-flex items-center gap-2 bg-white dark:bg-dark-900 text-dark-900 dark:text-white border border-dark-200 dark:border-dark-800/80 px-6 py-3 rounded-xl font-bold text-sm hover:bg-dark-50 dark:hover:bg-dark-800 transition-all shadow-sm">
                 View All Routes
                 <HiArrowRight />
               </Link>
@@ -376,7 +376,7 @@ const Home = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-white dark:bg-dark-950 transition-colors duration-250">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <FadeIn>
             <motion.div
@@ -434,9 +434,9 @@ const Home = () => {
               <div className="bg-primary-600 p-1.5 rounded-lg">
                 <FaBus className="text-white text-sm" />
               </div>
-              <span className="font-bold text-white">CUET Bus</span>
+              <span className="font-bold text-white">CUETGo</span>
             </div>
-            <p className="text-sm">© 2024 CUET Bus Booking System. All rights reserved.</p>
+            <p className="text-sm">© 2026 CUETGo Booking System. All rights reserved.</p>
           </div>
         </div>
       </footer>

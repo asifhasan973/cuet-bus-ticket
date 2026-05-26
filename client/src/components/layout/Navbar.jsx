@@ -39,7 +39,7 @@ const Navbar = () => {
               <FaBus className="text-white text-lg" />
             </motion.div>
             <div>
-              <span className="font-bold text-lg text-dark-900 dark:text-white tracking-tight transition-colors">CUET Bus</span>
+              <span className="font-bold text-lg text-dark-900 dark:text-white tracking-tight transition-colors">CUETGo</span>
               <span className="text-[10px] block text-dark-400 dark:text-dark-500 -mt-1 font-medium transition-colors">Seat Booking</span>
             </div>
           </Link>
