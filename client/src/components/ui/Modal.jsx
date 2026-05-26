@@ -15,13 +15,13 @@ const Modal = ({ isOpen, onClose, title, children }) => {
             onClick={onClose}
           />
           <motion.div
-            className="relative bg-white dark:bg-dark-900 rounded-2xl shadow-xl max-w-lg w-full max-h-[85vh] overflow-y-auto"
+            className="relative bg-white dark:bg-dark-700 rounded-2xl shadow-xl max-w-lg w-full max-h-[85vh] overflow-y-auto"
             initial={{ opacity: 0, scale: 0.9, y: 30 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 30 }}
             transition={{ type: 'spring', stiffness: 300, damping: 25 }}
           >
-            <div className="sticky top-0 bg-white dark:bg-dark-900 border-b border-dark-100 dark:border-dark-800 px-6 py-4 rounded-t-2xl flex items-center justify-between z-10">
+            <div className="sticky top-0 bg-white dark:bg-dark-700 border-b border-dark-100 dark:border-dark-600/50 px-6 py-4 rounded-t-2xl flex items-center justify-between z-10">
               <h3 className="font-bold text-lg text-dark-900 dark:text-white">{title}</h3>
               <motion.button
                 onClick={onClose}

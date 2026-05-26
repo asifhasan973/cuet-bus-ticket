@@ -111,7 +111,7 @@ function App() {
     <ThemeProvider>
       <AuthProvider>
         <Router>
-          <div className="min-h-screen bg-dark-50 dark:bg-dark-900 text-dark-800 dark:text-dark-100 transition-colors duration-250">
+          <div className="min-h-screen bg-dark-50 dark:bg-dark-800 text-dark-800 dark:text-dark-100 transition-colors duration-300">
             <Navbar />
             <AnimatedRoutes />
           </div>

@@ -30,27 +30,27 @@ const ProfilePage = () => {
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
-      <h1 className="text-2xl font-extrabold text-dark-900">My Profile</h1>
+      <h1 className="text-2xl font-extrabold text-dark-900 dark:text-white">My Profile</h1>
 
       {/* Profile Header */}
       <div className="card !p-0 overflow-hidden">
         <div className="bg-gradient-to-r from-primary-600 to-primary-700 h-32 relative">
           <div className="absolute -bottom-10 left-6">
-            <div className="w-20 h-20 bg-white rounded-2xl shadow-lg flex items-center justify-center text-3xl font-bold text-primary-600 border-4 border-white">
+            <div className="w-20 h-20 bg-white dark:bg-dark-700 rounded-2xl shadow-lg flex items-center justify-center text-3xl font-bold text-primary-600 border-4 border-white dark:border-dark-700">
               {user?.name?.charAt(0)}
             </div>
           </div>
         </div>
         <div className="pt-14 pb-6 px-6">
-          <h2 className="text-xl font-bold text-dark-900">{user?.name}</h2>
-          <p className="text-dark-500 text-sm capitalize">{user?.role} • {user?.department}</p>
+          <h2 className="text-xl font-bold text-dark-900 dark:text-white">{user?.name}</h2>
+          <p className="text-dark-500 dark:text-dark-400 text-sm capitalize">{user?.role} • {user?.department}</p>
         </div>
       </div>
 
       {/* Profile Details */}
       <div className="card">
         <div className="flex items-center justify-between mb-6">
-          <h3 className="font-bold text-dark-900">Profile Information</h3>
+          <h3 className="font-bold text-dark-900 dark:text-white">Profile Information</h3>
           <button onClick={() => setEditing(!editing)} className="btn-secondary text-sm !px-4 !py-1.5">
             {editing ? 'Cancel' : 'Edit'}
           </button>
@@ -59,13 +59,13 @@ const ProfilePage = () => {
         {editing ? (
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-semibold text-dark-700 mb-1.5">Name</label>
+              <label className="block text-sm font-semibold text-dark-700 dark:text-dark-200 mb-1.5">Name</label>
               <input type="text" value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 className="input-field" />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-dark-700 mb-1.5">Department</label>
+              <label className="block text-sm font-semibold text-dark-700 dark:text-dark-200 mb-1.5">Department</label>
               <select value={formData.department}
                 onChange={(e) => setFormData({ ...formData, department: e.target.value })}
                 className="input-field">
@@ -87,13 +87,13 @@ const ProfilePage = () => {
                 value: user?.studentId || user?.employeeId },
               { icon: HiAcademicCap, label: 'Department', value: user?.department },
             ].map((item, i) => (
-              <div key={i} className="flex items-center gap-4 py-3 border-b border-dark-100 last:border-0">
-                <div className="bg-primary-50 p-2.5 rounded-xl">
-                  <item.icon className="text-primary-600" />
+              <div key={i} className="flex items-center gap-4 py-3 border-b border-dark-100 dark:border-dark-600/50 last:border-0">
+                <div className="bg-primary-50 dark:bg-primary-900/20 p-2.5 rounded-xl">
+                  <item.icon className="text-primary-600 dark:text-primary-400" />
                 </div>
                 <div>
-                  <p className="text-xs text-dark-400 font-medium">{item.label}</p>
-                  <p className="font-semibold text-dark-900">{item.value || 'N/A'}</p>
+                  <p className="text-xs text-dark-400 dark:text-dark-500 font-medium">{item.label}</p>
+                  <p className="font-semibold text-dark-900 dark:text-dark-100">{item.value || 'N/A'}</p>
                 </div>
               </div>
             ))}

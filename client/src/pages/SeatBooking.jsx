@@ -244,10 +244,10 @@ const SeatBooking = () => {
 
       {/* ═══ SHIFT SELECTION ═══ */}
       <div>
-        <h2 className="text-sm font-bold text-dark-700 mb-3 flex items-center gap-2">
-          <span className="w-6 h-6 bg-primary-100 text-primary-700 rounded-full flex items-center justify-center text-xs font-black">1</span>
-          Select Shift
-        </h2>
+         <h2 className="text-sm font-bold text-dark-700 dark:text-dark-200 mb-3 flex items-center gap-2">
+            <span className="w-6 h-6 bg-primary-100 dark:bg-primary-900/40 text-primary-700 dark:text-primary-400 rounded-full flex items-center justify-center text-xs font-black">1</span>
+            Select Shift
+          </h2>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           {shifts.map(shift => {
             const isSelected = selectedShift?.shift === shift.shift;
@@ -273,7 +273,7 @@ const SeatBooking = () => {
                     {shift.directionLabel}
                   </span>
                 </div>
-                <h3 className={`font-bold text-sm ${isSelected ? 'text-white' : 'text-dark-900'}`}>
+                <h3 className={`font-bold text-sm ${isSelected ? 'text-white' : 'text-dark-900 dark:text-dark-100'}`}>
                   Shift {shift.shift} — {shift.label}
                 </h3>
                 <div className={`flex items-center gap-1 mt-1.5 text-xs font-semibold ${isSelected ? 'text-white/80' : 'text-dark-500'}`}>
@@ -282,7 +282,7 @@ const SeatBooking = () => {
                 </div>
                 {shift.specialRoute && (
                   <p className={`mt-2 text-[11px] font-medium ${isSelected ? 'text-white/70' : 'text-dark-400'}`}>
-                   � {shift.specialRoute}
+                    {shift.specialRoute}
                   </p>
                 )}
                 {isSelected && (
@@ -306,13 +306,13 @@ const SeatBooking = () => {
       {/* ═══ BUS SELECTION ═══ */}
       {selectedShift && !selectedBus && !busLoading && (
         <div>
-          <h2 className="text-sm font-bold text-dark-700 mb-3 flex items-center gap-2">
-            <span className="w-6 h-6 bg-primary-100 text-primary-700 rounded-full flex items-center justify-center text-xs font-black">2</span>
-            Select Bus
-            <span className="text-xs font-normal text-dark-400">
-              ({buses.length} buses available)
-            </span>
-          </h2>
+           <h2 className="text-sm font-bold text-dark-700 dark:text-dark-200 mb-3 flex items-center gap-2">
+              <span className="w-6 h-6 bg-primary-100 dark:bg-primary-900/40 text-primary-700 dark:text-primary-400 rounded-full flex items-center justify-center text-xs font-black">2</span>
+              Select Bus
+              <span className="text-xs font-normal text-dark-400 dark:text-dark-500">
+                ({buses.length} buses available)
+              </span>
+            </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {buses.map(bus => (
               <button
@@ -366,10 +366,10 @@ const SeatBooking = () => {
             >
               ← Change Bus
             </button>
-            <h2 className="text-sm font-bold text-dark-700 flex items-center gap-2">
-              <span className="w-6 h-6 bg-primary-100 text-primary-700 rounded-full flex items-center justify-center text-xs font-black">3</span>
-              Select Your Seat
-            </h2>
+             <h2 className="text-sm font-bold text-dark-700 dark:text-dark-200 flex items-center gap-2">
+                <span className="w-6 h-6 bg-primary-100 dark:bg-primary-900/40 text-primary-700 dark:text-primary-400 rounded-full flex items-center justify-center text-xs font-black">3</span>
+                Select Your Seat
+              </h2>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -388,20 +388,20 @@ const SeatBooking = () => {
                   </div>
                 </div>
                 <div className="p-5 space-y-3 text-sm">
-                  <div className="flex justify-between py-2 border-b border-dark-100">
-                    <span className="text-dark-500">Shift</span>
-                    <span className="font-bold text-dark-900">{SHIFT_ICONS[selectedShift.shift]} Shift {selectedShift.shift} — {selectedShift.label}</span>
+                  <div className="flex justify-between py-2 border-b border-dark-100 dark:border-dark-600/50">
+                    <span className="text-dark-500 dark:text-dark-400">Shift</span>
+                    <span className="font-bold text-dark-900 dark:text-dark-100">{SHIFT_ICONS[selectedShift.shift]} Shift {selectedShift.shift} — {selectedShift.label}</span>
                   </div>
-                  <div className="flex justify-between py-2 border-b border-dark-100">
-                    <span className="text-dark-500">Departure</span>
-                    <span className="font-semibold">{selectedShift.departure}</span>
+                  <div className="flex justify-between py-2 border-b border-dark-100 dark:border-dark-600/50">
+                    <span className="text-dark-500 dark:text-dark-400">Departure</span>
+                    <span className="font-semibold dark:text-dark-200">{selectedShift.departure}</span>
                   </div>
-                  <div className="flex justify-between py-2 border-b border-dark-100">
-                    <span className="text-dark-500">Arrival</span>
-                    <span className="font-semibold">{selectedShift.arrival}</span>
+                  <div className="flex justify-between py-2 border-b border-dark-100 dark:border-dark-600/50">
+                    <span className="text-dark-500 dark:text-dark-400">Arrival</span>
+                    <span className="font-semibold dark:text-dark-200">{selectedShift.arrival}</span>
                   </div>
-                  <div className="flex justify-between py-2 border-b border-dark-100">
-                    <span className="text-dark-500">Direction</span>
+                  <div className="flex justify-between py-2 border-b border-dark-100 dark:border-dark-600/50">
+                    <span className="text-dark-500 dark:text-dark-400">Direction</span>
                     <span className={`font-bold text-xs px-2 py-0.5 rounded-full ${
                       selectedShift.direction === 'inbound' 
                         ? 'bg-accent-100 text-accent-700' 
@@ -410,20 +410,20 @@ const SeatBooking = () => {
                       {selectedShift.directionLabel}
                     </span>
                   </div>
-                  <div className="flex justify-between py-2 border-b border-dark-100">
-                    <span className="text-dark-500">Total Seats</span>
-                    <span className="font-semibold">{selectedBus.totalSeats}</span>
+                  <div className="flex justify-between py-2 border-b border-dark-100 dark:border-dark-600/50">
+                    <span className="text-dark-500 dark:text-dark-400">Total Seats</span>
+                    <span className="font-semibold dark:text-dark-200">{selectedBus.totalSeats}</span>
                   </div>
                   <div className="flex justify-between py-2">
-                    <span className="text-dark-500">Available</span>
+                    <span className="text-dark-500 dark:text-dark-400">Available</span>
                     <span className="font-bold text-accent-600">{selectedBus.availableSeats}</span>
                   </div>
                 </div>
 
                 {/* Route */}
-                <div className="px-5 pb-5">
-                  <p className="font-bold text-dark-900 text-sm mb-3">
-                    {selectedShift.specialRoute ? '� Special Route' : '� Route'}
+                 <div className="px-5 pb-5">
+                  <p className="font-bold text-dark-900 dark:text-dark-100 text-sm mb-3">
+                    {selectedShift.specialRoute ? '🌟 Special Route' : '📍 Route'}
                   </p>
                   {selectedShift.specialRoute ? (
                     <div className="bg-teal-50 border border-teal-200 rounded-xl p-3">
@@ -435,10 +435,10 @@ const SeatBooking = () => {
                       {selectedBus.route?.stops?.map((stop, i) => (
                         <div key={i} className="flex items-center gap-3">
                           <div className="flex flex-col items-center">
-                            <div className={`w-3 h-3 rounded-full ${i === 0 ? 'bg-accent-500' : i === selectedBus.route.stops.length - 1 ? 'bg-primary-500' : 'bg-dark-300'}`} />
-                            {i < selectedBus.route.stops.length - 1 && <div className="w-0.5 h-4 bg-dark-200" />}
+                            <div className={`w-3 h-3 rounded-full ${i === 0 ? 'bg-accent-500' : i === selectedBus.route.stops.length - 1 ? 'bg-primary-500' : 'bg-dark-300 dark:bg-dark-500'}`} />
+                            {i < selectedBus.route.stops.length - 1 && <div className="w-0.5 h-4 bg-dark-200 dark:bg-dark-600" />}
                           </div>
-                          <span className="text-sm text-dark-700">{stop.name}</span>
+                          <span className="text-sm text-dark-700 dark:text-dark-200">{stop.name}</span>
                         </div>
                       ))}
                     </div>
@@ -460,19 +460,19 @@ const SeatBooking = () => {
             <div className="lg:col-span-2">
               <div className="card">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-bold text-dark-900">Select Your Seat</h3>
+                  <h3 className="font-bold text-dark-900 dark:text-dark-100">Select Your Seat</h3>
                   <div className="flex items-center gap-4 text-xs">
                     <div className="flex items-center gap-1.5">
-                      <div className="w-4 h-4 rounded bg-dark-100 border border-dark-200" />
-                      <span className="text-dark-500">Available</span>
+                      <div className="w-4 h-4 rounded bg-dark-100 dark:bg-dark-600 border border-dark-200 dark:border-dark-500" />
+                      <span className="text-dark-500 dark:text-dark-400">Available</span>
                     </div>
                     <div className="flex items-center gap-1.5">
                       <div className="w-4 h-4 rounded bg-primary-500" />
-                      <span className="text-dark-500">Selected</span>
+                      <span className="text-dark-500 dark:text-dark-400">Selected</span>
                     </div>
                     <div className="flex items-center gap-1.5">
-                      <div className="w-4 h-4 rounded bg-dark-400" />
-                      <span className="text-dark-500">Booked</span>
+                      <div className="w-4 h-4 rounded bg-dark-400 dark:bg-dark-500" />
+                      <span className="text-dark-500 dark:text-dark-400">Booked</span>
                     </div>
                   </div>
                 </div>
@@ -520,17 +520,17 @@ const SeatBooking = () => {
               </div>
             </div>
           </div>
-          <div className="bg-dark-50 rounded-xl p-4">
+          <div className="bg-dark-50 dark:bg-dark-600/50 rounded-xl p-4">
             <div className="grid grid-cols-2 gap-3 text-sm">
-              <div><span className="text-dark-400">Bus:</span> <span className="font-bold">{selectedBus?.busName}</span></div>
-              <div><span className="text-dark-400">Seat:</span> <span className="font-bold">{getSeatLabel(selectedSeat)}</span></div>
-              <div><span className="text-dark-400">Route:</span> <span className="font-bold text-xs">{selectedShift?.specialRoute || selectedBus?.route?.name}</span></div>
-              <div><span className="text-dark-400">Date:</span> <span className="font-bold text-accent-600">{new Date(selectedDate + 'T00:00:00').toLocaleDateString()}</span></div>
-              <div><span className="text-dark-400">Direction:</span> <span className="font-bold">{selectedShift?.directionLabel}</span></div>
-              <div><span className="text-dark-400">Points:</span> <span className="font-bold text-primary-600">{user?.points ?? 0} remaining</span></div>
+              <div><span className="text-dark-400 dark:text-dark-400">Bus:</span> <span className="font-bold dark:text-dark-100">{selectedBus?.busName}</span></div>
+              <div><span className="text-dark-400 dark:text-dark-400">Seat:</span> <span className="font-bold dark:text-dark-100">{getSeatLabel(selectedSeat)}</span></div>
+              <div><span className="text-dark-400 dark:text-dark-400">Route:</span> <span className="font-bold text-xs dark:text-dark-100">{selectedShift?.specialRoute || selectedBus?.route?.name}</span></div>
+              <div><span className="text-dark-400 dark:text-dark-400">Date:</span> <span className="font-bold text-accent-600 dark:text-accent-400">{new Date(selectedDate + 'T00:00:00').toLocaleDateString()}</span></div>
+              <div><span className="text-dark-400 dark:text-dark-400">Direction:</span> <span className="font-bold dark:text-dark-100">{selectedShift?.directionLabel}</span></div>
+              <div><span className="text-dark-400 dark:text-dark-400">Points:</span> <span className="font-bold text-primary-600 dark:text-primary-400">{user?.points ?? 0} remaining</span></div>
             </div>
           </div>
-          <p className="text-sm text-dark-500">
+          <p className="text-sm text-dark-500 dark:text-dark-400">
             1 Point will be deducted upon booking. You can cancel this booking from your dashboard.
           </p>
           <div className="flex gap-3">
