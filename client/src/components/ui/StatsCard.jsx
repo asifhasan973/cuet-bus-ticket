@@ -1,3 +1,6 @@
+import { motion } from 'framer-motion';
+import { AnimatedCounter } from './AnimatedComponents';
+
 const StatsCard = ({ icon: Icon, label, value, color = 'primary', trend }) => {
   const colorClasses = {
     primary: 'bg-primary-50 text-primary-600',
@@ -7,22 +10,32 @@ const StatsCard = ({ icon: Icon, label, value, color = 'primary', trend }) => {
   };
 
   return (
-    <div className="card group hover:scale-[1.02] transition-transform duration-300">
+    <motion.div
+      className="card group"
+      whileHover={{ scale: 1.03, y: -2 }}
+      transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+    >
       <div className="flex items-center justify-between">
         <div>
           <p className="text-sm text-dark-400 font-medium">{label}</p>
-          <p className="text-2xl font-bold text-dark-900 mt-1">{value}</p>
+          <p className="text-2xl font-bold text-dark-900 mt-1">
+            <AnimatedCounter value={value} duration={1} />
+          </p>
           {trend && (
             <p className={`text-xs mt-1 font-medium ${trend > 0 ? 'text-accent-500' : 'text-danger-500'}`}>
               {trend > 0 ? '↑' : '↓'} {Math.abs(trend)}% from last week
             </p>
           )}
         </div>
-        <div className={`p-3 rounded-xl ${colorClasses[color]} group-hover:scale-110 transition-transform duration-300`}>
+        <motion.div
+          className={`p-3 rounded-xl ${colorClasses[color]}`}
+          whileHover={{ scale: 1.15, rotate: 10 }}
+          transition={{ type: 'spring', stiffness: 300 }}
+        >
           <Icon className="text-2xl" />
-        </div>
+        </motion.div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

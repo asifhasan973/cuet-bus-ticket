@@ -1,6 +1,7 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { Toaster } from 'react-hot-toast';
+import { AnimatePresence, motion } from 'framer-motion';
 import Navbar from './components/layout/Navbar';
 import DashboardLayout from './components/layout/DashboardLayout';
 import LoadingSpinner from './components/ui/LoadingSpinner';
@@ -45,48 +46,71 @@ const GuestRoute = ({ children }) => {
   return children;
 };
 
+// Page transition wrapper
+const PageWrapper = ({ children }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 12 }}
+    animate={{ opacity: 1, y: 0 }}
+    exit={{ opacity: 0, y: -12 }}
+    transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+  >
+    {children}
+  </motion.div>
+);
+
+// Animated Routes wrapper
+const AnimatedRoutes = () => {
+  const location = useLocation();
+
+  return (
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
+        {/* Public Routes */}
+        <Route path="/" element={<PageWrapper><Home /></PageWrapper>} />
+        <Route path="/routes" element={<PageWrapper><RoutePage /></PageWrapper>} />
+
+        {/* Auth Routes */}
+        <Route path="/student/login" element={<GuestRoute><PageWrapper><StudentLogin /></PageWrapper></GuestRoute>} />
+        <Route path="/student/register" element={<GuestRoute><PageWrapper><StudentRegister /></PageWrapper></GuestRoute>} />
+        <Route path="/supervisor/login" element={<GuestRoute><PageWrapper><SupervisorLogin /></PageWrapper></GuestRoute>} />
+        <Route path="/supervisor/register" element={<GuestRoute><PageWrapper><SupervisorRegister /></PageWrapper></GuestRoute>} />
+
+        {/* Student Routes */}
+        <Route path="/student" element={<ProtectedRoute roles={['student']}><DashboardLayout /></ProtectedRoute>}>
+          <Route path="dashboard" element={<PageWrapper><StudentDashboard /></PageWrapper>} />
+          <Route path="booking" element={<PageWrapper><SeatBooking /></PageWrapper>} />
+          <Route path="routes" element={<PageWrapper><RoutePage /></PageWrapper>} />
+          <Route path="profile" element={<PageWrapper><ProfilePage /></PageWrapper>} />
+        </Route>
+
+        {/* Supervisor Routes */}
+        <Route path="/supervisor" element={<ProtectedRoute roles={['supervisor']}><DashboardLayout /></ProtectedRoute>}>
+          <Route path="dashboard" element={<PageWrapper><SupervisorDashboard /></PageWrapper>} />
+          <Route path="attendance" element={<PageWrapper><AttendancePage /></PageWrapper>} />
+          <Route path="routes" element={<PageWrapper><RoutePage /></PageWrapper>} />
+        </Route>
+
+        {/* Admin Routes */}
+        <Route path="/admin" element={<ProtectedRoute roles={['admin']}><DashboardLayout /></ProtectedRoute>}>
+          <Route path="dashboard" element={<PageWrapper><AdminDashboard /></PageWrapper>} />
+          <Route path="buses" element={<PageWrapper><AdminBusManagement /></PageWrapper>} />
+          <Route path="routes" element={<PageWrapper><RoutePage /></PageWrapper>} />
+        </Route>
+
+        {/* Catch all */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </AnimatePresence>
+  );
+};
+
 function App() {
   return (
     <AuthProvider>
       <Router>
         <div className="min-h-screen bg-dark-50">
           <Navbar />
-          <Routes>
-            {/* Public Routes */}
-            <Route path="/" element={<Home />} />
-            <Route path="/routes" element={<RoutePage />} />
-
-            {/* Auth Routes */}
-            <Route path="/student/login" element={<GuestRoute><StudentLogin /></GuestRoute>} />
-            <Route path="/student/register" element={<GuestRoute><StudentRegister /></GuestRoute>} />
-            <Route path="/supervisor/login" element={<GuestRoute><SupervisorLogin /></GuestRoute>} />
-            <Route path="/supervisor/register" element={<GuestRoute><SupervisorRegister /></GuestRoute>} />
-
-            {/* Student Routes */}
-            <Route path="/student" element={<ProtectedRoute roles={['student']}><DashboardLayout /></ProtectedRoute>}>
-              <Route path="dashboard" element={<StudentDashboard />} />
-              <Route path="booking" element={<SeatBooking />} />
-              <Route path="routes" element={<RoutePage />} />
-              <Route path="profile" element={<ProfilePage />} />
-            </Route>
-
-            {/* Supervisor Routes */}
-            <Route path="/supervisor" element={<ProtectedRoute roles={['supervisor']}><DashboardLayout /></ProtectedRoute>}>
-              <Route path="dashboard" element={<SupervisorDashboard />} />
-              <Route path="attendance" element={<AttendancePage />} />
-              <Route path="routes" element={<RoutePage />} />
-            </Route>
-
-            {/* Admin Routes */}
-            <Route path="/admin" element={<ProtectedRoute roles={['admin']}><DashboardLayout /></ProtectedRoute>}>
-              <Route path="dashboard" element={<AdminDashboard />} />
-              <Route path="buses" element={<AdminBusManagement />} />
-              <Route path="routes" element={<RoutePage />} />
-            </Route>
-
-            {/* Catch all */}
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
+          <AnimatedRoutes />
         </div>
       </Router>
       <Toaster
