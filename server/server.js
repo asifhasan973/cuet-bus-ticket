@@ -1,4 +1,6 @@
 const express = require('express');
+const http = require('http');
+const { Server } = require('socket.io');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 const dotenv = require('dotenv');
@@ -10,10 +12,27 @@ dotenv.config();
 // Connect to database
 connectDB();
 
-// Keep Vercel Serverless compatible
-// Cron jobs are now triggered natively by Vercel via /api/cron/reset-points
-
 const app = express();
+const server = http.createServer(app);
+
+// Initialize Socket.io
+const io = new Server(server, {
+  cors: {
+    origin: process.env.ALLOWED_ORIGINS
+      ? process.env.ALLOWED_ORIGINS.split(',')
+      : ['http://localhost:5173'],
+    credentials: true,
+  }
+});
+
+app.set('io', io);
+
+io.on('connection', (socket) => {
+  console.log(`Socket connected: ${socket.id}`);
+  socket.on('disconnect', () => {
+    console.log(`Socket disconnected: ${socket.id}`);
+  });
+});
 
 // Middleware
 app.use(cors({
@@ -42,6 +61,7 @@ app.use('/api/buses', require('./routes/buses'));
 app.use('/api/bookings', require('./routes/bookings'));
 app.use('/api/supervisor', require('./routes/supervisor'));
 app.use('/api/admin', require('./routes/admin'));
+app.use('/api/admin/analytics', require('./routes/analytics'));
 app.use('/api/shifts', require('./routes/shifts'));
 
 // Root and API Welcome Routes
@@ -92,7 +112,7 @@ const PORT = process.env.PORT || 5001;
 
 // Only listen if not deployed on Vercel Serverless (local dev or traditional hosting)
 if (process.env.NODE_ENV !== 'production' && process.env.NODE_ENV !== 'test' && !process.env.VERCEL) {
-  app.listen(PORT, () => {
+  server.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
   });
 }

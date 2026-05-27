@@ -99,6 +99,20 @@ router.post('/', auth, roleCheck('student'), async (req, res) => {
 
     await booking.populate('bus', 'busName route');
 
+    // Emit real-time seat update via Socket.io
+    const io = req.app.get('io');
+    if (io) {
+      io.emit('seatBooked', {
+        busId,
+        seatNumber,
+        travelDate,
+        shift: shiftNum,
+        studentName: req.user.name,
+        studentId: req.user.studentId,
+        bookedBy: req.user._id,
+      });
+    }
+
     res.status(201).json({
       message: 'Seat booked successfully!',
       booking,
@@ -202,6 +216,17 @@ router.delete('/:id', auth, async (req, res) => {
 
     booking.status = 'cancelled';
     await booking.save();
+
+    // Emit real-time seat update via Socket.io
+    const io = req.app.get('io');
+    if (io) {
+      io.emit('seatCancelled', {
+        busId: booking.bus,
+        seatNumber: booking.seatNumber,
+        travelDate: booking.travelDate,
+        shift: booking.shift,
+      });
+    }
 
     res.json({ message: 'Booking cancelled successfully' });
   } catch (error) {
