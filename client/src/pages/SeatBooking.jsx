@@ -12,6 +12,7 @@ import { toLocalDateInputValue } from '../utils/date';
 import { FaBus, FaClock, FaMapMarkerAlt, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { HiArrowRight, HiArrowNarrowRight, HiSun, HiMoon } from 'react-icons/hi';
 import toast from 'react-hot-toast';
+import { io } from 'socket.io-client';
 
 
 
@@ -67,6 +68,65 @@ const SeatBooking = () => {
       selectBus(busIdFromQuery);
     }
   }, [busIdFromQuery, selectedShift]);
+
+  useEffect(() => {
+    const socketUrl = (import.meta.env.VITE_API_URL || '').replace('/api', '') || window.location.origin;
+    const socket = io(socketUrl);
+
+    socket.on('seatBooked', ({ busId, seatNumber, travelDate, shift, studentName, studentId, bookedBy }) => {
+      if (
+        selectedBus &&
+        selectedBus._id === busId &&
+        selectedDate === travelDate &&
+        selectedShift &&
+        selectedShift.shift === shift
+      ) {
+        setSelectedBus(prev => {
+          if (!prev) return prev;
+          const updatedSeats = prev.seats.map(s => {
+            if (s.number === seatNumber) {
+              return { ...s, isBooked: true, studentName, studentId, bookedBy };
+            }
+            return s;
+          });
+          return {
+            ...prev,
+            seats: updatedSeats,
+            availableSeats: updatedSeats.filter(s => !s.isBooked).length
+          };
+        });
+      }
+    });
+
+    socket.on('seatCancelled', ({ busId, seatNumber, travelDate, shift }) => {
+      if (
+        selectedBus &&
+        selectedBus._id === busId &&
+        selectedDate === travelDate &&
+        selectedShift &&
+        selectedShift.shift === shift
+      ) {
+        setSelectedBus(prev => {
+          if (!prev) return prev;
+          const updatedSeats = prev.seats.map(s => {
+            if (s.number === seatNumber) {
+              return { ...s, isBooked: false, studentName: '', studentId: '', bookedBy: null };
+            }
+            return s;
+          });
+          return {
+            ...prev,
+            seats: updatedSeats,
+            availableSeats: updatedSeats.filter(s => !s.isBooked).length
+          };
+        });
+      }
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [selectedBus, selectedDate, selectedShift]);
 
   const fetchBuses = async () => {
     try {
