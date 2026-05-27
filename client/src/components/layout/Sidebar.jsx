@@ -41,13 +41,13 @@ const Sidebar = ({ isOpen, onClose }) => {
 
       <aside className={`
         fixed lg:sticky top-16 left-0 z-40 h-[calc(100vh-4rem)]
-        w-64 bg-white dark:bg-dark-700 border-r border-dark-100 dark:border-dark-600/50
+        w-64 bg-white dark:bg-dark-700 border-r border-dark-100 dark:border-dark-600
         transform transition-transform duration-300 ease-in-out
         ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
         overflow-y-auto transition-colors duration-300
       `}>
         {/* User Info Card */}
-        <div className="p-4 border-b border-dark-100 dark:border-dark-600/50">
+        <div className="p-4 border-b border-dark-100 dark:border-dark-600">
           <div className="bg-gradient-to-br from-primary-500 to-primary-700 rounded-xl p-4 text-white shadow-sm">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center text-lg font-bold">

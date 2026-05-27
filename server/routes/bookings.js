@@ -140,6 +140,30 @@ router.get('/', auth, roleCheck('admin'), async (req, res) => {
   }
 });
 
+// Helper to convert date string (YYYY-MM-DD) and time string (e.g. '6:30 AM') to a local Date object
+const parseDepartureTime = (dateStr, timeStr) => {
+  const parts = timeStr.trim().split(/\s+/);
+  if (parts.length < 2) return new Date(0);
+  const time = parts[0];
+  const modifier = parts[1].toUpperCase();
+  
+  let [hours, minutes] = time.split(':');
+  hours = parseInt(hours, 10);
+  minutes = parseInt(minutes, 10);
+  
+  if (modifier === 'PM' && hours < 12) {
+    hours += 12;
+  }
+  if (modifier === 'AM' && hours === 12) {
+    hours = 0;
+  }
+  
+  // Create date string in local ISO format (YYYY-MM-DDTHH:MM:00)
+  const pad = (num) => num.toString().padStart(2, '0');
+  const d = new Date(`${dateStr}T${pad(hours)}:${pad(minutes)}:00`);
+  return d;
+};
+
 // @route   DELETE /api/bookings/:id
 // @desc    Cancel a booking
 // @access  Student
@@ -153,6 +177,22 @@ router.delete('/:id', auth, async (req, res) => {
     // Only the student who booked or admin can cancel
     if (booking.student.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
       return res.status(403).json({ message: 'Not authorized' });
+    }
+
+    // Enforce 30-minute cancellation safety window (unless requested by admin)
+    if (req.user.role !== 'admin') {
+      const shiftInfo = getShiftInfo(booking.shift, booking.travelDate);
+      if (shiftInfo) {
+        const departureTime = parseDepartureTime(booking.travelDate, shiftInfo.departure);
+        const now = new Date();
+        const timeDiffMinutes = (departureTime - now) / (1000 * 60);
+
+        if (timeDiffMinutes < 30) {
+          return res.status(400).json({
+            message: 'Too late to cancel. Bookings can only be cancelled up to 30 minutes before departure.'
+          });
+        }
+      }
     }
 
     // Refund 1 point

@@ -18,6 +18,7 @@ const SHIFT_COLORS = {
 const AdminDashboard = () => {
   const [stats, setStats] = useState(null);
   const [users, setUsers] = useState([]);
+  const [pendingSupervisors, setPendingSupervisors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
   const [userFilter, setUserFilter] = useState('');
@@ -32,6 +33,7 @@ const AdminDashboard = () => {
     fetchStats();
     fetchUsers();
     fetchBuses();
+    fetchPendingSupervisors();
   }, []);
 
   const fetchBuses = async () => {
@@ -64,6 +66,15 @@ const AdminDashboard = () => {
     }
   };
 
+  const fetchPendingSupervisors = async () => {
+    try {
+      const res = await API.get('/admin/users?role=supervisor&isApproved=false');
+      setPendingSupervisors(res.data);
+    } catch (error) {
+      toast.error('Failed to load pending approvals');
+    }
+  };
+
   useEffect(() => {
     fetchUsers();
   }, [userFilter]);
@@ -74,6 +85,7 @@ const AdminDashboard = () => {
       await API.delete(`/admin/users/${id}`);
       toast.success('User deleted');
       fetchUsers();
+      fetchPendingSupervisors();
       fetchStats();
     } catch (error) {
       toast.error(error.response?.data?.message || 'Failed to delete user');
@@ -102,6 +114,31 @@ const AdminDashboard = () => {
       }
     } catch (error) {
       toast.error('Failed to update role');
+    }
+  };
+
+  const approveSupervisor = async (id, name) => {
+    try {
+      await API.put(`/admin/users/${id}`, { isApproved: true });
+      toast.success(`${name} approved successfully`);
+      fetchPendingSupervisors();
+      fetchUsers();
+      fetchStats();
+    } catch (error) {
+      toast.error('Failed to approve supervisor');
+    }
+  };
+
+  const rejectSupervisor = async (id, name) => {
+    if (!window.confirm(`Are you sure you want to reject and delete the application for ${name}?`)) return;
+    try {
+      await API.delete(`/admin/users/${id}`);
+      toast.success(`${name} application rejected`);
+      fetchPendingSupervisors();
+      fetchUsers();
+      fetchStats();
+    } catch (error) {
+      toast.error('Failed to reject supervisor');
     }
   };
 
@@ -138,7 +175,7 @@ const AdminDashboard = () => {
 
       {/* Tabs */}
       <div className="flex gap-1 bg-dark-100 dark:bg-dark-800 p-1 rounded-xl w-fit">
-        {['overview', 'users'].map(tab => (
+        {['overview', 'users', 'approvals'].map(tab => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
@@ -148,7 +185,7 @@ const AdminDashboard = () => {
                 : 'text-dark-500 dark:text-dark-400 hover:text-dark-700 dark:hover:text-dark-200'
             }`}
           >
-            {tab}
+            {tab === 'approvals' ? 'Supervisor Approvals' : tab}
           </button>
         ))}
       </div>
@@ -156,7 +193,7 @@ const AdminDashboard = () => {
       {activeTab === 'overview' && (
         /* Recent Bookings */
         <div className="card !p-0 overflow-hidden">
-          <div className="px-6 py-4 border-b border-dark-100 dark:border-dark-600/50">
+          <div className="px-6 py-4 border-b border-dark-100 dark:border-dark-600">
             <h2 className="font-bold text-dark-900 dark:text-white">Recent Bookings</h2>
           </div>
           <div className="overflow-x-auto">
@@ -170,7 +207,7 @@ const AdminDashboard = () => {
                   <th className="text-left px-6 py-3 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">Date</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-dark-100 dark:divide-dark-600/50">
+              <tbody className="divide-y divide-dark-100 dark:divide-dark-600">
                 {stats?.recentBookings?.map(booking => (
                   <tr key={booking._id} className="hover:bg-dark-50 dark:hover:bg-dark-600/20 transition-colors">
                     <td className="px-6 py-4 text-sm font-medium text-dark-900 dark:text-dark-100">
@@ -233,7 +270,7 @@ const AdminDashboard = () => {
                     <th className="text-right px-6 py-3 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-dark-100 dark:divide-dark-600/50">
+                <tbody className="divide-y divide-dark-100 dark:divide-dark-600">
                   {users.map(u => (
                     <tr key={u._id} className="hover:bg-dark-50 dark:hover:bg-dark-600/20 transition-colors">
                       <td className="px-6 py-4 text-sm font-semibold text-dark-900 dark:text-dark-100">{u.name}</td>
@@ -243,9 +280,9 @@ const AdminDashboard = () => {
                           value={u.role}
                           onChange={(e) => updateRole(u._id, e.target.value)}
                           className={`px-2 py-1 rounded-lg text-xs font-bold uppercase border-2 focus:outline-none bg-white dark:bg-dark-600 ${
-                            u.role === 'admin' ? 'bg-purple-50 dark:bg-purple-950/30 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-800/40' :
-                            u.role === 'supervisor' ? 'bg-accent-50 dark:bg-accent-950/30 text-accent-700 dark:text-accent-300 border-accent-200 dark:border-accent-800/40' :
-                            'bg-primary-50 dark:bg-primary-950/30 text-primary-700 dark:text-primary-300 border-primary-200 dark:border-primary-800/40'
+                            u.role === 'admin' ? 'bg-purple-50 dark:bg-purple-950/30 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-800' :
+                            u.role === 'supervisor' ? 'bg-accent-50 dark:bg-accent-950/30 text-accent-700 dark:text-accent-300 border-accent-200 dark:border-accent-800' :
+                            'bg-primary-50 dark:bg-primary-950/30 text-primary-700 dark:text-primary-300 border-primary-200 dark:border-primary-800'
                           }`}
                         >
                           <option value="student">STUDENT</option>
@@ -294,6 +331,64 @@ const AdminDashboard = () => {
                       </td>
                     </tr>
                   ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'approvals' && (
+        <div className="space-y-4">
+          <div className="card !p-0 overflow-hidden dark:border-dark-600">
+            <div className="px-6 py-4 border-b border-dark-100 dark:border-dark-600">
+              <h2 className="font-bold text-dark-900 dark:text-white">Pending Supervisor Registrations</h2>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-dark-50 dark:bg-dark-800">
+                  <tr>
+                    <th className="text-left px-6 py-3 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">Name</th>
+                    <th className="text-left px-6 py-3 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">Email</th>
+                    <th className="text-left px-6 py-3 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">Employee ID</th>
+                    <th className="text-left px-6 py-3 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">Registered Date</th>
+                    <th className="text-right px-6 py-3 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-dark-100 dark:divide-dark-600">
+                  {pendingSupervisors.map(u => (
+                    <tr key={u._id} className="hover:bg-dark-50 dark:hover:bg-dark-800/30 transition-colors">
+                      <td className="px-6 py-4 text-sm font-semibold text-dark-900 dark:text-dark-100">{u.name}</td>
+                      <td className="px-6 py-4 text-sm text-dark-600 dark:text-dark-300">{u.email}</td>
+                      <td className="px-6 py-4 text-sm font-medium text-dark-700 dark:text-dark-300">{u.employeeId || '-'}</td>
+                      <td className="px-6 py-4 text-sm text-dark-500 dark:text-dark-400">
+                        {new Date(u.createdAt).toLocaleDateString()}
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        <div className="flex justify-end gap-2">
+                          <button
+                            onClick={() => approveSupervisor(u._id, u.name)}
+                            className="bg-accent-500 text-white px-3.5 py-1.5 rounded-lg text-xs font-bold hover:bg-accent-600 transition-colors shadow-sm"
+                          >
+                            Approve
+                          </button>
+                          <button
+                            onClick={() => rejectSupervisor(u._id, u.name)}
+                            className="bg-danger-500 text-white px-3.5 py-1.5 rounded-lg text-xs font-bold hover:bg-danger-600 transition-colors shadow-sm"
+                          >
+                            Reject
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                  {pendingSupervisors.length === 0 && (
+                    <tr>
+                      <td colSpan="5" className="px-6 py-12 text-center text-dark-400 dark:text-dark-500 text-sm">
+                        No pending supervisor registration approvals.
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>

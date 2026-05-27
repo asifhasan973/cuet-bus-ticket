@@ -38,4 +38,8 @@ const bookingSchema = new mongoose.Schema({
   timestamps: true,
 });
 
+// Optimize query performance for seat availability and booking history
+bookingSchema.index({ bus: 1, travelDate: 1, shift: 1, status: 1 });
+bookingSchema.index({ student: 1, travelDate: -1 });
+
 module.exports = mongoose.model('Booking', bookingSchema);

@@ -5,13 +5,13 @@ import { auth, googleProvider } from '../firebase';
 import { signInWithPopup, signOut } from 'firebase/auth';
 import { ALLOWED_EMAIL_MESSAGE, isAllowedInstitutionEmail, normalizeEmail } from '../utils/emailDomain';
 import { FaBus, FaGoogle } from 'react-icons/fa';
-import { HiMail, HiLockClosed, HiUser, HiIdentification, HiAcademicCap, HiArrowRight, HiEye, HiEyeOff } from 'react-icons/hi';
+import { HiMail, HiLockClosed, HiUser, HiIdentification, HiArrowRight, HiEye, HiEyeOff } from 'react-icons/hi';
 import toast from 'react-hot-toast';
 
 const SupervisorRegister = () => {
   const [formData, setFormData] = useState({
     name: '', email: '', password: '', confirmPassword: '',
-    employeeId: '', department: '',
+    employeeId: '',
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -36,9 +36,14 @@ const SupervisorRegister = () => {
 
     setLoading(true);
     try {
-      await register({ ...formData, email: normalizedEmail, role: 'supervisor' });
-      toast.success('Registration successful!');
-      navigate('/supervisor/dashboard');
+      const res = await register({ ...formData, email: normalizedEmail, role: 'supervisor' });
+      if (res && res.pendingApproval) {
+        toast.success('Registration submitted! Account pending administrator approval.', { duration: 6000 });
+        navigate('/supervisor/login');
+      } else {
+        toast.success('Registration successful!');
+        navigate('/supervisor/dashboard');
+      }
     } catch (error) {
       toast.error(error.response?.data?.message || 'Registration failed');
     } finally {
@@ -79,6 +84,14 @@ const SupervisorRegister = () => {
           <p className="text-dark-500 dark:text-dark-400 mt-1 text-sm">Create your supervisor account</p>
         </div>
 
+        {/* Disclaimer Alert */}
+        <div className="bg-warning-50 dark:bg-warning-950/20 border border-warning-200 dark:border-warning-800/50 rounded-xl p-4 mb-6 text-sm text-warning-700 dark:text-warning-400">
+          <p className="font-semibold flex items-center gap-2 mb-1">
+            ⚠️ Verification Disclaimer
+          </p>
+          Supervisor accounts must be verified and approved by an administrator before access to the manifest and scanning tools is granted.
+        </div>
+
         <div className="card !p-8">
           {/* Google Sign Up */}
           <button
@@ -114,27 +127,12 @@ const SupervisorRegister = () => {
                   className="input-field !pl-10" placeholder="your.email@cuet.ac.bd" required />
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-semibold text-dark-700 dark:text-dark-200 mb-1.5">Employee ID</label>
-                <div className="relative">
-                  <HiIdentification className="absolute left-3.5 top-1/2 -translate-y-1/2 text-dark-400" />
-                  <input name="employeeId" type="text" value={formData.employeeId} onChange={handleChange}
-                    className="input-field !pl-10" placeholder="EMP001" required />
-                </div>
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-dark-700 dark:text-dark-200 mb-1.5">Department</label>
-                <div className="relative">
-                  <HiAcademicCap className="absolute left-3.5 top-1/2 -translate-y-1/2 text-dark-400" />
-                  <select name="department" value={formData.department} onChange={handleChange}
-                    className="input-field !pl-10" required>
-                    <option value="">Select</option>
-                    {['CSE', 'EEE', 'ME', 'CE', 'URP', 'Arch', 'PME', 'BME'].map(d => (
-                      <option key={d} value={d}>{d}</option>
-                    ))}
-                  </select>
-                </div>
+            <div>
+              <label className="block text-sm font-semibold text-dark-700 dark:text-dark-200 mb-1.5">Employee ID</label>
+              <div className="relative">
+                <HiIdentification className="absolute left-3.5 top-1/2 -translate-y-1/2 text-dark-400" />
+                <input name="employeeId" type="text" value={formData.employeeId} onChange={handleChange}
+                  className="input-field !pl-10" placeholder="EMP001" required />
               </div>
             </div>
             <div>

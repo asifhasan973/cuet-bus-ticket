@@ -3,18 +3,14 @@ import { Link, useNavigate } from 'react-router-dom';
 import { FaBus, FaTicketAlt, FaRoute, FaShieldAlt, FaClock, FaMobileAlt, FaMapMarkerAlt } from 'react-icons/fa';
 import { HiArrowRight } from 'react-icons/hi';
 import { useAuth } from '../context/AuthContext';
+import { SHIFT_SCHEDULE } from '../utils/shifts';
 import API from '../utils/api';
 import { motion } from 'framer-motion';
 import {
   FadeIn, StaggerContainer, StaggerItem, AnimatedCounter, ScaleOnHover, FloatingElement
 } from '../components/ui/AnimatedComponents';
 
-const SHIFT_SCHEDULE = [
-  { shift: 1, icon: '🌅', label: 'Morning', time: '6:30 AM → 8:00 AM', dir: 'CUET-bound', note: 'Weekdays', color: 'from-teal-400 to-teal-600' },
-  { shift: 2, icon: '☀️', label: 'Afternoon', time: '2:00 PM → 3:00 PM', dir: 'Outbound', note: 'All days', color: 'from-sky-400 to-blue-500' },
-  { shift: 3, icon: '🌇', label: 'Evening', time: '5:00 PM → 7:00 PM', dir: 'Outbound', note: 'Weekdays', color: 'from-indigo-400 to-purple-500' },
-  { shift: 4, icon: '🌙', label: 'Night', time: '9:00 PM → 10:30 PM', dir: 'CUET-bound', note: 'All days', color: 'from-slate-600 to-slate-800' },
-];
+
 
 const Home = () => {
   const { user } = useAuth();
@@ -128,15 +124,15 @@ const Home = () => {
             
             <FadeIn delay={0.2}>
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white leading-tight tracking-tight">
-                Book Your
+                Seamless Transit
+                <br />
                 <motion.span
                   className="bg-gradient-to-r from-primary-400 to-accent-400 bg-clip-text text-transparent inline-block"
                   animate={{ backgroundPosition: ['0%', '100%', '0%'] }}
                   transition={{ duration: 5, repeat: Infinity }}
                 >
-                  {' '}CUETGo{' '}
+                  One Tap Away
                 </motion.span>
-                Seat Online
               </h1>
             </FadeIn>
             
@@ -295,7 +291,7 @@ const Home = () => {
       </section>
 
       {/* Available Buses Section */}
-      <section className="py-20 bg-dark-50 dark:bg-dark-800/40 border-t border-dark-100 dark:border-dark-700/60 transition-colors duration-250">
+      <section className="py-20 bg-dark-50 dark:bg-dark-800/40 border-t border-dark-100 dark:border-dark-600 transition-colors duration-250">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <FadeIn>
             <div className="text-center mb-14">
@@ -321,7 +317,7 @@ const Home = () => {
               {buses.map(bus => (
                 <StaggerItem key={bus._id}>
                   <motion.div 
-                    className="card !p-0 overflow-hidden cursor-pointer group bg-white dark:bg-dark-700 border border-dark-100 dark:border-dark-600/50"
+                    className="card !p-0 overflow-hidden cursor-pointer group bg-white dark:bg-dark-700 border border-dark-100 dark:border-dark-600"
                     onClick={() => handleBusClick(bus._id)}
                     whileHover={{ y: -4, boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1)' }}
                     transition={{ type: 'spring', stiffness: 300, damping: 20 }}
@@ -347,7 +343,7 @@ const Home = () => {
                         <span className="font-bold text-accent-600 dark:text-accent-400">{bus.totalSeats} seats</span>
                       </div>
                     </div>
-                    <div className="px-4 py-3 border-t border-dark-100 dark:border-dark-600/50 bg-dark-50/50 dark:bg-dark-800/30 group-hover:bg-primary-50 dark:group-hover:bg-primary-950/20 transition-colors flex items-center justify-between">
+                    <div className="px-4 py-3 border-t border-dark-100 dark:border-dark-600 bg-dark-50/50 dark:bg-dark-800/30 group-hover:bg-primary-50 dark:group-hover:bg-primary-950/20 transition-colors flex items-center justify-between">
                       <span className="text-xs font-semibold text-primary-600 dark:text-primary-400">
                         {user ? 'View Details' : 'Login to Book'}
                       </span>
@@ -358,7 +354,7 @@ const Home = () => {
               ))}
             </StaggerContainer>
           ) : (
-            <div className="text-center py-10 bg-white dark:bg-dark-700 rounded-2xl shadow-sm border border-dark-100 dark:border-dark-600/50">
+            <div className="text-center py-10 bg-white dark:bg-dark-700 rounded-2xl shadow-sm border border-dark-100 dark:border-dark-600">
               <FaBus className="text-4xl text-dark-300 dark:text-dark-600 mx-auto mb-3" />
               <p className="text-dark-500 dark:text-dark-400 font-medium">No buses available at the moment</p>
             </div>
@@ -366,7 +362,7 @@ const Home = () => {
           
           <FadeIn delay={0.3}>
             <div className="text-center mt-10">
-              <Link to="/routes" className="inline-flex items-center gap-2 bg-white dark:bg-dark-700 text-dark-900 dark:text-white border border-dark-200 dark:border-dark-600/50 px-6 py-3 rounded-xl font-bold text-sm hover:bg-dark-50 dark:hover:bg-dark-600 transition-all shadow-sm">
+              <Link to="/routes" className="inline-flex items-center gap-2 bg-white dark:bg-dark-700 text-dark-900 dark:text-white border border-dark-200 dark:border-dark-600 px-6 py-3 rounded-xl font-bold text-sm hover:bg-dark-50 dark:hover:bg-dark-600 transition-all shadow-sm">
                 View All Routes
                 <HiArrowRight />
               </Link>

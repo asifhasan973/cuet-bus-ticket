@@ -198,10 +198,10 @@ const AdminBusManagement = () => {
         <div className="p-4">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
             {[
-              { shift: 1, icon: '', label: 'Morning', time: '6:30 AM → 8:00 AM', dir: 'CUET-bound', note: 'Weekdays only', color: 'bg-teal-50 dark:bg-teal-950/20 border-teal-200 dark:border-teal-800/40 text-teal-700 dark:text-teal-300' },
-              { shift: 2, icon: '', label: 'Afternoon', time: '2:00 PM → 3:00 PM', dir: 'Outbound', note: 'All days • Kaptai Rastar Matha', color: 'bg-sky-50 dark:bg-sky-950/20 border-sky-200 dark:border-sky-800/40 text-sky-700 dark:text-sky-300' },
-              { shift: 3, icon: '', label: 'Evening', time: '5:00 PM → 7:00 PM', dir: 'Outbound', note: 'Weekdays only', color: 'bg-indigo-50 dark:bg-indigo-950/20 border-indigo-200 dark:border-indigo-800/40 text-indigo-700 dark:text-indigo-300' },
-              { shift: 4, icon: '', label: 'Night', time: '9:00 PM → 10:30 PM', dir: 'CUET-bound', note: 'All days • From New Market', color: 'bg-slate-50 dark:bg-dark-800/40 border-slate-200 dark:border-dark-700 text-slate-700 dark:text-dark-300' },
+              { shift: 1, icon: '', label: 'Morning', time: '6:30 AM → 8:00 AM', dir: 'CUET-bound', note: 'Weekdays only', color: 'bg-teal-50 dark:bg-teal-950/20 border-teal-200 dark:border-teal-800 text-teal-700 dark:text-teal-300' },
+              { shift: 2, icon: '', label: 'Afternoon', time: '2:00 PM → 3:00 PM', dir: 'Outbound', note: 'All days • Kaptai Rastar Matha', color: 'bg-sky-50 dark:bg-sky-950/20 border-sky-200 dark:border-sky-800 text-sky-700 dark:text-sky-300' },
+              { shift: 3, icon: '', label: 'Evening', time: '5:00 PM → 7:00 PM', dir: 'Outbound', note: 'Weekdays only', color: 'bg-indigo-50 dark:bg-indigo-950/20 border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300' },
+              { shift: 4, icon: '', label: 'Night', time: '9:00 PM → 10:30 PM', dir: 'CUET-bound', note: 'All days • From New Market', color: 'bg-slate-50 dark:bg-dark-800/40 border-slate-200 dark:border-dark-600 text-slate-700 dark:text-dark-300' },
             ].map(s => (
               <div key={s.shift} className={`rounded-xl border-2 p-3 ${s.color}`}>
                 <div className="flex items-center gap-2 mb-1">
@@ -339,7 +339,7 @@ const AdminBusManagement = () => {
       {/* Bus List */}
       <div className="space-y-3">
         {buses.map(bus => (
-          <div key={bus._id} className="card !p-0 overflow-hidden border border-dark-100 dark:border-dark-600/50">
+          <div key={bus._id} className="card !p-0 overflow-hidden border border-dark-100 dark:border-dark-600">
             {/* Header Row */}
             <div className="flex items-center justify-between px-5 py-4">
               <div
@@ -398,7 +398,7 @@ const AdminBusManagement = () => {
 
             {/* Expanded Section */}
             {expandedBus === bus._id && (
-              <div className="border-t border-dark-100 dark:border-dark-600/50 px-5 py-4 bg-dark-50/50 dark:bg-dark-800/30">
+              <div className="border-t border-dark-100 dark:border-dark-600 px-5 py-4 bg-dark-50/50 dark:bg-dark-800/30">
                 {editingBus === bus._id ? (
                   /* ─── Edit Mode ─── */
                   <div className="space-y-4">

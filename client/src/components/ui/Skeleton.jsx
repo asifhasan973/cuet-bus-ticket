@@ -45,13 +45,13 @@ export const SkeletonCardGrid = ({ count = 4, className = 'grid grid-cols-1 sm:g
 
 // Table rows skeleton
 export const SkeletonTable = ({ rows = 5, cols = 5 }) => (
-  <div className="card !p-0 overflow-hidden dark:border-dark-800/80">
-    <div className="px-6 py-4 border-b border-dark-100 dark:border-dark-800/80">
+  <div className="card !p-0 overflow-hidden dark:border-dark-600">
+    <div className="px-6 py-4 border-b border-dark-100 dark:border-dark-600">
       <SkeletonLine className="h-5 w-48" />
     </div>
     <div className="overflow-x-auto">
       <table className="w-full">
-        <thead className="bg-dark-50 dark:bg-dark-900/60">
+        <thead className="bg-dark-50 dark:bg-dark-800">
           <tr>
             {Array.from({ length: cols }).map((_, i) => (
               <th key={i} className="px-6 py-3">
@@ -60,7 +60,7 @@ export const SkeletonTable = ({ rows = 5, cols = 5 }) => (
             ))}
           </tr>
         </thead>
-        <tbody className="divide-y divide-dark-100 dark:divide-dark-800/50">
+        <tbody className="divide-y divide-dark-100 dark:divide-dark-600">
           {Array.from({ length: rows }).map((_, rIndex) => (
             <tr key={rIndex}>
               {Array.from({ length: cols }).map((_, cIndex) => (
@@ -92,7 +92,7 @@ export const SkeletonSeatBooking = () => (
             <SkeletonPulse className="h-14 rounded-xl" />
             <SkeletonPulse className="h-14 rounded-xl" />
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 pt-4 border-t border-dark-100 dark:border-dark-800/60">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 pt-4 border-t border-dark-100 dark:border-dark-600">
             {Array.from({ length: 4 }).map((_, i) => (
               <SkeletonPulse key={i} className="h-10 rounded-xl" />
             ))}
@@ -104,7 +104,7 @@ export const SkeletonSeatBooking = () => (
           <SkeletonLine className="h-6 w-32" />
           <SkeletonLine className="h-4 w-full" />
           <SkeletonLine className="h-4 w-5/6" />
-          <div className="h-32 bg-dark-50 dark:bg-dark-900/60 rounded-xl flex items-center justify-center border border-dark-100 dark:border-dark-800">
+          <div className="h-32 bg-dark-50 dark:bg-dark-800/40 rounded-xl flex items-center justify-center border border-dark-100 dark:border-dark-600">
             <SkeletonPulse className="w-16 h-16 rounded-full" />
           </div>
           <SkeletonPulse className="h-12 w-full rounded-xl" />

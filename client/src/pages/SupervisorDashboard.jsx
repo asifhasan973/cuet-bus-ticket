@@ -60,7 +60,7 @@ const SupervisorDashboard = () => {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-dark-100 dark:border-dark-600/50">
+                <tr className="border-b border-dark-100 dark:border-dark-600">
                   <th className="text-left py-2 px-3 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">Shift</th>
                   <th className="text-left py-2 px-3 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">Weekday</th>
                   <th className="text-left py-2 px-3 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">Weekend</th>
@@ -69,7 +69,7 @@ const SupervisorDashboard = () => {
               </thead>
               <tbody>
                 {SHIFT_SCHEDULE.map(s => (
-                  <tr key={s.shift} className="border-b border-dark-50 dark:border-dark-600/30 hover:bg-dark-50 dark:hover:bg-dark-600/30 transition-colors">
+                  <tr key={s.shift} className="border-b border-dark-50 dark:border-dark-600 hover:bg-dark-50 dark:hover:bg-dark-600/30 transition-colors">
                     <td className="py-2.5 px-3 font-bold text-dark-900 dark:text-dark-100">
                       <span className="mr-1">{s.icon}</span> Shift {s.shift} — {s.label}
                     </td>
@@ -94,10 +94,10 @@ const SupervisorDashboard = () => {
 
       {/* Bus Overview */}
       <div className="card !p-0 overflow-hidden">
-        <div className="px-6 py-4 border-b border-dark-100 dark:border-dark-600/50">
+        <div className="px-6 py-4 border-b border-dark-100 dark:border-dark-600">
           <h2 className="font-bold text-dark-900 dark:text-white">Your Assigned Buses</h2>
         </div>
-        <div className="divide-y divide-dark-100 dark:divide-dark-600/50">
+        <div className="divide-y divide-dark-100 dark:divide-dark-600">
           {buses.map(bus => (
             <div key={bus._id} className="px-6 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 hover:bg-dark-50 dark:hover:bg-dark-600/20 transition-colors">
               <div className="flex items-center gap-3">

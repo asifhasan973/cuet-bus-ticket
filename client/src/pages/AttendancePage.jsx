@@ -1,24 +1,17 @@
 import { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import API from '../utils/api';
+import { getSeatLabel } from '../utils/seat';
+import { SHIFT_ICONS, SHIFT_LABELS } from '../utils/shifts';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 import Modal from '../components/ui/Modal';
 import { toLocalDateInputValue } from '../utils/date';
 import { FaBus, FaUser, FaCheck, FaTimes } from 'react-icons/fa';
 import { HiQrcode } from 'react-icons/hi';
 import toast from 'react-hot-toast';
-import { Html5QrcodeScanner } from 'html5-qrcode';
+import { Html5Qrcode } from 'html5-qrcode';
 
-const SHIFT_ICONS = { 1: '', 2: '', 3: '', 4: '' };
-const SHIFT_LABELS = { 1: 'Morning', 2: 'Afternoon', 3: 'Evening', 4: 'Night' };
 
-const getSeatLabel = (number) => {
-  if (!number) return '';
-  const rowIndex = Math.floor((number - 1) / 5);
-  const columnNumber = ((number - 1) % 5) + 1;
-  const rowLetter = String.fromCharCode(65 + rowIndex);
-  return `${rowLetter}${columnNumber}`;
-};
 
 const AttendancePage = () => {
   const [searchParams] = useSearchParams();
@@ -37,49 +30,60 @@ const AttendancePage = () => {
   useEffect(() => {
     if (!scannerOpen) return;
 
-    const scanner = new Html5QrcodeScanner(
-      "qr-reader",
-      { 
-        fps: 10, 
-        qrbox: { width: 220, height: 220 },
-        aspectRatio: 1.0
-      },
-      false
-    );
+    let html5QrCode;
+    let isActive = true;
 
-    const onScanSuccess = async (decodedText) => {
+    const startScanner = async () => {
       try {
-        await scanner.clear();
+        // Wait a short moment to ensure the modal DOM is rendered
+        await new Promise(resolve => setTimeout(resolve, 250));
+        if (!isActive) return;
+
+        html5QrCode = new Html5Qrcode("qr-reader");
+        
+        await html5QrCode.start(
+          { facingMode: "environment" },
+          {
+            fps: 10,
+            qrbox: { width: 220, height: 220 },
+            aspectRatio: 1.0
+          },
+          async (decodedText) => {
+            try {
+              if (html5QrCode && html5QrCode.isScanning) {
+                await html5QrCode.stop();
+              }
+              setScannerOpen(false);
+              
+              toast.loading('Verifying ticket...', { id: 'qr-scan' });
+              const res = await API.post('/supervisor/attendance', { bookingId: decodedText, status: 'present' });
+              toast.success(res.data.message || 'Attendance marked present!', { id: 'qr-scan' });
+              
+              if (selectedBus && selectedShift) {
+                fetchStudents(selectedBus, selectedDate, selectedShift);
+              }
+            } catch (error) {
+              toast.error(error.response?.data?.message || 'Failed to verify ticket', { id: 'qr-scan' });
+            }
+          },
+          (errorMessage) => {
+            // Ignore scan errors
+          }
+        );
+      } catch (err) {
+        console.error("Camera start error:", err);
+        toast.error("Could not start camera. Please verify permission settings.", { id: 'qr-scan-err' });
         setScannerOpen(false);
-        
-        toast.loading('Verifying ticket...', { id: 'qr-scan' });
-        const res = await API.post('/supervisor/attendance', { bookingId: decodedText, status: 'present' });
-        toast.success(res.data.message || 'Attendance marked present!', { id: 'qr-scan' });
-        
-        if (selectedBus && selectedShift) {
-          fetchStudents(selectedBus, selectedDate, selectedShift);
-        }
-      } catch (error) {
-        toast.error(error.response?.data?.message || 'Failed to verify ticket', { id: 'qr-scan' });
       }
     };
 
-    const onScanError = (err) => {
-      // ignore scan errors
-    };
-
-    const timer = setTimeout(() => {
-      const container = document.getElementById("qr-reader");
-      if (container) {
-        scanner.render(onScanSuccess, onScanError);
-      }
-    }, 150);
+    startScanner();
 
     return () => {
-      clearTimeout(timer);
-      scanner.clear().catch(err => {
-        // already cleared
-      });
+      isActive = false;
+      if (html5QrCode && html5QrCode.isScanning) {
+        html5QrCode.stop().catch(err => console.error("Error stopping scanner", err));
+      }
     };
   }, [scannerOpen, selectedBus, selectedShift, selectedDate]);
 
@@ -276,10 +280,10 @@ const AttendancePage = () => {
           <p className="text-dark-400 dark:text-dark-500 text-sm">Please select a shift to view booked students</p>
         </div>
       ) : loading ? <LoadingSpinner size="sm" /> : (
-        <div className="card !p-0 overflow-hidden dark:border-dark-800/80">
+        <div className="card !p-0 overflow-hidden dark:border-dark-600">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-dark-50 dark:bg-dark-900/60 border-b border-dark-100 dark:border-dark-800/60">
+              <thead className="bg-dark-50 dark:bg-dark-800 border-b border-dark-100 dark:border-dark-600">
                 <tr>
                   <th className="text-left px-6 py-3 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">Student</th>
                   <th className="text-left px-6 py-3 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">ID</th>
@@ -290,7 +294,7 @@ const AttendancePage = () => {
                   <th className="text-right px-6 py-3 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-dark-100 dark:divide-dark-800/50">
+              <tbody className="divide-y divide-dark-100 dark:divide-dark-600">
                 {students.map(booking => (
                   <tr key={booking._id} className="hover:bg-dark-50 dark:hover:bg-dark-800/30 transition-colors">
                     <td className="px-6 py-4">
@@ -327,6 +331,7 @@ const AttendancePage = () => {
                             disabled={processing[booking._id]}
                             className="bg-accent-500 text-white p-2 rounded-lg hover:bg-accent-600 transition-colors text-xs shadow-sm hover:shadow"
                             title="Mark Present (-1 token)"
+                            aria-label={`Mark ${booking.student?.name || 'student'} Present`}
                           >
                             <FaCheck />
                           </button>
@@ -335,6 +340,7 @@ const AttendancePage = () => {
                             disabled={processing[booking._id]}
                             className="bg-danger-500 text-white p-2 rounded-lg hover:bg-danger-600 transition-colors text-xs shadow-sm hover:shadow"
                             title="Mark Absent (-3 tokens)"
+                            aria-label={`Mark ${booking.student?.name || 'student'} Absent`}
                           >
                             <FaTimes />
                           </button>
@@ -370,12 +376,12 @@ const AttendancePage = () => {
           <p className="text-sm text-dark-500 dark:text-dark-400 text-center">
             Point your camera at the student's ticket QR code.
           </p>
-          <div className="relative overflow-hidden rounded-xl bg-dark-900 border dark:border-dark-800">
+          <div className="relative overflow-hidden rounded-xl bg-dark-900 border dark:border-dark-600">
             <div id="qr-reader" className="w-full mx-auto overflow-hidden" />
           </div>
           <button
             onClick={() => setScannerOpen(false)}
-            className="btn-secondary w-full dark:bg-transparent dark:text-dark-300 dark:border-dark-800 hover:dark:bg-dark-800"
+            className="btn-secondary w-full"
           >
             Cancel
           </button>

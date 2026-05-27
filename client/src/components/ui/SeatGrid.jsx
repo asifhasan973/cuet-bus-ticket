@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { FaUser } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
+import { getSeatLabel } from '../../utils/seat';
 
 const SeatGrid = ({ seats = [], onSelectSeat, selectedSeat, readOnly = false }) => {
   const [hoveredSeat, setHoveredSeat] = useState(null);
@@ -11,12 +12,6 @@ const SeatGrid = ({ seats = [], onSelectSeat, selectedSeat, readOnly = false }) 
     rows.push(seats.slice(i, i + 5));
   }
 
-  const getSeatLabel = (number) => {
-    const r = Math.floor((number - 1) / 5);
-    const c = (number - 1) % 5 + 1;
-    const rowLetter = String.fromCharCode(65 + r); // A, B, C...
-    return `${rowLetter}${c}`;
-  };
 
   const getSeatClass = (seat) => {
     if (seat.isBooked) {
@@ -79,7 +74,7 @@ const SeatGrid = ({ seats = [], onSelectSeat, selectedSeat, readOnly = false }) 
 
       {/* Bus body */}
       <motion.div
-        className="bg-dark-50 dark:bg-dark-900 border-2 border-dark-200 dark:border-dark-800/80 rounded-2xl p-4 space-y-2 transition-colors duration-250"
+        className="bg-dark-50 dark:bg-dark-800 border-2 border-dark-200 dark:border-dark-600 rounded-2xl p-4 space-y-2 transition-colors duration-250"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.1 }}
@@ -101,6 +96,13 @@ const SeatGrid = ({ seats = [], onSelectSeat, selectedSeat, readOnly = false }) 
                   onMouseLeave={() => setHoveredSeat(null)}
                   whileHover={!seat.isBooked && !readOnly ? { scale: 1.12 } : {}}
                   whileTap={!seat.isBooked && !readOnly ? { scale: 0.95 } : {}}
+                  aria-label={`Seat ${getSeatLabel(seat.number)}${
+                    seat.isBooked 
+                      ? ` (Booked${seat.studentName ? ` by ${seat.studentName}` : ''})` 
+                      : selectedSeat === seat.number 
+                        ? ' (Selected)' 
+                        : ' (Available)'
+                  }`}
                   className={`
                     w-12 h-12 rounded-lg flex flex-col items-center justify-center
                     transition-colors duration-200 text-xs font-bold relative
@@ -143,6 +145,13 @@ const SeatGrid = ({ seats = [], onSelectSeat, selectedSeat, readOnly = false }) 
                   onMouseLeave={() => setHoveredSeat(null)}
                   whileHover={!seat.isBooked && !readOnly ? { scale: 1.12 } : {}}
                   whileTap={!seat.isBooked && !readOnly ? { scale: 0.95 } : {}}
+                  aria-label={`Seat ${getSeatLabel(seat.number)}${
+                    seat.isBooked 
+                      ? ` (Booked${seat.studentName ? ` by ${seat.studentName}` : ''})` 
+                      : selectedSeat === seat.number 
+                        ? ' (Selected)' 
+                        : ' (Available)'
+                  }`}
                   className={`
                     w-12 h-12 rounded-lg flex flex-col items-center justify-center
                     transition-colors duration-200 text-xs font-bold relative
@@ -178,7 +187,7 @@ const SeatGrid = ({ seats = [], onSelectSeat, selectedSeat, readOnly = false }) 
             exit={{ opacity: 0, y: 5 }}
             transition={{ duration: 0.15 }}
           >
-            <div className="inline-flex items-center gap-2 bg-dark-800 dark:bg-dark-900 border dark:border-dark-800 text-white px-4 py-2 rounded-lg text-sm shadow-md">
+            <div className="inline-flex items-center gap-2 bg-dark-800 dark:bg-dark-900 border dark:border-dark-600 text-white px-4 py-2 rounded-lg text-sm shadow-md">
               <FaUser className="text-xs" />
               <span>{hoveredSeat.studentName || 'Student'}</span>
               {hoveredSeat.studentId && (

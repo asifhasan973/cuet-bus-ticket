@@ -36,7 +36,7 @@ const ProfilePage = () => {
       <div className="card !p-0 overflow-hidden">
         <div className="bg-gradient-to-r from-primary-600 to-primary-700 h-32 relative">
           <div className="absolute -bottom-10 left-6">
-            <div className="w-20 h-20 bg-white dark:bg-dark-700 rounded-2xl shadow-lg flex items-center justify-center text-3xl font-bold text-primary-600 border-4 border-white dark:border-dark-700">
+            <div className="w-20 h-20 bg-white dark:bg-dark-600 rounded-2xl shadow-lg flex items-center justify-center text-3xl font-bold text-primary-600 border-4 border-white dark:border-dark-700">
               {user?.name?.charAt(0)}
             </div>
           </div>
@@ -87,7 +87,7 @@ const ProfilePage = () => {
                 value: user?.studentId || user?.employeeId },
               { icon: HiAcademicCap, label: 'Department', value: user?.department },
             ].map((item, i) => (
-              <div key={i} className="flex items-center gap-4 py-3 border-b border-dark-100 dark:border-dark-600/50 last:border-0">
+              <div key={i} className="flex items-center gap-4 py-3 border-b border-dark-100 dark:border-dark-600 last:border-0">
                 <div className="bg-primary-50 dark:bg-primary-900/20 p-2.5 rounded-xl">
                   <item.icon className="text-primary-600 dark:text-primary-400" />
                 </div>

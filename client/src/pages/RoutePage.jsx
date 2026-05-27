@@ -91,7 +91,7 @@ const RoutePage = () => {
               </thead>
               <tbody>
                 {SHIFT_SCHEDULE.map(s => (
-                  <tr key={s.shift} className="border-b border-dark-50 dark:border-dark-600/50 hover:bg-dark-50 dark:hover:bg-dark-600/30 transition-colors">
+                  <tr key={s.shift} className="border-b border-dark-50 dark:border-dark-600 hover:bg-dark-50 dark:hover:bg-dark-600/30 transition-colors">
                     <td className="py-3 px-4 font-bold text-dark-900 dark:text-dark-100">
                       <span className="mr-1.5">{s.icon}</span>
                       Shift {s.shift} — {s.label}
@@ -214,7 +214,7 @@ const RoutePage = () => {
 
                 {/* Supervisor info */}
                 {routeBuses.some(b => b.supervisors?.length > 0) && (
-                  <div className="mt-4 pt-3 border-t border-dark-100 dark:border-dark-600/50">
+                  <div className="mt-4 pt-3 border-t border-dark-100 dark:border-dark-600">
                     <span className="text-xs font-bold text-dark-500 dark:text-dark-400">Supervisors: </span>
                     <span className="text-xs text-dark-600 dark:text-dark-300">
                       {[...new Set(routeBuses.flatMap(b => b.supervisors?.map(s => s.name) || []))].join(', ') || 'None assigned'}
