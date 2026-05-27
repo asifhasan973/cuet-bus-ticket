@@ -113,3 +113,66 @@ npm run seed
 │   └── seed.js             # Seed database script
 └── package.json            # Root configuration and concurrent scripts
 ```
+
+---
+
+## 🧪 Testing
+
+The backend includes a comprehensive, mock-based integration test suite using **Jest** and **Supertest** to test critical paths without requiring a live MongoDB connection.
+
+Run the test suite:
+```bash
+cd server
+npm test
+```
+
+Tested areas include:
+- **API Health**: Verifying basic server response.
+- **Cron Authorization**: Confirming Vercel Cron endpoints block unauthorized requests and process updates only with valid credentials.
+- **Auth Validation**: Testing institutional email validation constraints and registration data structures.
+
+---
+
+## 🧠 Architecture & Security Polish (Production Ready)
+
+To prepare this project for real-world deployments and recruiter reviews, we implemented several security and performance enhancements:
+
+1. **Vercel Cron Authentication**: Secured the daily points-reset job (`/api/cron/reset-points`) by validating Vercel's `Authorization: Bearer <CRON_SECRET>` headers.
+2. **CORS Restrictions**: Replaced wildcard CORS headers with an origin allowlist (supporting local development and staging/production domains).
+3. **Rate Limiting**: Added `express-rate-limit` to Auth endpoints (`login`, `register`, `google`) to prevent brute-force attacks.
+4. **Database Indexing**: Configured compound database indexes in Mongoose for frequent query patterns (such as bus/date/shift availability and student booking histories).
+5. **ErrorBoundary & 404**: Wrapped the React application in a custom Error Boundary to catch render-time exceptions and added an animated, on-brand 404 routing page.
+6. **Accessibility (a11y)**: Configured screen-reader friendly `aria-label` tags for the interactive seat booking buttons and added `role="dialog"` attributes to modern overlay modals.
+
+---
+
+## 📚 API Endpoints
+
+### 🔐 Authentication (`/api/auth`)
+- `POST /api/auth/register` - Create student or supervisor accounts (requires `@cuet.ac.bd` domain).
+- `POST /api/auth/login` - Local email/password login.
+- `POST /api/auth/google` - Lazy-loads Firebase SDK to register/login via Google OAuth.
+- `GET /api/auth/me` - Fetch authenticated user details.
+
+### 🚌 Buses (`/api/buses`)
+- `GET /api/buses` - List all buses.
+- `POST /api/buses` - Add a new bus (Admin only).
+- `PUT /api/buses/:id` - Edit a bus (Admin only).
+- `DELETE /api/buses/:id` - Remove a bus (Admin only).
+
+### 🎫 Bookings (`/api/bookings`)
+- `GET /api/bookings` - Fetch booking history/manifest.
+- `POST /api/bookings` - Book a specific seat.
+- `PUT /api/bookings/:id/cancel` - Cancel seat booking with token refunds.
+
+### ⏱️ Vercel Cron (`/api/cron`)
+- `GET /api/cron/reset-points` - Daily job to increment student tokens (requires `CRON_SECRET`).
+
+---
+
+## 💡 What I Learned
+
+- **Decoupling Business Logic**: Refactoring 500+ line pages taught me to extract duplicated state machines into shared utilities and custom hooks (like the shared `getSeatLabel()` and shift scheduler).
+- **Graceful Error Handling in SPAs**: Implementing a global Error Boundary taught me how to preserve user sessions and prevent white-screen crashes when sub-components encounter rendering errors.
+- **Serverless Lifecycle & Authentication**: Deploying on Vercel highlighted the importance of securing background worker routes and managing Firebase keys securely using system-level environment variables.
+```

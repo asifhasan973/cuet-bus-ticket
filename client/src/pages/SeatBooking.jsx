@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import API from '../utils/api';
+import { getSeatLabel } from '../utils/seat';
+import { SHIFT_ICONS, SHIFT_GRADIENTS, SHIFT_BG, SHIFT_SELECTED } from '../utils/shifts';
 import SeatGrid from '../components/ui/SeatGrid';
 import { SkeletonSeatBooking } from '../components/ui/Skeleton';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
@@ -11,33 +13,7 @@ import { FaBus, FaClock, FaMapMarkerAlt, FaChevronLeft, FaChevronRight } from 'r
 import { HiArrowRight, HiArrowNarrowRight, HiSun, HiMoon } from 'react-icons/hi';
 import toast from 'react-hot-toast';
 
-const SHIFT_ICONS = {
-  1: '',
-  2: '',
-  3: '',
-  4: '',
-};
 
-const SHIFT_GRADIENTS = {
-  1: 'from-teal-400 to-teal-600',
-  2: 'from-sky-400 to-blue-500',
-  3: 'from-indigo-400 to-purple-500',
-  4: 'from-slate-600 to-slate-800',
-};
-
-const SHIFT_BG = {
-  1: 'bg-teal-50 dark:bg-teal-950/20 border-teal-200 dark:border-teal-900/40 hover:border-amber-400',
-  2: 'bg-sky-50 dark:bg-sky-950/20 border-sky-200 dark:border-sky-900/40 hover:border-sky-400',
-  3: 'bg-indigo-50 dark:bg-indigo-950/20 border-indigo-200 dark:border-indigo-900/40 hover:border-indigo-400',
-  4: 'bg-slate-50 dark:bg-dark-800/40 border-slate-200 dark:border-dark-700 hover:border-slate-400',
-};
-
-const SHIFT_SELECTED = {
-  1: 'bg-teal-500 border-amber-500 text-white shadow-lg shadow-amber-500/25',
-  2: 'bg-sky-500 border-sky-500 text-white shadow-lg shadow-sky-500/25',
-  3: 'bg-indigo-500 border-indigo-500 text-white shadow-lg shadow-indigo-500/25',
-  4: 'bg-slate-700 border-slate-700 text-white shadow-lg shadow-slate-700/25',
-};
 
 const SeatBooking = () => {
   const { user, loadUser } = useAuth();
@@ -74,13 +50,6 @@ const SeatBooking = () => {
   const [dates] = useState(generateDates);
   const [selectedDate, setSelectedDate] = useState(dates[0].dateStr);
 
-  const getSeatLabel = (number) => {
-    if (!number) return '';
-    const r = Math.floor((number - 1) / 5);
-    const c = (number - 1) % 5 + 1;
-    const rowLetter = String.fromCharCode(65 + r);
-    return `${rowLetter}${c}`;
-  };
 
   useEffect(() => {
     fetchBuses();
@@ -197,7 +166,7 @@ const SeatBooking = () => {
         <div className="flex items-center gap-2">
           <button
             onClick={() => scrollDates(-1)}
-            className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full bg-white dark:bg-dark-900 border border-dark-200 dark:border-dark-800/80 text-dark-500 dark:text-dark-400 hover:bg-dark-50 dark:hover:bg-dark-800 hover:text-dark-700 dark:hover:text-dark-200 transition-colors shadow-sm cursor-pointer"
+            className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full bg-white dark:bg-dark-900 border border-dark-200 dark:border-dark-600 text-dark-500 dark:text-dark-400 hover:bg-dark-50 dark:hover:bg-dark-800 hover:text-dark-700 dark:hover:text-dark-200 transition-colors shadow-sm cursor-pointer"
           >
             <FaChevronLeft className="text-xs" />
           </button>
@@ -213,19 +182,25 @@ const SeatBooking = () => {
                 <button
                   key={d.dateStr}
                   onClick={() => setSelectedDate(d.dateStr)}
-                  className={`flex-shrink-0 flex flex-col items-center px-4 py-3 rounded-xl border-2 transition-all duration-200 min-w-[72px] cursor-pointer ${
+                  className={`flex-shrink-0 flex flex-col items-center px-4 py-3 rounded-xl border-2 transition-all duration-200 min-w-[72px] cursor-pointer group ${
                     isSelected
                       ? 'bg-primary-600 border-primary-600 text-white shadow-lg shadow-primary-600/25 scale-105'
-                      : 'bg-white dark:bg-dark-900 border-dark-100 dark:border-dark-800/80 text-dark-600 dark:text-dark-300 hover:border-primary-300 hover:bg-primary-50 dark:hover:bg-primary-950/20'
+                      : 'bg-white dark:bg-dark-900 border-dark-100 dark:border-dark-600 text-dark-600 dark:text-dark-300 hover:border-primary-300 hover:bg-primary-50 dark:hover:bg-primary-950/30'
                   }`}
                 >
-                  <span className={`text-[10px] font-bold uppercase tracking-wider ${isSelected ? 'text-white/80' : 'text-dark-400 dark:text-dark-500'}`}>
+                  <span className={`text-[10px] font-bold uppercase tracking-wider transition-colors duration-200 ${
+                    isSelected ? 'text-white/80' : 'text-dark-400 dark:text-dark-500 group-hover:text-primary-500 dark:group-hover:text-primary-400'
+                  }`}>
                     {d.isToday ? 'Today' : d.dayName}
                   </span>
-                  <span className={`text-xl font-black ${isSelected ? 'text-white' : 'text-dark-900 dark:text-dark-100'}`}>
+                  <span className={`text-xl font-black transition-colors duration-200 ${
+                    isSelected ? 'text-white' : 'text-dark-900 dark:text-dark-100 group-hover:text-primary-600 dark:group-hover:text-primary-400'
+                  }`}>
                     {d.dayNum}
                   </span>
-                  <span className={`text-[10px] font-semibold ${isSelected ? 'text-white/70' : 'text-dark-400 dark:text-dark-500'}`}>
+                  <span className={`text-[10px] font-semibold transition-colors duration-200 ${
+                    isSelected ? 'text-white/70' : 'text-dark-400 dark:text-dark-500 group-hover:text-primary-500 dark:group-hover:text-primary-400'
+                  }`}>
                     {d.monthName}
                   </span>
                 </button>
@@ -235,7 +210,7 @@ const SeatBooking = () => {
 
           <button
             onClick={() => scrollDates(1)}
-            className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full bg-white dark:bg-dark-900 border border-dark-200 dark:border-dark-800/80 text-dark-500 dark:text-dark-400 hover:bg-dark-50 dark:hover:bg-dark-800 hover:text-dark-700 dark:hover:text-dark-200 transition-colors shadow-sm cursor-pointer"
+            className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full bg-white dark:bg-dark-900 border border-dark-200 dark:border-dark-600 text-dark-500 dark:text-dark-400 hover:bg-dark-50 dark:hover:bg-dark-800 hover:text-dark-700 dark:hover:text-dark-200 transition-colors shadow-sm cursor-pointer"
           >
             <FaChevronRight className="text-xs" />
           </button>
@@ -313,19 +288,19 @@ const SeatBooking = () => {
                 ({buses.length} buses available)
               </span>
             </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {buses.map(bus => (
               <button
                 key={bus._id}
                 onClick={() => selectBus(bus._id)}
                 className="card text-left group hover:scale-[1.01] hover:shadow-lg transition-all duration-200 !p-0 overflow-hidden"
               >
-                <div className={`bg-gradient-to-r ${SHIFT_GRADIENTS[selectedShift.shift]} px-4 py-2.5 flex items-center justify-between`}>
-                  <div className="flex items-center gap-2">
-                    <FaBus className="text-white text-sm" />
-                    <h3 className="font-bold text-white text-sm">{bus.busName}</h3>
+                <div className={`bg-gradient-to-r ${SHIFT_GRADIENTS[selectedShift.shift]} px-5 py-3.5 flex items-center justify-between`}>
+                  <div className="flex items-center gap-2.5">
+                    <FaBus className="text-white text-base" />
+                    <h3 className="font-extrabold text-white text-lg md:text-xl tracking-tight">{bus.busName}</h3>
                   </div>
-                  <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${
+                  <span className={`text-[10px] font-bold uppercase px-2.5 py-1 rounded-full ${
                     bus.busType === 'flyover' ? 'bg-white/30 text-white' : 'bg-white/20 text-white/90'
                   }`}>
                     {bus.busType}
@@ -388,19 +363,19 @@ const SeatBooking = () => {
                   </div>
                 </div>
                 <div className="p-5 space-y-3 text-sm">
-                  <div className="flex justify-between py-2 border-b border-dark-100 dark:border-dark-600/50">
+                  <div className="flex justify-between py-2 border-b border-dark-100 dark:border-dark-600">
                     <span className="text-dark-500 dark:text-dark-400">Shift</span>
                     <span className="font-bold text-dark-900 dark:text-dark-100">{SHIFT_ICONS[selectedShift.shift]} Shift {selectedShift.shift} — {selectedShift.label}</span>
                   </div>
-                  <div className="flex justify-between py-2 border-b border-dark-100 dark:border-dark-600/50">
+                  <div className="flex justify-between py-2 border-b border-dark-100 dark:border-dark-600">
                     <span className="text-dark-500 dark:text-dark-400">Departure</span>
                     <span className="font-semibold dark:text-dark-200">{selectedShift.departure}</span>
                   </div>
-                  <div className="flex justify-between py-2 border-b border-dark-100 dark:border-dark-600/50">
+                  <div className="flex justify-between py-2 border-b border-dark-100 dark:border-dark-600">
                     <span className="text-dark-500 dark:text-dark-400">Arrival</span>
                     <span className="font-semibold dark:text-dark-200">{selectedShift.arrival}</span>
                   </div>
-                  <div className="flex justify-between py-2 border-b border-dark-100 dark:border-dark-600/50">
+                  <div className="flex justify-between py-2 border-b border-dark-100 dark:border-dark-600">
                     <span className="text-dark-500 dark:text-dark-400">Direction</span>
                     <span className={`font-bold text-xs px-2 py-0.5 rounded-full ${
                       selectedShift.direction === 'inbound' 
@@ -410,7 +385,7 @@ const SeatBooking = () => {
                       {selectedShift.directionLabel}
                     </span>
                   </div>
-                  <div className="flex justify-between py-2 border-b border-dark-100 dark:border-dark-600/50">
+                  <div className="flex justify-between py-2 border-b border-dark-100 dark:border-dark-600">
                     <span className="text-dark-500 dark:text-dark-400">Total Seats</span>
                     <span className="font-semibold dark:text-dark-200">{selectedBus.totalSeats}</span>
                   </div>
@@ -426,7 +401,7 @@ const SeatBooking = () => {
                     {selectedShift.specialRoute ? '🌟 Special Route' : '📍 Route'}
                   </p>
                   {selectedShift.specialRoute ? (
-                    <div className="bg-teal-50 dark:bg-teal-950/20 border border-teal-200 dark:border-teal-900/40 rounded-xl p-3">
+                    <div className="bg-teal-50 dark:bg-teal-950/20 border border-teal-200 dark:border-teal-800 rounded-xl p-3">
                       <p className="text-sm font-semibold text-amber-800 dark:text-amber-300">{selectedShift.specialRoute}</p>
                       <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">{selectedShift.description}</p>
                     </div>

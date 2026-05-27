@@ -41,8 +41,10 @@ router.get('/stats', auth, roleCheck('admin'), async (req, res) => {
 // @access  Admin
 router.get('/users', auth, roleCheck('admin'), async (req, res) => {
   try {
-    const { role } = req.query;
-    const filter = role ? { role } : {};
+    const { role, isApproved } = req.query;
+    const filter = {};
+    if (role) filter.role = role;
+    if (isApproved !== undefined) filter.isApproved = isApproved === 'true';
     const users = await User.find(filter).sort({ createdAt: -1 });
     res.json(users);
   } catch (error) {
@@ -83,10 +85,11 @@ router.delete('/users/:id', auth, roleCheck('admin'), async (req, res) => {
 // @access  Admin
 router.put('/users/:id', auth, roleCheck('admin'), async (req, res) => {
   try {
-    const { points, role } = req.body;
+    const { points, role, isApproved } = req.body;
     const updateData = {};
     if (points !== undefined) updateData.points = points;
     if (role !== undefined) updateData.role = role;
+    if (isApproved !== undefined) updateData.isApproved = isApproved;
 
     const user = await User.findByIdAndUpdate(
       req.params.id,

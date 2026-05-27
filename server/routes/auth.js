@@ -69,6 +69,7 @@ router.post('/register', [
       return res.status(400).json({ message: 'Employee ID is required for supervisors' });
     }
 
+    const isApproved = role !== 'supervisor';
     user = new User({
       name,
       email: normalizedEmail,
@@ -76,11 +77,19 @@ router.post('/register', [
       role,
       studentId: role === 'student' ? studentId : undefined,
       employeeId: role === 'supervisor' ? employeeId : undefined,
-      department,
+      department: role === 'student' ? department : undefined,
       points: role === 'student' ? 5 : 0,
+      isApproved,
     });
 
     await user.save();
+
+    if (!isApproved) {
+      return res.status(201).json({
+        message: 'Registration successful! Your account is pending administrator approval.',
+        pendingApproval: true,
+      });
+    }
 
     const token = generateToken(user._id);
 
@@ -126,6 +135,10 @@ router.post('/login', [
     const user = await User.findOne({ email: normalizedEmail }).select('+password');
     if (!user) {
       return res.status(400).json({ message: 'Invalid credentials' });
+    }
+
+    if (user.role === 'supervisor' && !user.isApproved) {
+      return res.status(403).json({ message: 'Your supervisor account is pending admin approval.' });
     }
 
     const isMatch = await user.matchPassword(password);
@@ -219,6 +232,7 @@ router.post('/google', async (req, res) => {
       const assignedRole = ['student', 'supervisor'].includes(role) ? role : 'student';
       const studentId = assignedRole === 'student' ? normalizedEmail.split('@')[0] : undefined;
       const employeeId = assignedRole === 'supervisor' ? 'EMP-' + Date.now().toString().slice(-4) : undefined;
+      const isApproved = assignedRole !== 'supervisor';
       
       user = new User({
         name: name || normalizedEmail.split('@')[0],
@@ -228,8 +242,13 @@ router.post('/google', async (req, res) => {
         studentId,
         employeeId,
         points: assignedRole === 'student' ? 5 : 0,
+        isApproved,
       });
       await user.save();
+    }
+
+    if (user.role === 'supervisor' && !user.isApproved) {
+      return res.status(403).json({ message: 'Your supervisor account is pending admin approval.' });
     }
     
     const token = generateToken(user._id);

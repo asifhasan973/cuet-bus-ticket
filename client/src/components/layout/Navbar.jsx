@@ -26,7 +26,7 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-white/90 dark:bg-dark-800/90 backdrop-blur-xl border-b border-dark-100 dark:border-dark-700/60 sticky top-0 z-50 transition-colors duration-300">
+    <nav className="bg-white/90 dark:bg-dark-800/90 backdrop-blur-xl border-b border-dark-100 dark:border-dark-600 sticky top-0 z-50 transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
@@ -58,7 +58,7 @@ const Navbar = () => {
                 <Link to={getDashboardLink()} className="px-4 py-2 text-dark-600 dark:text-dark-300 hover:text-primary-600 dark:hover:text-primary-400 rounded-lg hover:bg-primary-50 dark:hover:bg-primary-950/30 transition-all text-sm font-medium">
                   Dashboard
                 </Link>
-                <div className="w-px h-6 bg-dark-200 dark:bg-dark-800 mx-2" />
+                <div className="w-px h-6 bg-dark-200 dark:bg-dark-600 mx-2" />
                 <div className="flex items-center gap-3">
                   <div className="flex items-center gap-2 bg-dark-50 dark:bg-dark-800 px-3 py-1.5 rounded-full transition-colors">
                     <FaUserCircle className="text-primary-500" />
@@ -74,7 +74,7 @@ const Navbar = () => {
               </>
             ) : (
               <>
-                <div className="w-px h-6 bg-dark-200 dark:bg-dark-800 mx-2" />
+                <div className="w-px h-6 bg-dark-200 dark:bg-dark-600 mx-2" />
                 <Link to="/student/login" className="px-4 py-2 text-dark-600 dark:text-dark-300 hover:text-primary-600 dark:hover:text-primary-400 rounded-lg hover:bg-primary-50 dark:hover:bg-primary-950/30 transition-all text-sm font-medium">
                   Student Login
                 </Link>
@@ -84,7 +84,7 @@ const Navbar = () => {
               </>
             )}
 
-            <div className="w-px h-6 bg-dark-200 dark:bg-dark-800 mx-2" />
+            <div className="w-px h-6 bg-dark-200 dark:bg-dark-600 mx-2" />
             
             {/* Theme Toggle */}
             <motion.button
@@ -123,7 +123,7 @@ const Navbar = () => {
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            className="md:hidden border-t border-dark-100 dark:border-dark-700 bg-white/95 dark:bg-dark-800/95 backdrop-blur-xl overflow-hidden"
+            className="md:hidden border-t border-dark-100 dark:border-dark-600 bg-white/95 dark:bg-dark-800/95 backdrop-blur-xl overflow-hidden"
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
@@ -141,7 +141,7 @@ const Navbar = () => {
                   <Link to={getDashboardLink()} onClick={() => setIsOpen(false)} className="block px-4 py-2.5 text-dark-600 dark:text-dark-300 hover:text-primary-600 dark:hover:text-primary-400 rounded-lg hover:bg-primary-50 dark:hover:bg-primary-950/30 transition-all text-sm font-medium">
                     Dashboard
                   </Link>
-                  <div className="border-t border-dark-100 dark:border-dark-800 my-2" />
+                  <div className="border-t border-dark-100 dark:border-dark-600 my-2" />
                   <div className="px-4 py-2 flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <FaUserCircle className="text-primary-500" />
@@ -163,14 +163,14 @@ const Navbar = () => {
                 </>
               ) : (
                 <>
-                  <div className="border-t border-dark-100 dark:border-dark-800 my-2" />
+                  <div className="border-t border-dark-100 dark:border-dark-600 my-2" />
                   <Link to="/student/login" onClick={() => setIsOpen(false)} className="block px-4 py-2.5 text-dark-600 dark:text-dark-300 hover:text-primary-600 dark:hover:text-primary-400 rounded-lg hover:bg-primary-50 dark:hover:bg-primary-950/30 transition-all text-sm font-medium">
                     Student Login
                   </Link>
                   <Link to="/supervisor/login" onClick={() => setIsOpen(false)} className="block px-4 py-2.5 text-dark-600 dark:text-dark-300 hover:text-primary-600 dark:hover:text-primary-400 rounded-lg hover:bg-primary-50 dark:hover:bg-primary-950/30 transition-all text-sm font-medium">
                     Supervisor Login
                   </Link>
-                  <div className="border-t border-dark-100 dark:border-dark-800 my-2" />
+                  <div className="border-t border-dark-100 dark:border-dark-600 my-2" />
                   <div className="px-4 py-2 flex items-center justify-between">
                     <span className="text-sm font-medium text-dark-600 dark:text-dark-300">Theme</span>
                     <button

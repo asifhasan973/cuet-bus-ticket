@@ -14,6 +14,7 @@
   --color-primary-700: #1d4ed8;
   --color-primary-800: #1e40af;
   --color-primary-900: #1e3a8a;
+  --color-primary-950: #172554;
 
   --color-accent-50: #ecfdf5;
   --color-accent-100: #d1fae5;
@@ -101,7 +102,7 @@
   }
 
   .card {
-    @apply bg-white dark:bg-dark-700 rounded-2xl shadow-sm border border-dark-100 dark:border-dark-600/50 p-6
+    @apply bg-white dark:bg-dark-700 rounded-2xl shadow-sm border border-dark-100 dark:border-dark-600 p-6
            hover:shadow-md transition-all duration-300;
   }
 
@@ -115,7 +116,7 @@
 
   .glass {
     @apply bg-white/70 backdrop-blur-xl border border-white/20
-           dark:bg-dark-700/70 dark:border-dark-600/40;
+           dark:bg-dark-700/70 dark:border-dark-600;
   }
 }
 
@@ -142,4 +143,71 @@
 
 .animate-pulse-glow {
   animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* Print styles */
+@media print {
+  /* Hide everything on the page */
+  body * {
+    visibility: hidden !important;
+    background: none !important;
+  }
+  
+  /* Show only the ticket container */
+  #print-ticket,
+  #print-ticket * {
+    visibility: visible !important;
+  }
+  
+  /* Position the ticket on the page */
+  #print-ticket {
+    position: absolute !important;
+    left: 50% !important;
+    top: 20px !important;
+    transform: translateX(-50%) !important;
+    width: 100% !important;
+    max-width: 480px !important;
+    margin: 0 auto !important;
+    border: 2px dashed #475569 !important;
+    box-shadow: none !important;
+    background-color: white !important;
+    background-image: none !important;
+    color: #0f172a !important;
+    padding: 24px !important;
+  }
+
+  /* Ensure text colors are readable on white background when printing */
+  #print-ticket span, 
+  #print-ticket h4, 
+  #print-ticket p {
+    color: #0f172a !important;
+  }
+  #print-ticket .text-primary-500 {
+    color: #2563eb !important;
+  }
+  #print-ticket .text-accent-600 {
+    color: #059669 !important;
+  }
+  #print-ticket .text-dark-400,
+  #print-ticket .text-dark-500 {
+    color: #475569 !important;
+  }
+  
+  /* Hide cutout border backgrounds so they don't look weird when printing */
+  #print-ticket .absolute {
+    background-color: white !important;
+    border-color: #475569 !important;
+  }
+}
+
+/* Headless QR Scanner camera element styling */
+#qr-reader video {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  border-radius: 0.75rem !important;
+}
+
+#qr-reader {
+  border: none !important;
 }

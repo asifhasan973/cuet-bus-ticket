@@ -78,6 +78,7 @@ export const AnimatedCounter = ({ value, duration = 1.2 }) => {
   useEffect(() => {
     const target = typeof value === 'string' ? parseInt(value) : value;
     if (isNaN(target) || target === 0) {
+      // eslint-disable-next-line
       setCount(value);
       return;
     }

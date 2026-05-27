@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import API from '../utils/api';
+import { getSeatLabel } from '../utils/seat';
+import { SHIFT_ICONS, SHIFT_LABELS, SHIFT_COLORS } from '../utils/shifts';
 import StatsCard from '../components/ui/StatsCard';
 import Modal from '../components/ui/Modal';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
@@ -13,14 +15,7 @@ import { FadeIn, StaggerContainer, StaggerItem } from '../components/ui/Animated
 import { QRCodeSVG } from 'qrcode.react';
 import { SkeletonCardGrid, SkeletonTable, SkeletonLine } from '../components/ui/Skeleton';
 
-const SHIFT_ICONS = { 1: '🌅', 2: '☀️', 3: '🌇', 4: '🌙' };
-const SHIFT_LABELS = { 1: 'Morning', 2: 'Afternoon', 3: 'Evening', 4: 'Night' };
-const SHIFT_COLORS = {
-  1: 'bg-teal-100 text-teal-700 dark:bg-teal-950/40 dark:text-teal-400',
-  2: 'bg-sky-100 text-sky-700 dark:bg-sky-950/40 dark:text-sky-400',
-  3: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-950/40 dark:text-indigo-400',
-  4: 'bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-400',
-};
+
 
 const StudentDashboard = () => {
   const { user, loadUser } = useAuth();
@@ -35,13 +30,6 @@ const StudentDashboard = () => {
     loadUser();
   }, []);
 
-  const getSeatLabel = (number) => {
-    if (!number) return '';
-    const r = Math.floor((number - 1) / 5);
-    const c = (number - 1) % 5 + 1;
-    const rowLetter = String.fromCharCode(65 + r);
-    return `${rowLetter}${c}`;
-  };
 
   const fetchBookings = async () => {
     try {
@@ -209,13 +197,13 @@ const StudentDashboard = () => {
       {/* Booking History */}
       {bookings.length > 0 && (
         <FadeIn delay={0.5}>
-          <div className="card !p-0 overflow-hidden dark:border-dark-800/80">
-            <div className="px-6 py-4 border-b border-dark-100 dark:border-dark-800/80">
+          <div className="card !p-0 overflow-hidden dark:border-dark-650">
+            <div className="px-6 py-4 border-b border-dark-100 dark:border-dark-600">
               <h2 className="font-bold text-dark-900 dark:text-white">Booking History</h2>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-dark-50 dark:bg-dark-900/60 border-b border-dark-100 dark:border-dark-800/60">
+                <thead className="bg-dark-50 dark:bg-dark-800 border-b border-dark-100 dark:border-dark-600">
                   <tr>
                     <th className="text-left px-6 py-3 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">Bus</th>
                     <th className="text-left px-6 py-3 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">Shift</th>
@@ -225,7 +213,7 @@ const StudentDashboard = () => {
                     <th className="text-left px-6 py-3 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">Attendance</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-dark-100 dark:divide-dark-800/50">
+                <tbody className="divide-y divide-dark-100 dark:divide-dark-600">
                   {bookings.map((booking, index) => (
                     <motion.tr
                       key={booking._id}
@@ -289,7 +277,7 @@ const StudentDashboard = () => {
             <button
               onClick={() => setBookingToCancel(null)}
               disabled={cancelling}
-              className="btn-secondary flex-1 dark:bg-transparent dark:text-dark-300 dark:border-dark-800 hover:dark:bg-dark-800"
+              className="btn-secondary flex-1"
             >
               Keep Booking
             </button>
@@ -315,13 +303,13 @@ const StudentDashboard = () => {
         {selectedTicket && (
           <div className="space-y-6">
             {/* Boarding Pass Ticket Layout */}
-            <div className="border-2 border-dashed border-dark-200 dark:border-dark-800/80 rounded-2xl p-6 bg-gradient-to-b from-white to-dark-50/50 dark:from-dark-800 dark:to-dark-900/50 shadow-sm relative overflow-hidden">
+            <div id="print-ticket" className="border-2 border-dashed border-dark-200 dark:border-dark-600 rounded-2xl p-6 bg-gradient-to-b from-white to-dark-50/50 dark:from-dark-800 dark:to-dark-900/50 shadow-sm relative overflow-hidden">
               {/* Decorative side cutouts */}
-              <div className="absolute -left-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-dark-50 dark:bg-dark-900 border-r border-dark-200 dark:border-dark-800/80" />
-              <div className="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-dark-50 dark:bg-dark-900 border-l border-dark-200 dark:border-dark-800/80" />
+              <div className="absolute -left-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-dark-50 dark:bg-dark-800 border-r border-dark-200 dark:border-dark-600" />
+              <div className="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-dark-50 dark:bg-dark-800 border-l border-dark-200 dark:border-dark-600" />
               
               {/* Header */}
-              <div className="flex justify-between items-center pb-4 border-b border-dark-100 dark:border-dark-800/80">
+              <div className="flex justify-between items-center pb-4 border-b border-dark-100 dark:border-dark-600">
                 <div>
                   <span className="text-[10px] uppercase font-bold tracking-wider text-primary-500">Official Ticket</span>
                   <h4 className="font-extrabold text-xl text-dark-900 dark:text-white">CUETGo</h4>
@@ -335,7 +323,7 @@ const StudentDashboard = () => {
               </div>
 
               {/* Passenger Info */}
-              <div className="py-4 grid grid-cols-2 gap-3 border-b border-dark-100 dark:border-dark-800/80">
+              <div className="py-4 grid grid-cols-2 gap-3 border-b border-dark-100 dark:border-dark-600">
                 <div>
                   <span className="text-[10px] text-dark-400 dark:text-dark-500 block">Passenger</span>
                   <span className="text-sm font-bold text-dark-800 dark:text-dark-200">{user?.name}</span>
@@ -349,7 +337,7 @@ const StudentDashboard = () => {
               </div>
 
               {/* Trip details */}
-              <div className="py-4 grid grid-cols-2 gap-y-4 gap-x-3 border-b border-dark-100 dark:border-dark-800/80">
+              <div className="py-4 grid grid-cols-2 gap-y-4 gap-x-3 border-b border-dark-100 dark:border-dark-600">
                 <div>
                   <span className="text-[10px] text-dark-400 dark:text-dark-500 block">Bus</span>
                   <div className="flex items-center gap-1.5 mt-0.5">
@@ -377,7 +365,7 @@ const StudentDashboard = () => {
 
               {/* QR Code */}
               <div className="pt-6 flex flex-col items-center justify-center">
-                <div className="bg-white p-3 rounded-xl shadow-sm border border-dark-100 dark:border-dark-800/80">
+                <div className="bg-white p-3 rounded-xl shadow-sm border border-dark-100 dark:border-dark-600">
                   <QRCodeSVG 
                     value={selectedTicket._id} 
                     size={160}
@@ -395,7 +383,7 @@ const StudentDashboard = () => {
             <div className="flex gap-3">
               <button
                 onClick={() => window.print()}
-                className="btn-secondary flex-1 flex items-center justify-center gap-2 dark:bg-transparent dark:text-dark-300 dark:border-dark-800 hover:dark:bg-dark-800"
+                className="btn-secondary flex-1 flex items-center justify-center gap-2"
               >
                 <HiPrinter className="text-lg" /> Print Ticket
               </button>

@@ -17,6 +17,10 @@ const auth = async (req, res, next) => {
       return res.status(401).json({ message: 'Token is not valid' });
     }
 
+    if (user.role === 'supervisor' && !user.isApproved) {
+      return res.status(403).json({ message: 'Your supervisor account is pending admin approval.' });
+    }
+
     if (!isAllowedInstitutionEmail(user.email)) {
       return res.status(401).json({ message: ALLOWED_EMAIL_MESSAGE });
     }

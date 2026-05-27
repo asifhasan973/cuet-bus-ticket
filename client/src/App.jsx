@@ -1,10 +1,12 @@
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { ThemeProvider } from './context/ThemeContext';
 import { Toaster } from 'react-hot-toast';
 import { AnimatePresence, motion } from 'framer-motion';
 import Navbar from './components/layout/Navbar';
 import DashboardLayout from './components/layout/DashboardLayout';
 import LoadingSpinner from './components/ui/LoadingSpinner';
+import ErrorBoundary from './components/ui/ErrorBoundary';
 
 // Pages
 import Home from './pages/Home';
@@ -20,6 +22,7 @@ import SupervisorDashboard from './pages/SupervisorDashboard';
 import AttendancePage from './pages/AttendancePage';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminBusManagement from './pages/AdminBusManagement';
+import NotFound from './pages/NotFound';
 
 // Protected Route Component
 const ProtectedRoute = ({ children, roles }) => {
@@ -98,45 +101,46 @@ const AnimatedRoutes = () => {
         </Route>
 
         {/* Catch all */}
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<PageWrapper><NotFound /></PageWrapper>} />
       </Routes>
     </AnimatePresence>
   );
 };
 
-import { ThemeProvider } from './context/ThemeContext';
 
 function App() {
   return (
-    <ThemeProvider>
-      <AuthProvider>
-        <Router>
-          <div className="min-h-screen bg-dark-50 dark:bg-dark-800 text-dark-800 dark:text-dark-100 transition-colors duration-300">
-            <Navbar />
-            <AnimatedRoutes />
-          </div>
-        </Router>
-        <Toaster
-          position="top-right"
-          toastOptions={{
-            duration: 3000,
-            style: {
-              background: '#1e293b',
-              color: '#fff',
-              borderRadius: '12px',
-              padding: '12px 16px',
-              fontSize: '14px',
-            },
-            success: {
-              iconTheme: { primary: '#10b981', secondary: '#fff' },
-            },
-            error: {
-              iconTheme: { primary: '#ef4444', secondary: '#fff' },
-            },
-          }}
-        />
-      </AuthProvider>
-    </ThemeProvider>
+    <ErrorBoundary>
+      <ThemeProvider>
+        <AuthProvider>
+          <Router>
+            <div className="min-h-screen bg-dark-50 dark:bg-dark-800 text-dark-800 dark:text-dark-100 transition-colors duration-300">
+              <Navbar />
+              <AnimatedRoutes />
+            </div>
+          </Router>
+          <Toaster
+            position="top-right"
+            toastOptions={{
+              duration: 3000,
+              style: {
+                background: '#1e293b',
+                color: '#fff',
+                borderRadius: '12px',
+                padding: '12px 16px',
+                fontSize: '14px',
+              },
+              success: {
+                iconTheme: { primary: '#10b981', secondary: '#fff' },
+              },
+              error: {
+                iconTheme: { primary: '#ef4444', secondary: '#fff' },
+              },
+            }}
+          />
+        </AuthProvider>
+      </ThemeProvider>
+    </ErrorBoundary>
   );
 }
 
