@@ -110,8 +110,8 @@ app.use((err, req, res, next) => {
 
 const PORT = process.env.PORT || 5001;
 
-// Only listen if not deployed on Vercel Serverless (local dev or traditional hosting)
-if (process.env.NODE_ENV !== 'production' && process.env.NODE_ENV !== 'test' && !process.env.VERCEL) {
+// Only listen if not deployed on Vercel Serverless (local dev or traditional hosting) and not in a test environment
+if (process.env.NODE_ENV !== 'test' && !process.env.VERCEL) {
   server.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
   });
