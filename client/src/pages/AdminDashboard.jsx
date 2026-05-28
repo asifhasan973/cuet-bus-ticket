@@ -5,6 +5,7 @@ import LoadingSpinner from '../components/ui/LoadingSpinner';
 import { FaBus, FaUsers, FaUserTie, FaTrash, FaTimes, FaSave } from 'react-icons/fa';
 import { HiTicket } from 'react-icons/hi';
 import toast from 'react-hot-toast';
+import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, BarChart, Bar, Cell, CartesianGrid } from 'recharts';
 
 const SHIFT_ICONS = { 1: '', 2: '', 3: '', 4: '' };
 const SHIFT_LABELS = { 1: 'Morning', 2: 'Afternoon', 3: 'Evening', 4: 'Night' };
@@ -19,7 +20,9 @@ const AdminDashboard = () => {
   const [stats, setStats] = useState(null);
   const [users, setUsers] = useState([]);
   const [pendingSupervisors, setPendingSupervisors] = useState([]);
+  const [analytics, setAnalytics] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [analyticsLoading, setAnalyticsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
   const [userFilter, setUserFilter] = useState('');
   
@@ -34,6 +37,7 @@ const AdminDashboard = () => {
     fetchUsers();
     fetchBuses();
     fetchPendingSupervisors();
+    fetchAnalytics();
   }, []);
 
   const fetchBuses = async () => {
@@ -72,6 +76,18 @@ const AdminDashboard = () => {
       setPendingSupervisors(res.data);
     } catch (error) {
       toast.error('Failed to load pending approvals');
+    }
+  };
+
+  const fetchAnalytics = async () => {
+    try {
+      setAnalyticsLoading(true);
+      const res = await API.get('/admin/analytics');
+      setAnalytics(res.data);
+    } catch (error) {
+      console.error('Failed to load analytics');
+    } finally {
+      setAnalyticsLoading(false);
     }
   };
 
