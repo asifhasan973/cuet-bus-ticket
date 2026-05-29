@@ -21,8 +21,10 @@ if (process.env.NODE_ENV !== 'test') {
   }
 }
 
-// Connect to database
-connectDB();
+// Connect to database (skip in test environment)
+if (process.env.NODE_ENV !== 'test') {
+  connectDB();
+}
 
 const app = express();
 const server = http.createServer(app);
