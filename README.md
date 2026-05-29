@@ -156,3 +156,12 @@ VITE_FIREBASE_APP_ID=your_app_id
 
 > **Answer:** When a student cancels a booking, its status changes to `'cancelled'`. If we had a standard unique index on `{ bus, travelDate, shift, seatNumber }`, a cancelled booking would remain in the index and block other students from booking that seat.
 > By utilizing a partial filter index (`{ isActive: true }`), cancelled bookings (which set `isActive: false`) are ignored by the index constraint, freeing the seat instantly for others to book while preserving the cancelled record in the database for admin analytics.
+
+---
+
+## 🔒 Security Notes
+
+- **Environment Configurations:** Sensitive parameters (such as connection credentials, JWT keys, and administration tokens) are managed strictly via environment variables. These are kept locally in Git-ignored `.env` files and configured in the cloud settings on Render and Vercel.
+- **Template Templates:** Only generic template files (`.env.example`) are tracked in the Git repository to serve as configuration guides. No real secrets or keys are ever committed.
+- **Secret Rotation Policy:** If a secret is accidentally exposed, it must be rotated immediately in all cloud provider dashboards (MongoDB Atlas, Vercel Project Settings, and Render Services).
+- **Firebase Safety:** Client-side Firebase configuration parameters (API keys, project IDs) are public metadata compiled into the browser bundle. However, project access is strictly hardened by restricting Firebase authorized domains and configuring rigid security rules for writes.
