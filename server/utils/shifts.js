@@ -121,11 +121,58 @@ function getShiftInfo(shiftNumber, dateStr) {
 }
 
 /**
+ * Helper to parse time string like "6:30 AM" or "2:30 PM"
+ */
+function parseTime(timeStr) {
+  const match = timeStr.match(/^(\d+):(\d+)\s*(AM|PM)$/i);
+  if (!match) return { hours: 0, minutes: 0 };
+  let hours = parseInt(match[1], 10);
+  const minutes = parseInt(match[2], 10);
+  const ampm = match[3].toUpperCase();
+  if (ampm === 'PM' && hours < 12) hours += 12;
+  if (ampm === 'AM' && hours === 12) hours = 0;
+  return { hours, minutes };
+}
+
+/**
+ * Check if the shift departure time has already passed today
+ */
+function isShiftPassed(departureTimeStr) {
+  const { hours, minutes } = parseTime(departureTimeStr);
+  const now = new Date();
+  const currentHours = now.getHours();
+  const currentMinutes = now.getMinutes();
+
+  if (currentHours > hours) return true;
+  if (currentHours === hours && currentMinutes >= minutes) return true;
+  return false;
+}
+
+/**
+ * Get current date string in local system time (YYYY-MM-DD)
+ */
+function getLocalDateStr() {
+  const d = new Date();
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+/**
  * Get all available shifts with info for a given date
  */
 function getAllShiftsForDate(dateStr) {
   const shiftNumbers = getAvailableShifts(dateStr);
-  return shiftNumbers.map((num) => getShiftInfo(num, dateStr));
+  const allShifts = shiftNumbers.map((num) => getShiftInfo(num, dateStr));
+
+  const todayStr = getLocalDateStr();
+  if (dateStr === todayStr) {
+    // Filter out shifts that have already departed today
+    return allShifts.filter((shift) => !isShiftPassed(shift.departure));
+  }
+
+  return allShifts;
 }
 
 /**

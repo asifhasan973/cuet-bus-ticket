@@ -3,10 +3,10 @@
  */
 
 export const SHIFT_ICONS = {
-  1: '🌅',
-  2: '☀️',
-  3: '🌇',
-  4: '🌙',
+  1: '',
+  2: '',
+  3: '',
+  4: '',
 };
 
 export const SHIFT_LABELS = {
@@ -47,7 +47,7 @@ export const SHIFT_SELECTED = {
 export const SHIFT_SCHEDULE = [
   {
     shift: 1,
-    icon: '🌅',
+    icon: '',
     label: 'Morning',
     time: '6:30 AM → 8:00 AM',
     dir: 'CUET-bound',
@@ -56,7 +56,7 @@ export const SHIFT_SCHEDULE = [
   },
   {
     shift: 2,
-    icon: '☀️',
+    icon: '',
     label: 'Afternoon',
     time: '2:00 PM → 3:00 PM',
     dir: 'Outbound',
@@ -65,7 +65,7 @@ export const SHIFT_SCHEDULE = [
   },
   {
     shift: 3,
-    icon: '🌇',
+    icon: '',
     label: 'Evening',
     time: '5:00 PM → 7:00 PM',
     dir: 'Outbound',
@@ -74,7 +74,7 @@ export const SHIFT_SCHEDULE = [
   },
   {
     shift: 4,
-    icon: '🌙',
+    icon: '',
     label: 'Night',
     time: '9:00 PM → 10:30 PM',
     dir: 'CUET-bound',

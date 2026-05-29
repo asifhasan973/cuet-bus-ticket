@@ -89,7 +89,7 @@ const StudentDashboard = () => {
       <FadeIn>
         <div>
           <h1 className="text-2xl font-extrabold text-dark-900 dark:text-white">
-            Welcome back, {user?.name?.split(' ')[0]}! 👋
+            Welcome back, {user?.name?.split(' ')[0]}!
           </h1>
           <p className="text-dark-500 dark:text-dark-400 text-sm mt-1">
             Here's your booking overview
@@ -184,7 +184,7 @@ const StudentDashboard = () => {
                         </div>
                       </div>
                       <p className="text-xs text-dark-400 dark:text-dark-500 mb-4 line-clamp-1">
-                        📍 {booking.bus?.route?.name}
+                        {booking.bus?.route?.name}
                       </p>
 
                       <div className="flex gap-2">

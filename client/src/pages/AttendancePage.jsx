@@ -101,7 +101,7 @@ const AttendancePage = () => {
   }, [selectedDate]);
 
   useEffect(() => {
-    if (selectedBus && selectedShift) {
+    if (selectedBus) {
       fetchStudents(selectedBus, selectedDate, selectedShift);
     } else {
       setStudents([]);
@@ -125,10 +125,6 @@ const AttendancePage = () => {
     try {
       const res = await API.get(`/shifts?date=${dateStr}`);
       setShifts(res.data);
-      // Auto-select first shift if none selected
-      if (res.data.length > 0 && !selectedShift) {
-        setSelectedShift(res.data[0].shift);
-      }
     } catch (error) {
       console.error('Failed to load shifts');
     }
@@ -238,7 +234,20 @@ const AttendancePage = () => {
               <span className="block text-xs font-bold text-dark-500 dark:text-dark-400 uppercase mb-1">
                 Shift
               </span>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                <button
+                  onClick={() => setSelectedShift('')}
+                  className={`px-3 py-2 rounded-lg text-xs font-bold transition-all text-center ${
+                    selectedShift === ''
+                      ? 'bg-primary-600 text-white shadow-sm'
+                      : 'bg-dark-100 dark:bg-dark-800 text-dark-600 dark:text-dark-300 hover:bg-dark-200 dark:hover:bg-dark-700'
+                  }`}
+                >
+                  <span className="block">All Shifts</span>
+                  <span className="block text-[10px] font-semibold opacity-80">
+                    Show all bookings
+                  </span>
+                </button>
                 {shifts.map((s) => (
                   <button
                     key={s.shift}
@@ -297,10 +306,10 @@ const AttendancePage = () => {
       </div>
 
       {/* Student list */}
-      {!selectedShift ? (
+      {!selectedBus ? (
         <div className="card text-center py-10">
           <p className="text-dark-400 dark:text-dark-500 text-sm">
-            Please select a shift to view booked students
+            Please select a bus to view booked students
           </p>
         </div>
       ) : loading ? (
