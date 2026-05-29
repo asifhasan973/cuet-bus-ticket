@@ -132,7 +132,9 @@ const ProfilePage = () => {
         <div className="card bg-gradient-to-br from-primary-600 to-primary-800 !border-0 text-white">
           <p className="text-white/70 text-sm font-medium">Points</p>
           <p className="text-4xl font-extrabold mt-1">{user?.points ?? 0}</p>
-          <p className="text-white/60 text-xs mt-2">Present = -1 point • Absent = -3 points</p>
+          <p className="text-white/60 text-xs mt-2">
+            Booking = 1 point • Present = 0 extra points • Absent = 2 extra penalty points
+          </p>
         </div>
       )}
     </div>
