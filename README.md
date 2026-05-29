@@ -161,7 +161,9 @@ VITE_FIREBASE_APP_ID=your_app_id
 
 ## 🔒 Security Notes
 
-- **Environment Configurations:** Sensitive parameters (such as connection credentials, JWT keys, and administration tokens) are managed strictly via environment variables. These are kept locally in Git-ignored `.env` files and configured in the cloud settings on Render and Vercel.
-- **Template Templates:** Only generic template files (`.env.example`) are tracked in the Git repository to serve as configuration guides. No real secrets or keys are ever committed.
-- **Secret Rotation Policy:** If a secret is accidentally exposed, it must be rotated immediately in all cloud provider dashboards (MongoDB Atlas, Vercel Project Settings, and Render Services).
-- **Firebase Safety:** Client-side Firebase configuration parameters (API keys, project IDs) are public metadata compiled into the browser bundle. However, project access is strictly hardened by restricting Firebase authorized domains and configuring rigid security rules for writes.
+- **Environment Isolation:** Real production environment variables and credentials are never committed to this Git repository. Local development configuration uses `.env` files which are strictly ignored in `.gitignore`.
+- **Configuration Templates:** Tracked `.env.example` files are only dummy templates containing non-sensitive placeholder configurations.
+- **Production Secrets:** Production database connections, JWT secrets, and admin access keys must be configured inside the deployment settings of the hosting provider (e.g., Render Environment Variables, Vercel Project Settings).
+- **Incident Response:** If any credential is accidentally committed or exposed in a public branch, it must be rotated immediately in its respective platform dashboard (MongoDB Atlas database access, Firebase keys, or Render settings) and the Git history must be purged.
+- **GitHub Code Security:** We recommend enabling GitHub's **Secret scanning** and **Push protection** (under Repository settings → Code security and analysis) to detect and block secret leaks prior to code check-in.
+- **Firebase Safety:** Client-side Firebase configurations (API keys, App IDs) are public metadata needed by the browser. Access is secured by setting strict domain whitelisting (Authorized Domains) in the Firebase console and locking down database security rules.
