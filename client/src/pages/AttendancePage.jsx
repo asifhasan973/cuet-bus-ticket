@@ -60,7 +60,7 @@ const AttendancePage = () => {
               });
               toast.success(res.data.message || 'Attendance marked present!', { id: 'qr-scan' });
 
-              if (selectedBus && selectedShift) {
+              if (selectedBus) {
                 fetchStudents(selectedBus, selectedDate, selectedShift);
               }
             } catch (error) {
@@ -147,7 +147,7 @@ const AttendancePage = () => {
     try {
       const res = await API.post('/supervisor/attendance', { bookingId, status });
       toast.success(res.data.message);
-      if (selectedBus && selectedShift) {
+      if (selectedBus) {
         fetchStudents(selectedBus, selectedDate, selectedShift);
       }
     } catch (error) {
@@ -168,7 +168,7 @@ const AttendancePage = () => {
       }));
       await API.post('/supervisor/attendance/bulk', { attendanceList });
       toast.success('All students marked present');
-      if (selectedBus && selectedShift) {
+      if (selectedBus) {
         fetchStudents(selectedBus, selectedDate, selectedShift);
       }
     } catch (error) {
