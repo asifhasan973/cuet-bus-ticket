@@ -1,15 +1,6 @@
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import {
-  HiHome,
-  HiTicket,
-  HiMap,
-  HiUser,
-  HiUsers,
-  HiClipboardCheck,
-  HiCog,
-  HiChartBar,
-} from 'react-icons/hi';
+import { HiHome, HiTicket, HiMap, HiUser, HiClipboardCheck } from 'react-icons/hi';
 import { FaBus } from 'react-icons/fa';
 
 const Sidebar = ({ isOpen, onClose }) => {

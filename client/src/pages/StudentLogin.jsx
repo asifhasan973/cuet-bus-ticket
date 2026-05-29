@@ -29,7 +29,7 @@ const StudentLogin = () => {
       await login(demoEmail, demoPassword);
       toast.success('Logged in as Demo Student!');
       navigate('/student/dashboard');
-    } catch (error) {
+    } catch {
       toast.error('Demo login failed');
     } finally {
       setLoading(false);

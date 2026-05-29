@@ -5,7 +5,6 @@ import LoadingSpinner from '../components/ui/LoadingSpinner';
 import { FaBus, FaUsers } from 'react-icons/fa';
 import { HiClipboardCheck } from 'react-icons/hi';
 import { Link } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
 
 const SHIFT_SCHEDULE = [
   {
@@ -43,7 +42,6 @@ const SHIFT_SCHEDULE = [
 ];
 
 const SupervisorDashboard = () => {
-  const { user } = useAuth();
   const [buses, setBuses] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -55,7 +53,7 @@ const SupervisorDashboard = () => {
     try {
       const res = await API.get('/supervisor/buses');
       setBuses(res.data);
-    } catch (error) {
+    } catch {
       console.error('Failed to load buses');
     } finally {
       setLoading(false);

@@ -368,12 +368,9 @@ const seedData = async () => {
     console.log(`Supervisor: chowdhury@cuet.ac.bd  / ${SUPER_PASSWORD}`);
     console.log(`Supervisor: uddin@cuet.ac.bd      / ${SUPER_PASSWORD}`);
     console.log(`Student:    asif@student.cuet.ac.bd / ${STUDENT_PASSWORD}`);
-    console.log(`  (All 10 students share password: ${STUDENT_PASSWORD})`);
     console.log('────────────────────────────────────');
     console.log('\n🚌 14 Buses: Halda, Shangu, Turag, Jamuna, Buriganga, Gomti,');
-    console.log('   Rupsha, Isamoti, Shurma, Matamuhuri, Tista, Padma, BRTC-1, BRTC-2');
-    console.log('🎫 Active Bookings: 7 students have booked seats');
-    console.log('📋 History: 3 past completed/absent bookings\n');
+    console.log('   Rupsha, Isamoti, Shurma, Matamuhuri, Tista, Padma, BRTC-1, BRTC-2\n');
 
     process.exit(0);
   } catch (error) {

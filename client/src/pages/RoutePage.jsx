@@ -5,11 +5,6 @@ import API from '../utils/api';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 import { FaBus, FaMapMarkerAlt } from 'react-icons/fa';
 
-const ROUTE_GROUPS = [
-  { label: 'Flyover Route', type: 'flyover' },
-  { label: 'Regular Routes', type: 'regular' },
-];
-
 const SHIFT_SCHEDULE = [
   {
     shift: 1,
@@ -74,7 +69,7 @@ const RoutePage = () => {
     try {
       const res = await API.get('/buses');
       setBuses(res.data);
-    } catch (error) {
+    } catch {
       console.error('Failed to load routes');
     } finally {
       setLoading(false);

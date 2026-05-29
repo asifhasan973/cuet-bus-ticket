@@ -5,119 +5,83 @@
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4-38B2AC?style=for-the-badge&logo=tailwind-css)](https://tailwindcss.com)
 [![Express](https://img.shields.io/badge/Express-4.21-lightgrey?style=for-the-badge&logo=express)](https://expressjs.com)
 [![MongoDB](https://img.shields.io/badge/MongoDB-8.x-green?style=for-the-badge&logo=mongodb)](https://www.mongodb.com)
+[![Socket.io](https://img.shields.io/badge/Socket.io-4.x-black?style=for-the-badge&logo=socket.io)](https://socket.io)
 
-**CUETGo** is a full-stack MERN web application designed for **Chittagong University of Engineering & Technology (CUET)** to modernize the traditional token-based university bus ticketing system. It provides a visual, real-time seat booking platform with role-based access for Students, Supervisors, and Administrators. Key capabilities include visual seat layouts, digital boarding passes with QR codes, supervisor mobile camera QR scanning for attendance marking, and automated point/token allocations.
+**CUETGo** is a full-stack, real-time MERN application designed for **Chittagong University of Engineering & Technology (CUET)** to modernize the traditional token-based university bus ticketing system. It provides a visual, real-time seat booking platform with role-based access control (RBAC) for Students, Supervisors, and Administrators.
 
 ---
 
-## 🔗 Live Demo
+## 🔗 Live Links
 
-- **Live URL:** [https://cuet-bus-ticket-main.vercel.app/](https://cuet-bus-ticket-main.vercel.app/)
+- **Live Frontend Portal:** [https://cuet-bus-ticket-main.vercel.app/](https://cuet-bus-ticket-main.vercel.app/)
 - **GitHub Repository:** [https://github.com/asifhasan973/cuet-bus-ticket](https://github.com/asifhasan973/cuet-bus-ticket)
+- **Detailed System Architecture:** [docs/architecture.md](docs/architecture.md)
 
 ---
 
-## 🔑 Demo Credentials (Quick Access)
+## 🔑 Recruiter Quick Access (Demo Credentials)
 
-For easy recruiter testing, the login pages contain a **Recruiter Quick Access** banner. Clicking any role's button will automatically pre-fill the credentials and sign you in immediately:
+> [!TIP]
+> The login pages contain a **Recruiter Quick Access** banner. Clicking any role's button will automatically pre-fill the credentials and sign you in immediately.
 
-- **Student Dashboard:** `asif@student.cuet.ac.bd` (Click **"Try as Demo Student"** on the Student Login page to log in automatically)
-- **Supervisor Dashboard:** `rahman@cuet.ac.bd` (Click **"Try as Demo Supervisor"** on the Supervisor Login page to log in automatically)
-- **Admin Dashboard:** `admin@cuet.ac.bd` (Click **"Try as Demo Admin"** on the Supervisor/Admin Login page to log in automatically)
-
----
-
-## 🚀 Key Features
-
-- **🎫 Visual Seat Grid:** Interactive seat selector (2-aisle-3 bus configuration) with real-time status indicators (Available, Selected, Booked, and "My Booking" color states).
-- **📷 Digital Boarding Passes & Mobile QR Scanner:** Confirmed bookings generate boarding passes with unique QR codes. Supervisors scan these tickets with their phone cameras to mark attendance instantly.
-- **⚖️ Concurrency-Safe Booking:** Database-level compound unique indexes with partial filter expressions to eliminate race conditions (no double bookings for the same seat).
-- **🪙 Atomic Token Lifecycle:** Atomic points decrement checks (`User.findOneAndUpdate`) to prevent negative token balances under high-concurrency requests.
-- **🛡️ Secure RBAC & Auth:** Strict JSON Web Token (JWT) sessions and Google OAuth registration/login verified against strict university email domain limits.
-- **🌓 Persistent Dark Theme:** Dynamic theme selector utilizing Tailwind CSS v4 custom variants, persisting preference using `localStorage`.
+| Role           | Demo Email                | Password     | Quick Login Button           |
+| :------------- | :------------------------ | :----------- | :--------------------------- |
+| **Student**    | `asif@student.cuet.ac.bd` | `student123` | **"Try as Demo Student"**    |
+| **Supervisor** | `rahman@cuet.ac.bd`       | `super123`   | **"Try as Demo Supervisor"** |
+| **Admin**      | `admin@cuet.ac.bd`        | `admin123`   | **"Try as Demo Admin"**      |
 
 ---
 
-## 📷 Screenshots / Visual Proof
+## 🛠️ Architectural & Technical Highlights
 
-- **Landing Page:**
-  ![Landing Page](https://raw.githubusercontent.com/asifhasan973/cuet-bus-ticket/main/readme-assets/landing.png)
-- **Student Dashboard & QR Boarding Pass:**
+This project was built with a strong focus on **reliability**, **data integrity**, and **real-time interactivity**. Below are the primary engineering challenges solved in the codebase:
+
+### 1. Concurrency-Safe Booking (Zero Double Bookings)
+
+In a high-concurrency environment (e.g. multiple students booking the same seat simultaneously), traditional check-then-save routines cause race conditions.
+
+- **Solution:** Implemented a database-level compound unique index on `{ bus, travelDate, shift, seatNumber }` filtered by `{ isActive: true }` in MongoDB. If two concurrent requests try to book the same seat, MongoDB throws a duplicate key error (code 11000). The backend catches this, automatically rolls back transaction states, and informs the user safely.
+
+### 2. Atomic Token Lifecycle & Balance Protection
+
+To prevent students from exploiting latency to double-book seats using the same single token:
+
+- **Solution:** Applied an atomic database update: `User.findOneAndUpdate({ _id: studentId, points: { $gt: 0 } }, { $inc: { points: -1 } })`. The check and deduction happen in a single, atomic thread-safe database transaction. If the student has 0 points, the query condition fails immediately and blocks booking creation.
+
+### 3. Persistent WebSockets (Socket.io)
+
+- **Solution:** Deployed the Node.js Express backend to a persistent environment on **Render** (moving away from serverless environments). This supports persistent TCP connections, enabling Socket.io to push real-time seat grid state updates instantly to all connected clients when a seat is reserved or cancelled.
+
+### 4. Digital QR Attendance & Smart Token Rules
+
+- **Solution:** Booked tickets generate a digital boarding pass with a unique QR code. Supervisors scan this QR code using their device's camera to mark attendance.
+- **Attendance Penalty Rules:** To discourage students from booking seats and not showing up, the attendance marking system uses smart token deductions:
+  - **Present:** 0 extra tokens deducted (1 token was already spent during booking).
+  - **Absent:** **-2 extra tokens** deducted (total penalty of 3 tokens for missing the bus).
+
+---
+
+## 📷 UI Preview
+
+- **Student Dashboard:**
   ![Student Dashboard](https://raw.githubusercontent.com/asifhasan973/cuet-bus-ticket/main/readme-assets/dashboard.png)
-- **Seat Selector:**
+- **Interactive Seat Selector:**
   ![Seat Selector](https://raw.githubusercontent.com/asifhasan973/cuet-bus-ticket/main/readme-assets/seat-booking.png)
-- **Supervisor Scanner:**
+- **Supervisor Attendance Scanner:**
   ![Supervisor Scanner](https://raw.githubusercontent.com/asifhasan973/cuet-bus-ticket/main/readme-assets/supervisor.png)
 - **Admin Bus Management:**
   ![Admin Dashboard](https://raw.githubusercontent.com/asifhasan973/cuet-bus-ticket/main/readme-assets/admin.png)
 
 ---
 
-## 🏗️ Architecture & Database Schema
+## 💻 Tech Stack
 
-### Database Models
-
-1.  **User Model (`User.js`):**
-    - `name` (String): Full name.
-    - `email` (String, Unique): Verified institutional email.
-    - `role` (String): `'student'`, `'supervisor'`, or `'admin'`.
-    - `studentId` / `employeeId` (String): Role-specific identification.
-    - `points` (Number): Active token balance for booking rides.
-    - `isApproved` (Boolean): supervisor approval flag.
-2.  **Bus Model (`Bus.js`):**
-    - `busName` (String, Unique): Name of the bus (e.g. _Buriganga_, _Halda_).
-    - `busType` (String): `'regular'` or `'flyover'`.
-    - `route` (Object): Name and array of stops with ordering.
-    - `totalSeats` (Number): Seat capacity (default 50).
-    - `supervisors` (Array of ObjectIds): Assigned supervisors.
-3.  **Booking Model (`Booking.js`):**
-    - `student` (ObjectId, ref User): Student who booked.
-    - `bus` (ObjectId, ref Bus): Bus booked.
-    - `seatNumber` (Number): Booked seat number.
-    - `shift` (Number): Selected shift (1, 2, 3, or 4).
-    - `travelDate` (String): Travel date in format `YYYY-MM-DD`.
-    - `status` (String): `'confirmed'`, `'cancelled'`, or `'completed'`.
-    - `attendance` (String): `'pending'`, `'present'`, or `'absent'`.
-    - `isActive` (Boolean): True for active bookings; set to false on cancellation (frees seat constraint).
-
-### Database Indexes (Concurrency Safety)
-
-To ensure high performance and prevent race conditions, the Booking collection has the following indexes:
-
-- `{ bus: 1, travelDate: 1, shift: 1, seatNumber: 1 }` (Unique, Partial filter: `{ isActive: true }`) -> Prevents two users from booking the same seat.
-- `{ student: 1, travelDate: 1, shift: 1 }` (Unique, Partial filter: `{ isActive: true }`) -> Prevents a student from booking multiple seats on the same day and shift.
-- `{ bus: 1, travelDate: 1, shift: 1, status: 1 }` -> Optimizes bus availability searches.
-- `{ student: 1, travelDate: -1 }` -> Optimizes student dashboard history queries.
-
----
-
-## 🔌 API Endpoints Summary
-
-### 🔐 Authentication (`/api/auth`)
-
-- `POST /api/auth/register` - Registers student or supervisor (requires `@cuet.ac.bd` domain).
-- `POST /api/auth/login` - Local email/password login (Rate limited).
-- `POST /api/auth/google` - Sign-in/Sign-up using Firebase Google OAuth.
-- `GET /api/auth/me` - Fetch authenticated session user details.
-
-### 🚌 Buses (`/api/buses`)
-
-- `GET /api/buses` - List active buses and seat counts.
-- `GET /api/buses/:id` - Fetch single bus layout with occupied seats.
-- `POST /api/buses` - Create a bus (Admin only).
-- `PUT /api/buses/:id` - Edit a bus (Admin only).
-- `DELETE /api/buses/:id` - Remove a bus (Admin only).
-
-### 🎫 Bookings (`/api/bookings`)
-
-- `POST /api/bookings` - Create a seat booking (Student only, checks points & index).
-- `GET /api/bookings/my` - Fetch booking history of logged-in student.
-- `DELETE /api/bookings/:id` - Cancel seat booking and refund points (30m safety window).
-
-### 👨‍🏫 Supervisor (`/api/supervisor`)
-
-- `GET /api/supervisor/buses` - Get buses assigned to supervisor.
-- `POST /api/supervisor/attendance` - Mark student attendance (Present: 0 extra points, Absent: 2 penalty points).
+| Layer               | Technologies Used                                                  |
+| :------------------ | :----------------------------------------------------------------- |
+| **Frontend**        | React 19, Vite, Tailwind CSS v4, Framer Motion, Axios              |
+| **Backend**         | Node.js, Express, Socket.io, Firebase Admin                        |
+| **Database**        | MongoDB Atlas, Mongoose ODM                                        |
+| **Hosting & CI/CD** | Frontend: Vercel (SPA) \| Backend: Render (Persistent Web Service) |
 
 ---
 
@@ -147,89 +111,48 @@ VITE_FIREBASE_APP_ID=your_app_id
 
 ---
 
-## 💻 Local Setup & Testing
+## 🛠️ Local Installation & Setup
 
-### Prerequisites
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/asifhasan973/cuet-bus-ticket.git
+   cd cuet-bus-ticket
+   ```
+2. **Install all dependencies**
+   ```bash
+   npm run install-all
+   ```
+3. **Configure Environment Files**
+   - Create `server/.env` based on `server/.env.example`
+   - Create `client/.env` based on `client/.env.example`
+4. **Seed Database (Generates 14 default buses and demo users)**
+   ```bash
+   npm run seed
+   ```
+5. **Start Development Servers**
 
-- Node.js (v18+)
-- MongoDB Instance / Atlas Cluster
+   ```bash
+   npm run dev
+   ```
 
-### Step-by-Step Installation
-
-1.  **Clone the repository**
-    ```bash
-    git clone https://github.com/asifhasan973/cuet-bus-ticket.git
-    cd cuet-bus-ticket
-    ```
-2.  **Install dependencies in all folders**
-    ```bash
-    npm run install-all
-    ```
-3.  **Setup Environment Files**
-    - Create `server/.env` based on `server/.env.example`
-    - Create `client/.env` based on `client/.env.example`
-4.  **Seed Database**
-    ```bash
-    npm run seed
-    ```
-5.  **Run Development Server**
-
-    ```bash
-    npm run dev
-    ```
-
-    - Frontend: `http://localhost:5173`
-    - Backend: `http://localhost:5001`
-
-### Running Integration Tests
-
-The project contains Jest and Supertest suites for API route and controller validation.
-
-```bash
-cd server
-npm test
-```
+   - Frontend: `http://localhost:5173`
+   - Backend: `http://localhost:5001`
 
 ---
 
-## 🛡️ Security & Performance Best Practices
-
-- **Helmet.js:** Configures secure HTTP response headers to defend against common web vulnerabilities.
-- **Express Rate Limiter:** Applied on authentication routes to mitigate brute-force attacks.
-- **MongoDB Sanitization:** Sanitizes client-supplied inputs via `express-mongo-sanitize` to protect against NoSQL injections.
-- **Global Error Boundaries:** Reusable React boundary component traps rendering-level failures to protect UX continuity.
-
----
-
-## ⚠️ Known Limitations
-
-- **WebSockets on Free Tier Render:** Real-time seat updates use Socket.io. Deployed on Render's persistent environment, WebSockets are fully active and stable. However, if hosted on Render's Free tier, the server will spin down after 15 minutes of inactivity, causing the initial loading request to take ~50 seconds while it spins up. Once awake, Socket.io works instantly and persistently.
-
----
-
-## 💼 CV / Resume Description
-
-**Full Stack / MERN Developer Role Bullet Points:**
-
-- **Concurrency & Reliability:** Implemented a robust booking validation system using MongoDB compound unique indexes with partial filters to prevent duplicate seat assignments under concurrent requests, lowering booking errors to zero.
-- **Atomic Transactions:** Created transactional point-deduction flows using atomic `findOneAndUpdate` queries in Mongoose, ensuring data integrity and preventing negative token balances during high-traffic booking windows.
-- **Full Stack Integration:** Built a role-based university booking platform using React, Node.js, Express, and MongoDB, integrating Firebase Google login, QR boarding pass generation, and mobile-based camera scanning for supervisor attendance tracking.
-
----
-
-## 🎙️ Interview Prep & Technical Q&A
+## 🎙️ Recruiter Q&A
 
 ### 1. How did you resolve seat booking race conditions on the backend?
 
-> **Answer:** Initially, the backend performed a `findOne` query to check if a seat was booked, followed by a separate `save()` query. In concurrent scenarios (e.g. two users clicking "Book" simultaneously), both requests could read the seat as available before either saved, resulting in double bookings.
-> To resolve this, I introduced an `isActive` boolean field in the `Booking` schema and created a database-level compound unique index on `{ bus, travelDate, shift, seatNumber }` filtered by `{ isActive: true }`. If a concurrent request attempts to book the same seat, MongoDB throws a duplicate key error (code 11000) which the backend catches, rolls back point deductions, and returns a clear user-friendly warning.
+> **Answer:** Initially, a backend might query if a seat is available and then issue a save command. Under concurrent load, both queries see the seat as empty before either has completed their write, leading to double bookings.
+> To resolve this, I introduced an `isActive` boolean flag and a compound unique index on `{ bus, travelDate, shift, seatNumber }` filtered by `{ isActive: true }`. MongoDB handles this index validation atomically. If two requests try to claim the exact same seat, one will fail the index validation and throw a duplicate key error (code 11000). The backend catches this error, rolls back point deductions, and returns a graceful error to the second user.
 
 ### 2. Why did you use `User.findOneAndUpdate` instead of checking points in memory?
 
-> **Answer:** Checking a student's point balance in memory (`if (user.points <= 0)`) before executing a decrement introduces a race condition where a student with 1 point can make multiple concurrent API requests and book several seats, driving their points balance negative.
-> I resolved this by applying an atomic database update: `User.findOneAndUpdate({ _id: studentId, points: { $gt: 0 } }, { $inc: { points: -1 } })`. Mongoose executes this in a single atomic database operation. If the student has 0 points, the query condition fails, return value is null, and we block booking creation immediately.
+> **Answer:** Querying the user, checking if `points > 0` in memory, and then saving introduces a race condition. Under high-speed requests, a user with 1 point could book multiple seats because the point check is evaluated before the first booking is written.
+> I resolved this by performing an atomic operation: `User.findOneAndUpdate({ _id: studentId, points: { $gt: 0 } }, { $inc: { points: -1 } })`. Since MongoDB runs updates atomically on a document, if the points are 0, the query filter fails, no deduction occurs, and the booking request is instantly blocked.
 
 ### 3. Why did you choose a partial filter unique index instead of a standard unique index?
 
-> **Answer:** In our system, when a student cancels a booking, its status changes to `'cancelled'`. If we had a standard unique index on `{ bus, travelDate, shift, seatNumber }`, a cancelled booking would still reside in the index and block other students from booking that seat.
-> By using a partial filter index where `isActive: true`, cancelled bookings (which have `isActive: false`) are ignored by the index, freeing the seat instantly for others to book while preserving the cancelled record in the database for analytics.
+> **Answer:** When a student cancels a booking, its status changes to `'cancelled'`. If we had a standard unique index on `{ bus, travelDate, shift, seatNumber }`, a cancelled booking would remain in the index and block other students from booking that seat.
+> By utilizing a partial filter index (`{ isActive: true }`), cancelled bookings (which set `isActive: false`) are ignored by the index constraint, freeing the seat instantly for others to book while preserving the cancelled record in the database for admin analytics.

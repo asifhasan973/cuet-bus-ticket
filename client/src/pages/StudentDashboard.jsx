@@ -6,7 +6,7 @@ import { getSeatLabel } from '../utils/seat';
 import { SHIFT_ICONS, SHIFT_LABELS, SHIFT_COLORS } from '../utils/shifts';
 import StatsCard from '../components/ui/StatsCard';
 import Modal from '../components/ui/Modal';
-import LoadingSpinner from '../components/ui/LoadingSpinner';
+
 import {
   HiTicket,
   HiCurrencyDollar,
@@ -39,7 +39,7 @@ const StudentDashboard = () => {
     try {
       const res = await API.get('/bookings/my');
       setBookings(res.data);
-    } catch (error) {
+    } catch {
       toast.error('Failed to load bookings');
     } finally {
       setLoading(false);
@@ -55,7 +55,7 @@ const StudentDashboard = () => {
       fetchBookings();
       loadUser();
       setBookingToCancel(null);
-    } catch (error) {
+    } catch {
       toast.error('Failed to cancel booking');
     } finally {
       setCancelling(false);
@@ -63,7 +63,6 @@ const StudentDashboard = () => {
   };
 
   const activeBookings = bookings.filter((b) => b.status === 'confirmed');
-  const todayStr = new Date().toISOString().split('T')[0];
 
   if (loading) {
     return (

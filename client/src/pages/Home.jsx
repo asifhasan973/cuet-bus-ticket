@@ -37,7 +37,7 @@ const Home = () => {
     try {
       const res = await API.get('/buses');
       setBuses(res.data);
-    } catch (error) {
+    } catch {
       console.error('Failed to load buses');
     } finally {
       setLoadingBuses(false);

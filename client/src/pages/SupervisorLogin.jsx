@@ -29,7 +29,7 @@ const SupervisorLogin = () => {
       await login(demoEmail, demoPassword);
       toast.success('Logged in as Demo Supervisor!');
       navigate('/supervisor/dashboard');
-    } catch (error) {
+    } catch {
       toast.error('Demo login failed');
     } finally {
       setLoading(false);
@@ -46,7 +46,7 @@ const SupervisorLogin = () => {
       await login(demoEmail, demoPassword);
       toast.success('Logged in as Demo Admin!');
       navigate('/admin/dashboard');
-    } catch (error) {
+    } catch {
       toast.error('Demo login failed');
     } finally {
       setLoading(false);
