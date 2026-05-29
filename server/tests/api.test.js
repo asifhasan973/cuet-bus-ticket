@@ -4,6 +4,52 @@ const mongoose = require('mongoose');
 // Mock connectDB to prevent connecting to database during tests
 jest.mock('../config/db', () => jest.fn());
 
+// Mock transactionHelper to bypass sessions in tests
+jest.mock('../utils/transactionHelper', () => ({
+  runInTransaction: jest.fn().mockImplementation((workFn) => workFn(null)),
+}));
+
+// Helper to wrap mongoose calls to support query chaining (.session(), .populate(), .sort(), .select(), etc.)
+const mockQuery = (mockFn) => {
+  const query = {
+    session: jest.fn().mockImplementation((...args) => {
+      const res = mockFn();
+      if (res && typeof res.session === 'function') return res.session(...args);
+      return query;
+    }),
+    populate: jest.fn().mockImplementation((...args) => {
+      const res = mockFn();
+      if (res && typeof res.populate === 'function') return res.populate(...args);
+      return query;
+    }),
+    sort: jest.fn().mockImplementation((...args) => {
+      const res = mockFn();
+      if (res && typeof res.sort === 'function') return res.sort(...args);
+      return query;
+    }),
+    select: jest.fn().mockImplementation((...args) => {
+      const res = mockFn();
+      if (res && typeof res.select === 'function') return res.select(...args);
+      return query;
+    }),
+    then: (resolve, reject) => {
+      const res = mockFn();
+      if (res && typeof res.then === 'function') {
+        return res.then(resolve, reject);
+      }
+      return Promise.resolve(res).then(resolve, reject);
+    },
+    catch: (reject) => {
+      const res = mockFn();
+      if (res && typeof res.catch === 'function') {
+        return res.catch(reject);
+      }
+      return Promise.resolve(res).catch(reject);
+    },
+  };
+  return query;
+};
+
 // Mock the User model
 const mockUserInstance = {
   save: (...args) => mockUserSave(...args),
@@ -24,11 +70,11 @@ const mockUserFindOneAndUpdate = jest.fn().mockResolvedValue(mockUserInstance);
 
 jest.mock('../models/User', () => {
   const Model = jest.fn().mockImplementation(() => mockUserInstance);
-  Model.updateMany = (...args) => mockUserUpdateMany(...args);
-  Model.findOne = (...args) => mockUserFindOne(...args);
-  Model.findById = (...args) => mockUserFindById(...args);
-  Model.findByIdAndUpdate = (...args) => mockUserFindByIdAndUpdate(...args);
-  Model.findOneAndUpdate = (...args) => mockUserFindOneAndUpdate(...args);
+  Model.updateMany = (...args) => mockQuery(() => mockUserUpdateMany(...args));
+  Model.findOne = (...args) => mockQuery(() => mockUserFindOne(...args));
+  Model.findById = (...args) => mockQuery(() => mockUserFindById(...args));
+  Model.findByIdAndUpdate = (...args) => mockQuery(() => mockUserFindByIdAndUpdate(...args));
+  Model.findOneAndUpdate = (...args) => mockQuery(() => mockUserFindOneAndUpdate(...args));
   return Model;
 });
 
@@ -44,9 +90,9 @@ jest.mock('../models/Booking', () => {
       bus: { busName: 'Halda', route: { name: 'CUETRoute' } },
     }),
   }));
-  Model.findById = (...args) => mockBookingFindById(...args);
-  Model.findOne = (...args) => mockBookingFindOne(...args);
-  Model.findOneAndUpdate = (...args) => mockBookingFindOneAndUpdate(...args);
+  Model.findById = (...args) => mockQuery(() => mockBookingFindById(...args));
+  Model.findOne = (...args) => mockQuery(() => mockBookingFindOne(...args));
+  Model.findOneAndUpdate = (...args) => mockQuery(() => mockBookingFindOneAndUpdate(...args));
   return Model;
 });
 
@@ -54,7 +100,7 @@ jest.mock('../models/Booking', () => {
 const mockBusFindById = jest.fn();
 jest.mock('../models/Bus', () => {
   const Model = jest.fn();
-  Model.findById = (...args) => mockBusFindById(...args);
+  Model.findById = (...args) => mockQuery(() => mockBusFindById(...args));
   return Model;
 });
 
@@ -215,9 +261,11 @@ describe('CUETGo API Tests', () => {
 
       expect(res.statusCode).toEqual(200);
       expect(res.body.message).toEqual('Booking cancelled successfully');
-      expect(mockUserFindByIdAndUpdate).toHaveBeenCalledWith('mock_user_id', {
-        $inc: { points: 1 },
-      });
+      expect(mockUserFindByIdAndUpdate).toHaveBeenCalledWith(
+        'mock_user_id',
+        { $inc: { points: 1 } },
+        expect.any(Object)
+      );
     });
   });
 
