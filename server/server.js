@@ -11,6 +11,14 @@ const connectDB = require('./config/db');
 // Load env vars
 dotenv.config();
 
+// Validate environment variables on startup
+const REQUIRED_ENV_VARS = ['MONGO_URI', 'JWT_SECRET'];
+const missingEnv = REQUIRED_ENV_VARS.filter((v) => !process.env[v]);
+if (missingEnv.length > 0) {
+  console.error(`❌ FATAL ERROR: Missing environment variables: ${missingEnv.join(', ')}`);
+  process.exit(1);
+}
+
 // Connect to database
 connectDB();
 
@@ -105,10 +113,18 @@ app.get('/api/cron/reset-points', async (req, res) => {
   }
 });
 
-// Error handling middleware
+// Global error handling middleware
 app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ message: 'Something went wrong!' });
+  const statusCode = err.statusCode || 500;
+  const message = err.message || 'Internal Server Error';
+
+  console.error(`[ERROR] ${req.method} ${req.url} - Status: ${statusCode} - ${err.stack}`);
+
+  res.status(statusCode).json({
+    status: err.status || 'error',
+    message,
+    ...(process.env.NODE_ENV !== 'production' && { stack: err.stack }),
+  });
 });
 
 const PORT = process.env.PORT || 5001;
