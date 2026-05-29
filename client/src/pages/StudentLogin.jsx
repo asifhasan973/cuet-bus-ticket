@@ -18,6 +18,7 @@ const StudentLogin = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const { login, googleLogin } = useAuth();
+  const navigate = useNavigate();
   const handleDemoSignIn = async () => {
     const demoEmail = 'asif@student.cuet.ac.bd';
     const demoPassword = ['student', '123'].join('');
