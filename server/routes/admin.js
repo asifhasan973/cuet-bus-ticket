@@ -69,7 +69,7 @@ router.delete('/users/:id', auth, roleCheck('admin'), async (req, res) => {
     // Cancel any active bookings
     await Booking.updateMany(
       { student: user._id, status: 'confirmed' },
-      { status: 'cancelled' }
+      { status: 'cancelled', isActive: false }
     );
 
     await user.deleteOne();
@@ -91,11 +91,7 @@ router.put('/users/:id', auth, roleCheck('admin'), async (req, res) => {
     if (role !== undefined) updateData.role = role;
     if (isApproved !== undefined) updateData.isApproved = isApproved;
 
-    const user = await User.findByIdAndUpdate(
-      req.params.id,
-      updateData,
-      { new: true }
-    );
+    const user = await User.findByIdAndUpdate(req.params.id, updateData, { new: true });
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
@@ -113,16 +109,10 @@ router.post('/users/:id/assign-buses', auth, roleCheck('admin'), async (req, res
   try {
     const { busIds } = req.body;
     // Unassign this supervisor from all buses first
-    await Bus.updateMany(
-      { supervisors: req.params.id },
-      { $pull: { supervisors: req.params.id } }
-    );
+    await Bus.updateMany({ supervisors: req.params.id }, { $pull: { supervisors: req.params.id } });
     // Assign to new buses
     if (busIds && busIds.length > 0) {
-      await Bus.updateMany(
-        { _id: { $in: busIds } },
-        { $addToSet: { supervisors: req.params.id } }
-      );
+      await Bus.updateMany({ _id: { $in: busIds } }, { $addToSet: { supervisors: req.params.id } });
     }
     res.json({ message: 'Buses assigned successfully' });
   } catch (error) {

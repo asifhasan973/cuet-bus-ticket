@@ -43,7 +43,9 @@ const ProfilePage = () => {
         </div>
         <div className="pt-14 pb-6 px-6">
           <h2 className="text-xl font-bold text-dark-900 dark:text-white">{user?.name}</h2>
-          <p className="text-dark-500 dark:text-dark-400 text-sm capitalize">{user?.role} • {user?.department}</p>
+          <p className="text-dark-500 dark:text-dark-400 text-sm capitalize">
+            {user?.role} • {user?.department}
+          </p>
         </div>
       </div>
 
@@ -51,7 +53,10 @@ const ProfilePage = () => {
       <div className="card">
         <div className="flex items-center justify-between mb-6">
           <h3 className="font-bold text-dark-900 dark:text-white">Profile Information</h3>
-          <button onClick={() => setEditing(!editing)} className="btn-secondary text-sm !px-4 !py-1.5">
+          <button
+            onClick={() => setEditing(!editing)}
+            className="btn-secondary text-sm !px-4 !py-1.5"
+          >
             {editing ? 'Cancel' : 'Edit'}
           </button>
         </div>
@@ -59,18 +64,29 @@ const ProfilePage = () => {
         {editing ? (
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-semibold text-dark-700 dark:text-dark-200 mb-1.5">Name</label>
-              <input type="text" value={formData.name}
+              <label className="block text-sm font-semibold text-dark-700 dark:text-dark-200 mb-1.5">
+                Name
+              </label>
+              <input
+                type="text"
+                value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="input-field" />
+                className="input-field"
+              />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-dark-700 dark:text-dark-200 mb-1.5">Department</label>
-              <select value={formData.department}
+              <label className="block text-sm font-semibold text-dark-700 dark:text-dark-200 mb-1.5">
+                Department
+              </label>
+              <select
+                value={formData.department}
                 onChange={(e) => setFormData({ ...formData, department: e.target.value })}
-                className="input-field">
-                {['CSE', 'EEE', 'ME', 'CE', 'URP', 'Arch', 'PME', 'BME'].map(d => (
-                  <option key={d} value={d}>{d}</option>
+                className="input-field"
+              >
+                {['CSE', 'EEE', 'ME', 'CE', 'URP', 'Arch', 'PME', 'BME'].map((d) => (
+                  <option key={d} value={d}>
+                    {d}
+                  </option>
                 ))}
               </select>
             </div>
@@ -83,17 +99,27 @@ const ProfilePage = () => {
             {[
               { icon: HiUser, label: 'Name', value: user?.name },
               { icon: HiMail, label: 'Email', value: user?.email },
-              { icon: HiIdentification, label: user?.role === 'student' ? 'Student ID' : 'Employee ID',
-                value: user?.studentId || user?.employeeId },
+              {
+                icon: HiIdentification,
+                label: user?.role === 'student' ? 'Student ID' : 'Employee ID',
+                value: user?.studentId || user?.employeeId,
+              },
               { icon: HiAcademicCap, label: 'Department', value: user?.department },
             ].map((item, i) => (
-              <div key={i} className="flex items-center gap-4 py-3 border-b border-dark-100 dark:border-dark-600 last:border-0">
+              <div
+                key={i}
+                className="flex items-center gap-4 py-3 border-b border-dark-100 dark:border-dark-600 last:border-0"
+              >
                 <div className="bg-primary-50 dark:bg-primary-900/20 p-2.5 rounded-xl">
                   <item.icon className="text-primary-600 dark:text-primary-400" />
                 </div>
                 <div>
-                  <p className="text-xs text-dark-400 dark:text-dark-500 font-medium">{item.label}</p>
-                  <p className="font-semibold text-dark-900 dark:text-dark-100">{item.value || 'N/A'}</p>
+                  <p className="text-xs text-dark-400 dark:text-dark-500 font-medium">
+                    {item.label}
+                  </p>
+                  <p className="font-semibold text-dark-900 dark:text-dark-100">
+                    {item.value || 'N/A'}
+                  </p>
                 </div>
               </div>
             ))}
@@ -106,9 +132,7 @@ const ProfilePage = () => {
         <div className="card bg-gradient-to-br from-primary-600 to-primary-800 !border-0 text-white">
           <p className="text-white/70 text-sm font-medium">Points</p>
           <p className="text-4xl font-extrabold mt-1">{user?.points ?? 0}</p>
-          <p className="text-white/60 text-xs mt-2">
-            Present = -1 point • Absent = -3 points
-          </p>
+          <p className="text-white/60 text-xs mt-2">Present = -1 point • Absent = -3 points</p>
         </div>
       )}
     </div>

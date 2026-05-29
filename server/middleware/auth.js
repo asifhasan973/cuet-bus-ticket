@@ -5,20 +5,22 @@ const { ALLOWED_EMAIL_MESSAGE, isAllowedInstitutionEmail } = require('../utils/e
 const auth = async (req, res, next) => {
   try {
     const token = req.header('Authorization')?.replace('Bearer ', '');
-    
+
     if (!token) {
       return res.status(401).json({ message: 'No token, authorization denied' });
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const user = await User.findById(decoded.id);
-    
+
     if (!user) {
       return res.status(401).json({ message: 'Token is not valid' });
     }
 
     if (user.role === 'supervisor' && !user.isApproved) {
-      return res.status(403).json({ message: 'Your supervisor account is pending admin approval.' });
+      return res
+        .status(403)
+        .json({ message: 'Your supervisor account is pending admin approval.' });
     }
 
     if (!isAllowedInstitutionEmail(user.email)) {

@@ -14,14 +14,14 @@ router.get('/', auth, roleCheck('admin'), async (req, res) => {
       { $match: { status: 'confirmed' } },
       { $group: { _id: '$travelDate', count: { $sum: 1 } } },
       { $sort: { _id: 1 } },
-      { $limit: 7 }
+      { $limit: 7 },
     ]);
 
     // 2. Bookings by shift
     const bookingsByShift = await Booking.aggregate([
       { $match: { status: 'confirmed' } },
       { $group: { _id: '$shift', count: { $sum: 1 } } },
-      { $sort: { _id: 1 } }
+      { $sort: { _id: 1 } },
     ]);
 
     // 3. Bookings by bus popularity
@@ -32,13 +32,13 @@ router.get('/', auth, roleCheck('admin'), async (req, res) => {
       { $unwind: '$busInfo' },
       { $project: { name: '$busInfo.busName', count: 1 } },
       { $sort: { count: -1 } },
-      { $limit: 5 }
+      { $limit: 5 },
     ]);
 
     res.json({
-      bookingsByDate: bookingsByDate.map(b => ({ date: b._id, bookings: b.count })),
-      bookingsByShift: bookingsByShift.map(b => ({ shift: b._id, bookings: b.count })),
-      bookingsByBus: bookingsByBus.map(b => ({ name: b.name, bookings: b.count }))
+      bookingsByDate: bookingsByDate.map((b) => ({ date: b._id, bookings: b.count })),
+      bookingsByShift: bookingsByShift.map((b) => ({ shift: b._id, bookings: b.count })),
+      bookingsByBus: bookingsByBus.map((b) => ({ name: b.name, bookings: b.count })),
     });
   } catch (error) {
     console.error(error);

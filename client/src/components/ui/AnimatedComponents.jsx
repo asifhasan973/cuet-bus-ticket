@@ -110,7 +110,12 @@ export const AnimatedCounter = ({ value, duration = 1.2 }) => {
   // Handle values with + suffix like "700+"
   const suffix = typeof value === 'string' && value.includes('+') ? '+' : '';
 
-  return <span ref={ref}>{count}{suffix}</span>;
+  return (
+    <span ref={ref}>
+      {count}
+      {suffix}
+    </span>
+  );
 };
 
 // ─── Scale on Hover ───

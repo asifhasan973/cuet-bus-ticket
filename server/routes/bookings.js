@@ -6,122 +6,170 @@ const User = require('../models/User');
 const auth = require('../middleware/auth');
 const roleCheck = require('../middleware/roleCheck');
 const { getAvailableShifts, getShiftInfo } = require('../utils/shifts');
+const { body, param, validationResult } = require('express-validator');
 
 // @route   POST /api/bookings
 // @desc    Book a seat
 // @access  Student
-router.post('/', auth, roleCheck('student'), async (req, res) => {
-  try {
-    const { busId, seatNumber, travelDate, shift } = req.body;
+router.post(
+  '/',
+  auth,
+  roleCheck('student'),
+  [
+    body('busId', 'Bus ID is required and must be valid').isMongoId(),
+    body('seatNumber', 'Seat number is required and must be an integer').isInt({ min: 1 }),
+    body('travelDate', 'Travel date is required and must be in YYYY-MM-DD format').matches(
+      /^\d{4}-\d{2}-\d{2}$/
+    ),
+    body('shift', 'Shift is required and must be between 1 and 4').isInt({ min: 1, max: 4 }),
+  ],
+  async (req, res) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
 
-    if (!travelDate) return res.status(400).json({ message: 'Travel date is required' });
-    if (!shift) return res.status(400).json({ message: 'Shift is required' });
+      const { busId, seatNumber, travelDate, shift } = req.body;
 
-    const shiftNum = parseInt(shift);
-    if (![1, 2, 3, 4].includes(shiftNum)) {
-      return res.status(400).json({ message: 'Invalid shift number' });
-    }
+      if (!travelDate) return res.status(400).json({ message: 'Travel date is required' });
+      if (!shift) return res.status(400).json({ message: 'Shift is required' });
 
-    const dateObj = new Date(`${travelDate}T00:00:00Z`);
-    if (isNaN(dateObj.getTime())) return res.status(400).json({ message: 'Invalid travel date format' });
+      const shiftNum = parseInt(shift);
+      if (![1, 2, 3, 4].includes(shiftNum)) {
+        return res.status(400).json({ message: 'Invalid shift number' });
+      }
 
-    const today = new Date();
-    today.setUTCHours(0, 0, 0, 0);
-    if (dateObj < today) {
-      return res.status(400).json({ message: 'Cannot book for past dates' });
-    }
+      const dateObj = new Date(`${travelDate}T00:00:00Z`);
+      if (isNaN(dateObj.getTime()))
+        return res.status(400).json({ message: 'Invalid travel date format' });
 
-    // Validate shift is available for this date (weekends only have shift 2 & 4)
-    const availableShifts = getAvailableShifts(travelDate);
-    if (!availableShifts.includes(shiftNum)) {
-      return res.status(400).json({ message: `Shift ${shiftNum} is not available on this date (weekend)` });
-    }
+      const today = new Date();
+      today.setUTCHours(0, 0, 0, 0);
+      if (dateObj < today) {
+        return res.status(400).json({ message: 'Cannot book for past dates' });
+      }
 
-    const studentId = req.user._id;
+      // Validate shift is available for this date (weekends only have shift 2 & 4)
+      const availableShifts = getAvailableShifts(travelDate);
+      if (!availableShifts.includes(shiftNum)) {
+        return res
+          .status(400)
+          .json({ message: `Shift ${shiftNum} is not available on this date (weekend)` });
+      }
 
-    // Check if student already has a booking for this date + shift
-    const existingBooking = await Booking.findOne({
-      student: studentId,
-      travelDate,
-      shift: shiftNum,
-      status: 'confirmed'
-    });
-    if (existingBooking) {
-      return res.status(400).json({ message: 'You already have a booking for this shift on this date.' });
-    }
+      const studentId = req.user._id;
 
-    // Check if student has enough points
-    if (req.user.points <= 0) {
-      return res.status(400).json({ message: 'Insufficient points.' });
-    }
+      // Find the bus
+      const bus = await Bus.findById(busId);
+      if (!bus) {
+        return res.status(404).json({ message: 'Bus not found' });
+      }
+      if (bus.status !== 'active') {
+        return res.status(400).json({ message: 'Bus is not currently active' });
+      }
 
-    // Find the bus
-    const bus = await Bus.findById(busId);
-    if (!bus) {
-      return res.status(404).json({ message: 'Bus not found' });
-    }
-    if (bus.status !== 'active') {
-      return res.status(400).json({ message: 'Bus is not currently active' });
-    }
+      // Check if seat valid
+      if (seatNumber < 1 || seatNumber > bus.totalSeats) {
+        return res.status(400).json({ message: 'Invalid seat number' });
+      }
 
-    // Check if seat valid
-    if (seatNumber < 1 || seatNumber > bus.totalSeats) {
-      return res.status(400).json({ message: 'Invalid seat number' });
-    }
-
-    // Check if seat already booked on this date + shift
-    const seatBooked = await Booking.findOne({
-      bus: busId,
-      travelDate,
-      shift: shiftNum,
-      seatNumber,
-      status: { $in: ['confirmed', 'completed'] }
-    });
-    if (seatBooked) {
-      return res.status(400).json({ message: 'This seat is already booked for the selected date and shift' });
-    }
-
-    // Create booking record
-    const booking = new Booking({
-      student: studentId,
-      bus: busId,
-      seatNumber,
-      shift: shiftNum,
-      travelDate,
-      status: 'confirmed',
-    });
-    await booking.save();
-
-    // Deduct 1 point for booking
-    await User.findByIdAndUpdate(studentId, {
-      $inc: { points: -1 }
-    });
-
-    await booking.populate('bus', 'busName route');
-
-    // Emit real-time seat update via Socket.io
-    const io = req.app.get('io');
-    if (io) {
-      io.emit('seatBooked', {
-        busId,
-        seatNumber,
+      // Check if student already has a booking for this date + shift
+      const existingBooking = await Booking.findOne({
+        student: studentId,
         travelDate,
         shift: shiftNum,
-        studentName: req.user.name,
-        studentId: req.user.studentId,
-        bookedBy: req.user._id,
+        isActive: true,
       });
-    }
+      if (existingBooking) {
+        return res
+          .status(400)
+          .json({ message: 'You already have a booking for this shift on this date.' });
+      }
 
-    res.status(201).json({
-      message: 'Seat booked successfully!',
-      booking,
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Server error' });
+      // Check if seat already booked on this date + shift
+      const seatBooked = await Booking.findOne({
+        bus: busId,
+        travelDate,
+        shift: shiftNum,
+        seatNumber,
+        isActive: true,
+      });
+      if (seatBooked) {
+        return res
+          .status(400)
+          .json({ message: 'This seat is already booked for the selected date and shift' });
+      }
+
+      // Deduct 1 point atomically. This guarantees that student points never go negative
+      // and prevents double booking via concurrent requests.
+      const student = await User.findOneAndUpdate(
+        { _id: studentId, points: { $gt: 0 } },
+        { $inc: { points: -1 } },
+        { new: true }
+      );
+      if (!student) {
+        return res.status(400).json({ message: 'Insufficient points.' });
+      }
+
+      // Create booking record
+      const booking = new Booking({
+        student: studentId,
+        bus: busId,
+        seatNumber,
+        shift: shiftNum,
+        travelDate,
+        status: 'confirmed',
+        isActive: true,
+      });
+
+      try {
+        await booking.save();
+      } catch (saveError) {
+        // Refund the point atomically if saving the booking fails (e.g. unique index throws)
+        await User.findByIdAndUpdate(studentId, {
+          $inc: { points: 1 },
+        });
+        throw saveError;
+      }
+
+      await booking.populate('bus', 'busName route');
+
+      // Emit real-time seat update via Socket.io
+      const io = req.app.get('io');
+      if (io) {
+        io.emit('seatBooked', {
+          busId,
+          seatNumber,
+          travelDate,
+          shift: shiftNum,
+          studentName: req.user.name,
+          studentId: req.user.studentId,
+          bookedBy: req.user._id,
+        });
+      }
+
+      res.status(201).json({
+        message: 'Seat booked successfully!',
+        booking,
+      });
+    } catch (error) {
+      if (error.code === 11000) {
+        // Handle Mongoose duplicate key errors (concurrency safety)
+        if (error.keyPattern && error.keyPattern.student) {
+          return res
+            .status(400)
+            .json({ message: 'You already have a booking for this shift on this date.' });
+        }
+        return res
+          .status(400)
+          .json({ message: 'This seat has already been booked. Please choose another seat.' });
+      }
+      console.error(error);
+      res.status(500).json({ message: 'Server error' });
+    }
   }
-});
+);
 
 // @route   GET /api/bookings/my
 // @desc    Get current user's bookings
@@ -160,18 +208,18 @@ const parseDepartureTime = (dateStr, timeStr) => {
   if (parts.length < 2) return new Date(0);
   const time = parts[0];
   const modifier = parts[1].toUpperCase();
-  
+
   let [hours, minutes] = time.split(':');
   hours = parseInt(hours, 10);
   minutes = parseInt(minutes, 10);
-  
+
   if (modifier === 'PM' && hours < 12) {
     hours += 12;
   }
   if (modifier === 'AM' && hours === 12) {
     hours = 0;
   }
-  
+
   // Create date string in local ISO format (YYYY-MM-DDTHH:MM:00)
   const pad = (num) => num.toString().padStart(2, '0');
   const d = new Date(`${dateStr}T${pad(hours)}:${pad(minutes)}:00`);
@@ -181,58 +229,77 @@ const parseDepartureTime = (dateStr, timeStr) => {
 // @route   DELETE /api/bookings/:id
 // @desc    Cancel a booking
 // @access  Student
-router.delete('/:id', auth, async (req, res) => {
-  try {
-    const booking = await Booking.findById(req.params.id);
-    if (!booking) {
-      return res.status(404).json({ message: 'Booking not found' });
-    }
+router.delete(
+  '/:id',
+  auth,
+  [param('id', 'Invalid booking ID format').isMongoId()],
+  async (req, res) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
 
-    // Only the student who booked or admin can cancel
-    if (booking.student.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
-      return res.status(403).json({ message: 'Not authorized' });
-    }
+      const booking = await Booking.findById(req.params.id);
+      if (!booking) {
+        return res.status(404).json({ message: 'Booking not found' });
+      }
 
-    // Enforce 30-minute cancellation safety window (unless requested by admin)
-    if (req.user.role !== 'admin') {
-      const shiftInfo = getShiftInfo(booking.shift, booking.travelDate);
-      if (shiftInfo) {
-        const departureTime = parseDepartureTime(booking.travelDate, shiftInfo.departure);
-        const now = new Date();
-        const timeDiffMinutes = (departureTime - now) / (1000 * 60);
+      // Only the student who booked or admin can cancel
+      if (booking.student.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
+        return res.status(403).json({ message: 'Not authorized' });
+      }
 
-        if (timeDiffMinutes < 30) {
-          return res.status(400).json({
-            message: 'Too late to cancel. Bookings can only be cancelled up to 30 minutes before departure.'
-          });
+      // Enforce 30-minute cancellation safety window (unless requested by admin)
+      if (req.user.role !== 'admin') {
+        const shiftInfo = getShiftInfo(booking.shift, booking.travelDate);
+        if (shiftInfo) {
+          const departureTime = parseDepartureTime(booking.travelDate, shiftInfo.departure);
+          const now = new Date();
+          const timeDiffMinutes = (departureTime - now) / (1000 * 60);
+
+          if (timeDiffMinutes < 30) {
+            return res.status(400).json({
+              message:
+                'Too late to cancel. Bookings can only be cancelled up to 30 minutes before departure.',
+            });
+          }
         }
       }
-    }
 
-    // Refund 1 point
-    await User.findByIdAndUpdate(booking.student, {
-      $inc: { points: 1 }
-    });
+      // Perform the atomic status update to prevent concurrent double-cancellation point duplication
+      const updatedBooking = await Booking.findOneAndUpdate(
+        { _id: req.params.id, status: 'confirmed' },
+        { status: 'cancelled', isActive: false },
+        { new: true }
+      );
 
-    booking.status = 'cancelled';
-    await booking.save();
+      if (!updatedBooking) {
+        return res.status(400).json({ message: 'Booking is already cancelled or completed.' });
+      }
 
-    // Emit real-time seat update via Socket.io
-    const io = req.app.get('io');
-    if (io) {
-      io.emit('seatCancelled', {
-        busId: booking.bus,
-        seatNumber: booking.seatNumber,
-        travelDate: booking.travelDate,
-        shift: booking.shift,
+      // Refund 1 point
+      await User.findByIdAndUpdate(booking.student, {
+        $inc: { points: 1 },
       });
-    }
 
-    res.json({ message: 'Booking cancelled successfully' });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Server error' });
+      // Emit real-time seat update via Socket.io
+      const io = req.app.get('io');
+      if (io) {
+        io.emit('seatCancelled', {
+          busId: booking.bus,
+          seatNumber: booking.seatNumber,
+          travelDate: booking.travelDate,
+          shift: booking.shift,
+        });
+      }
+
+      res.json({ message: 'Booking cancelled successfully' });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Server error' });
+    }
   }
-});
+);
 
 module.exports = router;

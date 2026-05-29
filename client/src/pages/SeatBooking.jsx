@@ -14,8 +14,6 @@ import { HiArrowRight, HiArrowNarrowRight, HiSun, HiMoon } from 'react-icons/hi'
 import toast from 'react-hot-toast';
 import { io } from 'socket.io-client';
 
-
-
 const SeatBooking = () => {
   const { user, loadUser } = useAuth();
   const [searchParams] = useSearchParams();
@@ -51,7 +49,6 @@ const SeatBooking = () => {
   const [dates] = useState(generateDates);
   const [selectedDate, setSelectedDate] = useState(dates[0].dateStr);
 
-
   useEffect(() => {
     fetchBuses();
   }, []);
@@ -70,33 +67,37 @@ const SeatBooking = () => {
   }, [busIdFromQuery, selectedShift]);
 
   useEffect(() => {
-    const socketUrl = (import.meta.env.VITE_API_URL || '').replace('/api', '') || window.location.origin;
+    const socketUrl =
+      (import.meta.env.VITE_API_URL || '').replace('/api', '') || window.location.origin;
     const socket = io(socketUrl);
 
-    socket.on('seatBooked', ({ busId, seatNumber, travelDate, shift, studentName, studentId, bookedBy }) => {
-      if (
-        selectedBus &&
-        selectedBus._id === busId &&
-        selectedDate === travelDate &&
-        selectedShift &&
-        selectedShift.shift === shift
-      ) {
-        setSelectedBus(prev => {
-          if (!prev) return prev;
-          const updatedSeats = prev.seats.map(s => {
-            if (s.number === seatNumber) {
-              return { ...s, isBooked: true, studentName, studentId, bookedBy };
-            }
-            return s;
+    socket.on(
+      'seatBooked',
+      ({ busId, seatNumber, travelDate, shift, studentName, studentId, bookedBy }) => {
+        if (
+          selectedBus &&
+          selectedBus._id === busId &&
+          selectedDate === travelDate &&
+          selectedShift &&
+          selectedShift.shift === shift
+        ) {
+          setSelectedBus((prev) => {
+            if (!prev) return prev;
+            const updatedSeats = prev.seats.map((s) => {
+              if (s.number === seatNumber) {
+                return { ...s, isBooked: true, studentName, studentId, bookedBy };
+              }
+              return s;
+            });
+            return {
+              ...prev,
+              seats: updatedSeats,
+              availableSeats: updatedSeats.filter((s) => !s.isBooked).length,
+            };
           });
-          return {
-            ...prev,
-            seats: updatedSeats,
-            availableSeats: updatedSeats.filter(s => !s.isBooked).length
-          };
-        });
+        }
       }
-    });
+    );
 
     socket.on('seatCancelled', ({ busId, seatNumber, travelDate, shift }) => {
       if (
@@ -106,9 +107,9 @@ const SeatBooking = () => {
         selectedShift &&
         selectedShift.shift === shift
       ) {
-        setSelectedBus(prev => {
+        setSelectedBus((prev) => {
           if (!prev) return prev;
-          const updatedSeats = prev.seats.map(s => {
+          const updatedSeats = prev.seats.map((s) => {
             if (s.number === seatNumber) {
               return { ...s, isBooked: false, studentName: '', studentId: '', bookedBy: null };
             }
@@ -117,7 +118,7 @@ const SeatBooking = () => {
           return {
             ...prev,
             seats: updatedSeats,
-            availableSeats: updatedSeats.filter(s => !s.isBooked).length
+            availableSeats: updatedSeats.filter((s) => !s.isBooked).length,
           };
         });
       }
@@ -155,7 +156,9 @@ const SeatBooking = () => {
     }
     try {
       setBusLoading(true);
-      const res = await API.get(`/buses/${busId}?date=${selectedDate}&shift=${selectedShift.shift}`);
+      const res = await API.get(
+        `/buses/${busId}?date=${selectedDate}&shift=${selectedShift.shift}`
+      );
       setSelectedBus(res.data);
       setSelectedSeat(null);
     } catch (error) {
@@ -218,7 +221,9 @@ const SeatBooking = () => {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-extrabold text-dark-900 dark:text-white">Book a Seat</h1>
-        <p className="text-dark-500 dark:text-dark-400 text-sm mt-1">Select date → shift → bus → seat</p>
+        <p className="text-dark-500 dark:text-dark-400 text-sm mt-1">
+          Select date → shift → bus → seat
+        </p>
       </div>
 
       {/* ═══ DATE PAGINATION (Shohoz-style) ═══ */}
@@ -230,13 +235,13 @@ const SeatBooking = () => {
           >
             <FaChevronLeft className="text-xs" />
           </button>
-          
+
           <div
             ref={dateScrollRef}
             className="flex gap-2 overflow-x-auto scrollbar-hide scroll-smooth flex-1"
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
-            {dates.map(d => {
+            {dates.map((d) => {
               const isSelected = selectedDate === d.dateStr;
               return (
                 <button
@@ -248,19 +253,31 @@ const SeatBooking = () => {
                       : 'bg-white dark:bg-dark-900 border-dark-100 dark:border-dark-600 text-dark-600 dark:text-dark-300 hover:border-primary-300 hover:bg-primary-50 dark:hover:bg-primary-950/30'
                   }`}
                 >
-                  <span className={`text-[10px] font-bold uppercase tracking-wider transition-colors duration-200 ${
-                    isSelected ? 'text-white/80' : 'text-dark-400 dark:text-dark-500 group-hover:text-primary-500 dark:group-hover:text-primary-400'
-                  }`}>
+                  <span
+                    className={`text-[10px] font-bold uppercase tracking-wider transition-colors duration-200 ${
+                      isSelected
+                        ? 'text-white/80'
+                        : 'text-dark-400 dark:text-dark-500 group-hover:text-primary-500 dark:group-hover:text-primary-400'
+                    }`}
+                  >
                     {d.isToday ? 'Today' : d.dayName}
                   </span>
-                  <span className={`text-xl font-black transition-colors duration-200 ${
-                    isSelected ? 'text-white' : 'text-dark-900 dark:text-dark-100 group-hover:text-primary-600 dark:group-hover:text-primary-400'
-                  }`}>
+                  <span
+                    className={`text-xl font-black transition-colors duration-200 ${
+                      isSelected
+                        ? 'text-white'
+                        : 'text-dark-900 dark:text-dark-100 group-hover:text-primary-600 dark:group-hover:text-primary-400'
+                    }`}
+                  >
                     {d.dayNum}
                   </span>
-                  <span className={`text-[10px] font-semibold transition-colors duration-200 ${
-                    isSelected ? 'text-white/70' : 'text-dark-400 dark:text-dark-500 group-hover:text-primary-500 dark:group-hover:text-primary-400'
-                  }`}>
+                  <span
+                    className={`text-[10px] font-semibold transition-colors duration-200 ${
+                      isSelected
+                        ? 'text-white/70'
+                        : 'text-dark-400 dark:text-dark-500 group-hover:text-primary-500 dark:group-hover:text-primary-400'
+                    }`}
+                  >
                     {d.monthName}
                   </span>
                 </button>
@@ -279,51 +296,69 @@ const SeatBooking = () => {
 
       {/* ═══ SHIFT SELECTION ═══ */}
       <div>
-         <h2 className="text-sm font-bold text-dark-700 dark:text-dark-200 mb-3 flex items-center gap-2">
-            <span className="w-6 h-6 bg-primary-100 dark:bg-primary-900/40 text-primary-700 dark:text-primary-400 rounded-full flex items-center justify-center text-xs font-black">1</span>
-            Select Shift
-          </h2>
+        <h2 className="text-sm font-bold text-dark-700 dark:text-dark-200 mb-3 flex items-center gap-2">
+          <span className="w-6 h-6 bg-primary-100 dark:bg-primary-900/40 text-primary-700 dark:text-primary-400 rounded-full flex items-center justify-center text-xs font-black">
+            1
+          </span>
+          Select Shift
+        </h2>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          {shifts.map(shift => {
+          {shifts.map((shift) => {
             const isSelected = selectedShift?.shift === shift.shift;
             return (
               <button
                 key={shift.shift}
                 onClick={() => handleShiftSelect(shift)}
                 className={`relative rounded-xl border-2 p-4 transition-all duration-200 text-left ${
-                  isSelected
-                    ? SHIFT_SELECTED[shift.shift]
-                    : SHIFT_BG[shift.shift]
+                  isSelected ? SHIFT_SELECTED[shift.shift] : SHIFT_BG[shift.shift]
                 }`}
               >
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-2xl">{SHIFT_ICONS[shift.shift]}</span>
-                  <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${
-                    isSelected 
-                      ? 'bg-white/20 text-white'
-                      : shift.direction === 'inbound' 
-                        ? 'bg-accent-100 dark:bg-accent-950/40 text-accent-700 dark:text-accent-300' 
-                        : 'bg-teal-100 dark:bg-teal-950/40 text-teal-700 dark:text-teal-300'
-                  }`}>
+                  <span
+                    className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${
+                      isSelected
+                        ? 'bg-white/20 text-white'
+                        : shift.direction === 'inbound'
+                          ? 'bg-accent-100 dark:bg-accent-950/40 text-accent-700 dark:text-accent-300'
+                          : 'bg-teal-100 dark:bg-teal-950/40 text-teal-700 dark:text-teal-300'
+                    }`}
+                  >
                     {shift.directionLabel}
                   </span>
                 </div>
-                <h3 className={`font-bold text-sm ${isSelected ? 'text-white' : 'text-dark-900 dark:text-dark-100'}`}>
+                <h3
+                  className={`font-bold text-sm ${isSelected ? 'text-white' : 'text-dark-900 dark:text-dark-100'}`}
+                >
                   Shift {shift.shift} — {shift.label}
                 </h3>
-                <div className={`flex items-center gap-1 mt-1.5 text-xs font-semibold ${isSelected ? 'text-white/80' : 'text-dark-500 dark:text-dark-400'}`}>
+                <div
+                  className={`flex items-center gap-1 mt-1.5 text-xs font-semibold ${isSelected ? 'text-white/80' : 'text-dark-500 dark:text-dark-400'}`}
+                >
                   <FaClock className="text-[10px]" />
                   {shift.departure} → {shift.arrival}
                 </div>
                 {shift.specialRoute && (
-                  <p className={`mt-2 text-[11px] font-medium ${isSelected ? 'text-white/70' : 'text-dark-500 dark:text-dark-400'}`}>
+                  <p
+                    className={`mt-2 text-[11px] font-medium ${isSelected ? 'text-white/70' : 'text-dark-500 dark:text-dark-400'}`}
+                  >
                     {shift.specialRoute}
                   </p>
                 )}
                 {isSelected && (
                   <div className="absolute top-2 right-2 w-5 h-5 bg-white/30 rounded-full flex items-center justify-center">
-                    <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                    <svg
+                      className="w-3 h-3 text-white"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={3}
+                        d="M5 13l4 4L19 7"
+                      />
                     </svg>
                   </div>
                 )}
@@ -341,40 +376,54 @@ const SeatBooking = () => {
       {/* ═══ BUS SELECTION ═══ */}
       {selectedShift && !selectedBus && !busLoading && (
         <div>
-           <h2 className="text-sm font-bold text-dark-700 dark:text-dark-200 mb-3 flex items-center gap-2">
-              <span className="w-6 h-6 bg-primary-100 dark:bg-primary-900/40 text-primary-700 dark:text-primary-400 rounded-full flex items-center justify-center text-xs font-black">2</span>
-              Select Bus
-              <span className="text-xs font-normal text-dark-400 dark:text-dark-500">
-                ({buses.length} buses available)
-              </span>
-            </h2>
+          <h2 className="text-sm font-bold text-dark-700 dark:text-dark-200 mb-3 flex items-center gap-2">
+            <span className="w-6 h-6 bg-primary-100 dark:bg-primary-900/40 text-primary-700 dark:text-primary-400 rounded-full flex items-center justify-center text-xs font-black">
+              2
+            </span>
+            Select Bus
+            <span className="text-xs font-normal text-dark-400 dark:text-dark-500">
+              ({buses.length} buses available)
+            </span>
+          </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {buses.map(bus => (
+            {buses.map((bus) => (
               <button
                 key={bus._id}
                 onClick={() => selectBus(bus._id)}
                 className="card text-left group hover:scale-[1.01] hover:shadow-lg transition-all duration-200 !p-0 overflow-hidden"
               >
-                <div className={`bg-gradient-to-r ${SHIFT_GRADIENTS[selectedShift.shift]} px-5 py-3.5 flex items-center justify-between`}>
+                <div
+                  className={`bg-gradient-to-r ${SHIFT_GRADIENTS[selectedShift.shift]} px-5 py-3.5 flex items-center justify-between`}
+                >
                   <div className="flex items-center gap-2.5">
                     <FaBus className="text-white text-base" />
-                    <h3 className="font-extrabold text-white text-lg md:text-xl tracking-tight">{bus.busName}</h3>
+                    <h3 className="font-extrabold text-white text-lg md:text-xl tracking-tight">
+                      {bus.busName}
+                    </h3>
                   </div>
-                  <span className={`text-[10px] font-bold uppercase px-2.5 py-1 rounded-full ${
-                    bus.busType === 'flyover' ? 'bg-white/30 text-white' : 'bg-white/20 text-white/90'
-                  }`}>
+                  <span
+                    className={`text-[10px] font-bold uppercase px-2.5 py-1 rounded-full ${
+                      bus.busType === 'flyover'
+                        ? 'bg-white/30 text-white'
+                        : 'bg-white/20 text-white/90'
+                    }`}
+                  >
                     {bus.busType}
                   </span>
                 </div>
                 <div className="p-4">
-                  <p className="text-xs text-dark-500 dark:text-dark-400 mb-2 line-clamp-1">{bus.route?.name}</p>
+                  <p className="text-xs text-dark-500 dark:text-dark-400 mb-2 line-clamp-1">
+                    {bus.route?.name}
+                  </p>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-1 text-xs text-dark-400 dark:text-dark-500">
                       <FaMapMarkerAlt className="text-[10px]" />
                       {bus.route?.stops?.length} stops
                     </div>
                     <span className="text-xs font-bold text-accent-600 dark:text-accent-400">
-                      {bus.availableSeats !== undefined ? `${bus.availableSeats}/${bus.totalSeats} empty` : `${bus.totalSeats} seats`}
+                      {bus.availableSeats !== undefined
+                        ? `${bus.availableSeats}/${bus.totalSeats} empty`
+                        : `${bus.totalSeats} seats`}
                     </span>
                   </div>
                 </div>
@@ -396,84 +445,116 @@ const SeatBooking = () => {
         <div>
           <div className="flex items-center gap-3 mb-4">
             <button
-              onClick={() => { setSelectedBus(null); setSelectedSeat(null); }}
+              onClick={() => {
+                setSelectedBus(null);
+                setSelectedSeat(null);
+              }}
               className="text-sm text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 font-semibold flex items-center gap-1 bg-primary-50 dark:bg-primary-950/20 px-3 py-1.5 rounded-lg"
             >
               ← Change Bus
             </button>
-             <h2 className="text-sm font-bold text-dark-700 dark:text-dark-200 flex items-center gap-2">
-                <span className="w-6 h-6 bg-primary-100 dark:bg-primary-900/40 text-primary-700 dark:text-primary-400 rounded-full flex items-center justify-center text-xs font-black">3</span>
-                Select Your Seat
-              </h2>
+            <h2 className="text-sm font-bold text-dark-700 dark:text-dark-200 flex items-center gap-2">
+              <span className="w-6 h-6 bg-primary-100 dark:bg-primary-900/40 text-primary-700 dark:text-primary-400 rounded-full flex items-center justify-center text-xs font-black">
+                3
+              </span>
+              Select Your Seat
+            </h2>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Bus Info Sidebar */}
             <div className="lg:col-span-1 space-y-4">
               <div className="card !p-0 overflow-hidden">
-                <div className={`bg-gradient-to-r ${SHIFT_GRADIENTS[selectedShift.shift]} px-5 py-4`}>
+                <div
+                  className={`bg-gradient-to-r ${SHIFT_GRADIENTS[selectedShift.shift]} px-5 py-4`}
+                >
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
                       <FaBus className="text-white text-lg" />
                     </div>
                     <div>
                       <h3 className="font-bold text-white text-lg">{selectedBus.busName}</h3>
-                      <span className="text-white/70 text-xs font-medium uppercase">{selectedBus.busType} Bus</span>
+                      <span className="text-white/70 text-xs font-medium uppercase">
+                        {selectedBus.busType} Bus
+                      </span>
                     </div>
                   </div>
                 </div>
                 <div className="p-5 space-y-3 text-sm">
                   <div className="flex justify-between py-2 border-b border-dark-100 dark:border-dark-600">
                     <span className="text-dark-500 dark:text-dark-400">Shift</span>
-                    <span className="font-bold text-dark-900 dark:text-dark-100">{SHIFT_ICONS[selectedShift.shift]} Shift {selectedShift.shift} — {selectedShift.label}</span>
+                    <span className="font-bold text-dark-900 dark:text-dark-100">
+                      {SHIFT_ICONS[selectedShift.shift]} Shift {selectedShift.shift} —{' '}
+                      {selectedShift.label}
+                    </span>
                   </div>
                   <div className="flex justify-between py-2 border-b border-dark-100 dark:border-dark-600">
                     <span className="text-dark-500 dark:text-dark-400">Departure</span>
-                    <span className="font-semibold dark:text-dark-200">{selectedShift.departure}</span>
+                    <span className="font-semibold dark:text-dark-200">
+                      {selectedShift.departure}
+                    </span>
                   </div>
                   <div className="flex justify-between py-2 border-b border-dark-100 dark:border-dark-600">
                     <span className="text-dark-500 dark:text-dark-400">Arrival</span>
-                    <span className="font-semibold dark:text-dark-200">{selectedShift.arrival}</span>
+                    <span className="font-semibold dark:text-dark-200">
+                      {selectedShift.arrival}
+                    </span>
                   </div>
                   <div className="flex justify-between py-2 border-b border-dark-100 dark:border-dark-600">
                     <span className="text-dark-500 dark:text-dark-400">Direction</span>
-                    <span className={`font-bold text-xs px-2 py-0.5 rounded-full ${
-                      selectedShift.direction === 'inbound' 
-                        ? 'bg-accent-100 text-accent-700' 
-                        : 'bg-teal-100 text-teal-700'
-                    }`}>
+                    <span
+                      className={`font-bold text-xs px-2 py-0.5 rounded-full ${
+                        selectedShift.direction === 'inbound'
+                          ? 'bg-accent-100 text-accent-700'
+                          : 'bg-teal-100 text-teal-700'
+                      }`}
+                    >
                       {selectedShift.directionLabel}
                     </span>
                   </div>
                   <div className="flex justify-between py-2 border-b border-dark-100 dark:border-dark-600">
                     <span className="text-dark-500 dark:text-dark-400">Total Seats</span>
-                    <span className="font-semibold dark:text-dark-200">{selectedBus.totalSeats}</span>
+                    <span className="font-semibold dark:text-dark-200">
+                      {selectedBus.totalSeats}
+                    </span>
                   </div>
                   <div className="flex justify-between py-2">
                     <span className="text-dark-500 dark:text-dark-400">Available</span>
-                    <span className="font-bold text-accent-600 dark:text-accent-400">{selectedBus.availableSeats}</span>
+                    <span className="font-bold text-accent-600 dark:text-accent-400">
+                      {selectedBus.availableSeats}
+                    </span>
                   </div>
                 </div>
 
                 {/* Route */}
-                 <div className="px-5 pb-5">
+                <div className="px-5 pb-5">
                   <p className="font-bold text-dark-900 dark:text-dark-100 text-sm mb-3">
                     {selectedShift.specialRoute ? '🌟 Special Route' : '📍 Route'}
                   </p>
                   {selectedShift.specialRoute ? (
                     <div className="bg-teal-50 dark:bg-teal-950/20 border border-teal-200 dark:border-teal-800 rounded-xl p-3">
-                      <p className="text-sm font-semibold text-amber-800 dark:text-amber-300">{selectedShift.specialRoute}</p>
-                      <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">{selectedShift.description}</p>
+                      <p className="text-sm font-semibold text-amber-800 dark:text-amber-300">
+                        {selectedShift.specialRoute}
+                      </p>
+                      <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
+                        {selectedShift.description}
+                      </p>
                     </div>
                   ) : (
                     <div className="space-y-2">
                       {selectedBus.route?.stops?.map((stop, i) => (
                         <div key={i} className="flex items-center gap-3">
                           <div className="flex flex-col items-center">
-                            <div className={`w-3 h-3 rounded-full ${i === 0 ? 'bg-accent-500' : i === selectedBus.route.stops.length - 1 ? 'bg-primary-500' : 'bg-dark-300 dark:bg-dark-500'}`} />
-                            {i < selectedBus.route.stops.length - 1 && <div className="w-0.5 h-4 bg-dark-200 dark:bg-dark-600" />}
+                            <div
+                              className={`w-3 h-3 rounded-full ${i === 0 ? 'bg-accent-500' : i === selectedBus.route.stops.length - 1 ? 'bg-primary-500' : 'bg-dark-300 dark:bg-dark-500'}`}
+                            />
+                            {i < selectedBus.route.stops.length - 1 && (
+                              <div className="w-0.5 h-4 bg-dark-200 dark:bg-dark-600" />
+                            )}
                           </div>
-                          <span className="text-sm text-dark-700 dark:text-dark-200">{stop.name}</span>
+                          <span className="text-sm text-dark-700 dark:text-dark-200">
+                            {stop.name}
+                          </span>
                         </div>
                       ))}
                     </div>
@@ -516,6 +597,7 @@ const SeatBooking = () => {
                   selectedSeat={selectedSeat}
                   onSelectSeat={setSelectedSeat}
                   readOnly={false}
+                  currentUserId={user?._id}
                 />
               </div>
             </div>
@@ -528,17 +610,27 @@ const SeatBooking = () => {
         <div className="bg-gradient-to-r from-dark-800 to-dark-900 rounded-2xl p-4 flex flex-wrap items-center gap-4 text-white">
           <div className="flex items-center gap-2 text-sm">
             <span className="text-white/50">Date:</span>
-            <span className="font-bold">{new Date(selectedDate + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</span>
+            <span className="font-bold">
+              {new Date(selectedDate + 'T00:00:00').toLocaleDateString('en-US', {
+                weekday: 'short',
+                month: 'short',
+                day: 'numeric',
+              })}
+            </span>
           </div>
           <div className="w-px h-6 bg-white/20 hidden sm:block" />
           <div className="flex items-center gap-2 text-sm">
             <span className="text-white/50">{SHIFT_ICONS[selectedShift.shift]} Shift:</span>
-            <span className="font-bold">Shift {selectedShift.shift} — {selectedShift.label}</span>
+            <span className="font-bold">
+              Shift {selectedShift.shift} — {selectedShift.label}
+            </span>
           </div>
           <div className="w-px h-6 bg-white/20 hidden sm:block" />
           <div className="flex items-center gap-2 text-sm">
             <span className="text-white/50">⏰ Time:</span>
-            <span className="font-bold">{selectedShift.departure} → {selectedShift.arrival}</span>
+            <span className="font-bold">
+              {selectedShift.departure} → {selectedShift.arrival}
+            </span>
           </div>
         </div>
       )}
@@ -546,34 +638,74 @@ const SeatBooking = () => {
       {/* ═══ CONFIRMATION MODAL ═══ */}
       <Modal isOpen={showConfirm} onClose={() => setShowConfirm(false)} title="Confirm Booking">
         <div className="space-y-4">
-          <div className={`bg-gradient-to-r ${SHIFT_GRADIENTS[selectedShift?.shift]} rounded-xl p-4 text-white`}>
+          <div
+            className={`bg-gradient-to-r ${SHIFT_GRADIENTS[selectedShift?.shift]} rounded-xl p-4 text-white`}
+          >
             <div className="flex items-center gap-3 mb-3">
               <span className="text-3xl">{SHIFT_ICONS[selectedShift?.shift]}</span>
               <div>
-                <h3 className="font-bold text-lg">Shift {selectedShift?.shift} — {selectedShift?.label}</h3>
-                <p className="text-white/70 text-sm">{selectedShift?.departure} → {selectedShift?.arrival}</p>
+                <h3 className="font-bold text-lg">
+                  Shift {selectedShift?.shift} — {selectedShift?.label}
+                </h3>
+                <p className="text-white/70 text-sm">
+                  {selectedShift?.departure} → {selectedShift?.arrival}
+                </p>
               </div>
             </div>
           </div>
           <div className="bg-dark-50 dark:bg-dark-800/40 rounded-xl p-4">
             <div className="grid grid-cols-2 gap-3 text-sm">
-              <div><span className="text-dark-500 dark:text-dark-400">Bus:</span> <span className="font-bold dark:text-dark-100">{selectedBus?.busName}</span></div>
-              <div><span className="text-dark-500 dark:text-dark-400">Seat:</span> <span className="font-bold dark:text-dark-100">{getSeatLabel(selectedSeat)}</span></div>
-              <div><span className="text-dark-500 dark:text-dark-400">Route:</span> <span className="font-bold text-xs dark:text-dark-100">{selectedShift?.specialRoute || selectedBus?.route?.name}</span></div>
-              <div><span className="text-dark-500 dark:text-dark-400">Date:</span> <span className="font-bold text-accent-600 dark:text-accent-400">{new Date(selectedDate + 'T00:00:00').toLocaleDateString()}</span></div>
-              <div><span className="text-dark-500 dark:text-dark-400">Direction:</span> <span className="font-bold dark:text-dark-100">{selectedShift?.directionLabel}</span></div>
-              <div><span className="text-dark-500 dark:text-dark-400">Points:</span> <span className="font-bold text-primary-600 dark:text-primary-400">{user?.points ?? 0} remaining</span></div>
+              <div>
+                <span className="text-dark-500 dark:text-dark-400">Bus:</span>{' '}
+                <span className="font-bold dark:text-dark-100">{selectedBus?.busName}</span>
+              </div>
+              <div>
+                <span className="text-dark-500 dark:text-dark-400">Seat:</span>{' '}
+                <span className="font-bold dark:text-dark-100">{getSeatLabel(selectedSeat)}</span>
+              </div>
+              <div>
+                <span className="text-dark-500 dark:text-dark-400">Route:</span>{' '}
+                <span className="font-bold text-xs dark:text-dark-100">
+                  {selectedShift?.specialRoute || selectedBus?.route?.name}
+                </span>
+              </div>
+              <div>
+                <span className="text-dark-500 dark:text-dark-400">Date:</span>{' '}
+                <span className="font-bold text-accent-600 dark:text-accent-400">
+                  {new Date(selectedDate + 'T00:00:00').toLocaleDateString()}
+                </span>
+              </div>
+              <div>
+                <span className="text-dark-500 dark:text-dark-400">Direction:</span>{' '}
+                <span className="font-bold dark:text-dark-100">
+                  {selectedShift?.directionLabel}
+                </span>
+              </div>
+              <div>
+                <span className="text-dark-500 dark:text-dark-400">Points:</span>{' '}
+                <span className="font-bold text-primary-600 dark:text-primary-400">
+                  {user?.points ?? 0} remaining
+                </span>
+              </div>
             </div>
           </div>
           <p className="text-sm text-dark-500 dark:text-dark-400">
             1 Point will be deducted upon booking. You can cancel this booking from your dashboard.
           </p>
           <div className="flex gap-3">
-            <button onClick={() => setShowConfirm(false)} className="btn-secondary flex-1">Cancel</button>
-            <button onClick={handleBookSeat} disabled={booking} className="btn-primary flex-1 flex items-center justify-center gap-2">
+            <button onClick={() => setShowConfirm(false)} className="btn-secondary flex-1">
+              Cancel
+            </button>
+            <button
+              onClick={handleBookSeat}
+              disabled={booking}
+              className="btn-primary flex-1 flex items-center justify-center gap-2"
+            >
               {booking ? (
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              ) : 'Confirm Booking'}
+              ) : (
+                'Confirm Booking'
+              )}
             </button>
           </div>
         </div>

@@ -1,6 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const { getAllShiftsForDate, getShiftInfo, WEEKDAY_SHIFTS, WEEKEND_SHIFTS } = require('../utils/shifts');
+const {
+  getAllShiftsForDate,
+  getShiftInfo,
+  WEEKDAY_SHIFTS,
+  WEEKEND_SHIFTS,
+} = require('../utils/shifts');
 
 // @route   GET /api/shifts
 // @desc    Get available shifts for a date

@@ -22,7 +22,9 @@ const StatsCard = ({ icon: Icon, label, value, color = 'primary', trend }) => {
             <AnimatedCounter value={value} duration={1} />
           </p>
           {trend && (
-            <p className={`text-xs mt-1 font-medium ${trend > 0 ? 'text-accent-500' : 'text-danger-500'}`}>
+            <p
+              className={`text-xs mt-1 font-medium ${trend > 0 ? 'text-accent-500' : 'text-danger-500'}`}
+            >
               {trend > 0 ? '↑' : '↓'} {Math.abs(trend)}% from last week
             </p>
           )}

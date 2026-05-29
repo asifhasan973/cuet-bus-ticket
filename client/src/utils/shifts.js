@@ -45,8 +45,40 @@ export const SHIFT_SELECTED = {
 };
 
 export const SHIFT_SCHEDULE = [
-  { shift: 1, icon: '🌅', label: 'Morning', time: '6:30 AM → 8:00 AM', dir: 'CUET-bound', note: 'Weekdays', color: 'from-teal-400 to-teal-600' },
-  { shift: 2, icon: '☀️', label: 'Afternoon', time: '2:00 PM → 3:00 PM', dir: 'Outbound', note: 'All days', color: 'from-sky-400 to-blue-500' },
-  { shift: 3, icon: '🌇', label: 'Evening', time: '5:00 PM → 7:00 PM', dir: 'Outbound', note: 'Weekdays', color: 'from-indigo-400 to-purple-500' },
-  { shift: 4, icon: '🌙', label: 'Night', time: '9:00 PM → 10:30 PM', dir: 'CUET-bound', note: 'All days', color: 'from-slate-600 to-slate-800' },
+  {
+    shift: 1,
+    icon: '🌅',
+    label: 'Morning',
+    time: '6:30 AM → 8:00 AM',
+    dir: 'CUET-bound',
+    note: 'Weekdays',
+    color: 'from-teal-400 to-teal-600',
+  },
+  {
+    shift: 2,
+    icon: '☀️',
+    label: 'Afternoon',
+    time: '2:00 PM → 3:00 PM',
+    dir: 'Outbound',
+    note: 'All days',
+    color: 'from-sky-400 to-blue-500',
+  },
+  {
+    shift: 3,
+    icon: '🌇',
+    label: 'Evening',
+    time: '5:00 PM → 7:00 PM',
+    dir: 'Outbound',
+    note: 'Weekdays',
+    color: 'from-indigo-400 to-purple-500',
+  },
+  {
+    shift: 4,
+    icon: '🌙',
+    label: 'Night',
+    time: '9:00 PM → 10:30 PM',
+    dir: 'CUET-bound',
+    note: 'All days',
+    color: 'from-slate-600 to-slate-800',
+  },
 ];

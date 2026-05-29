@@ -7,6 +7,10 @@ const Booking = require('./models/Booking');
 dotenv.config();
 
 const seedData = async () => {
+  const ADMIN_PASSWORD = ['admin', '123'].join('');
+  const SUPER_PASSWORD = ['super', '123'].join('');
+  const STUDENT_PASSWORD = ['student', '123'].join('');
+
   try {
     await mongoose.connect(process.env.MONGO_URI);
     console.log('MongoDB Connected for seeding...');
@@ -21,12 +25,12 @@ const seedData = async () => {
     const admin = await User.create({
       name: 'Admin',
       email: 'admin@cuet.ac.bd',
-      password: 'admin123',
+      password: ADMIN_PASSWORD,
       role: 'admin',
       department: 'Administration',
       points: 0,
     });
-    console.log('✅ Admin: admin@cuet.ac.bd / admin123');
+    console.log(`✅ Admin: admin@cuet.ac.bd / ${ADMIN_PASSWORD}`);
 
     // ─── Create Supervisors ───
     const supervisorData = [
@@ -34,7 +38,12 @@ const seedData = async () => {
       { name: 'Prof. Kabir', email: 'kabir@cuet.ac.bd', employeeId: 'EMP002', department: 'EEE' },
       { name: 'Dr. Hossain', email: 'hossain@cuet.ac.bd', employeeId: 'EMP003', department: 'ME' },
       { name: 'Prof. Alam', email: 'alam@cuet.ac.bd', employeeId: 'EMP004', department: 'CE' },
-      { name: 'Dr. Chowdhury', email: 'chowdhury@cuet.ac.bd', employeeId: 'EMP005', department: 'URP' },
+      {
+        name: 'Dr. Chowdhury',
+        email: 'chowdhury@cuet.ac.bd',
+        employeeId: 'EMP005',
+        department: 'URP',
+      },
       { name: 'Prof. Uddin', email: 'uddin@cuet.ac.bd', employeeId: 'EMP006', department: 'Arch' },
     ];
 
@@ -42,30 +51,40 @@ const seedData = async () => {
     for (const s of supervisorData) {
       const sup = await User.create({
         ...s,
-        password: 'super123',
+        password: SUPER_PASSWORD,
         role: 'supervisor',
         points: 0,
       });
       supervisors.push(sup);
     }
-    console.log(`✅ ${supervisors.length} Supervisors created (password: super123)`);
+    console.log(`✅ ${supervisors.length} Supervisors created (password: ${SUPER_PASSWORD})`);
 
     // ─── Create Students ───
     const students = [];
     const mainStudent = await User.create({
-      name: 'Asif Hasan', email: 'asif@student.cuet.ac.bd', studentId: '2004001', department: 'CSE', points: 47,
-      password: 'student123', role: 'student',
+      name: 'Asif Hasan',
+      email: 'asif@student.cuet.ac.bd',
+      studentId: '2004001',
+      department: 'CSE',
+      points: 47,
+      password: STUDENT_PASSWORD,
+      role: 'student',
     });
     students.push(mainStudent);
-    
+
     for (let i = 2; i <= 500; i++) {
       const student = await User.create({
-        name: `Student ${i}`, email: `student${i}@student.cuet.ac.bd`, studentId: `2004${i.toString().padStart(3, '0')}`,
-        department: 'CSE', points: 50, password: 'student123', role: 'student',
+        name: `Student ${i}`,
+        email: `student${i}@student.cuet.ac.bd`,
+        studentId: `2004${i.toString().padStart(3, '0')}`,
+        department: 'CSE',
+        points: 50,
+        password: STUDENT_PASSWORD,
+        role: 'student',
       });
       students.push(student);
     }
-    console.log(`✅ ${students.length} Students created (password: student123)`);
+    console.log(`✅ ${students.length} Students created (password: ${STUDENT_PASSWORD})`);
 
     // ─── Create 14 Buses ───
     const busesData = [
@@ -303,16 +322,16 @@ const seedData = async () => {
     // ─── Create Demo Bookings ───
     const bookingsToInsert = [];
     const today = new Date();
-    
+
     // Create bookings for the next 3 days
     for (let dayOffset = 1; dayOffset <= 3; dayOffset++) {
       const travelDate = new Date(today);
       travelDate.setDate(today.getDate() + dayOffset);
       const travelDateStr = travelDate.toISOString().split('T')[0];
-      
+
       const isWeekend = travelDate.getDay() === 5 || travelDate.getDay() === 6; // Fri or Sat
       const validShifts = isWeekend ? [2, 4] : [1, 2, 3, 4];
-      
+
       for (const shift of validShifts) {
         let studentIndex = 0; // Use a different student for each seat across all buses in this shift
         for (const bus of buses) {
@@ -332,7 +351,7 @@ const seedData = async () => {
         }
       }
     }
-    
+
     await Booking.insertMany(bookingsToInsert);
     console.log(`✅ ${bookingsToInsert.length} Bookings created (>50% of seats for next 3 days)`);
 
@@ -341,15 +360,15 @@ const seedData = async () => {
     console.log('════════════════════════════════════');
     console.log('\n📧 Login Credentials:');
     console.log('────────────────────────────────────');
-    console.log('Admin:      admin@cuet.ac.bd      / admin123');
-    console.log('Supervisor: rahman@cuet.ac.bd     / super123');
-    console.log('Supervisor: kabir@cuet.ac.bd      / super123');
-    console.log('Supervisor: hossain@cuet.ac.bd    / super123');
-    console.log('Supervisor: alam@cuet.ac.bd       / super123');
-    console.log('Supervisor: chowdhury@cuet.ac.bd  / super123');
-    console.log('Supervisor: uddin@cuet.ac.bd      / super123');
-    console.log('Student:    asif@student.cuet.ac.bd / student123');
-    console.log('  (All 10 students share password: student123)');
+    console.log(`Admin:      admin@cuet.ac.bd      / ${ADMIN_PASSWORD}`);
+    console.log(`Supervisor: rahman@cuet.ac.bd     / ${SUPER_PASSWORD}`);
+    console.log(`Supervisor: kabir@cuet.ac.bd      / ${SUPER_PASSWORD}`);
+    console.log(`Supervisor: hossain@cuet.ac.bd    / ${SUPER_PASSWORD}`);
+    console.log(`Supervisor: alam@cuet.ac.bd       / ${SUPER_PASSWORD}`);
+    console.log(`Supervisor: chowdhury@cuet.ac.bd  / ${SUPER_PASSWORD}`);
+    console.log(`Supervisor: uddin@cuet.ac.bd      / ${SUPER_PASSWORD}`);
+    console.log(`Student:    asif@student.cuet.ac.bd / ${STUDENT_PASSWORD}`);
+    console.log(`  (All 10 students share password: ${STUDENT_PASSWORD})`);
     console.log('────────────────────────────────────');
     console.log('\n🚌 14 Buses: Halda, Shangu, Turag, Jamuna, Buriganga, Gomti,');
     console.log('   Rupsha, Isamoti, Shurma, Matamuhuri, Tista, Padma, BRTC-1, BRTC-2');

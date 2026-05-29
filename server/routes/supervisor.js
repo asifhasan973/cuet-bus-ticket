@@ -5,6 +5,7 @@ const Booking = require('../models/Booking');
 const User = require('../models/User');
 const auth = require('../middleware/auth');
 const roleCheck = require('../middleware/roleCheck');
+const { body, validationResult } = require('express-validator');
 
 // @route   GET /api/supervisor/buses
 // @desc    Get buses assigned to supervisor
@@ -29,12 +30,15 @@ router.get('/bus/:id/students', auth, roleCheck('supervisor'), async (req, res) 
     const { date, shift } = req.query;
     const filter = {
       bus: req.params.id,
-      status: 'confirmed'
+      status: 'confirmed',
     };
     if (date) filter.travelDate = date;
     if (shift) filter.shift = parseInt(shift);
 
-    const bookings = await Booking.find(filter).populate('student', 'name email studentId department points');
+    const bookings = await Booking.find(filter).populate(
+      'student',
+      'name email studentId department points'
+    );
 
     res.json(bookings);
   } catch (error) {
@@ -46,82 +50,145 @@ router.get('/bus/:id/students', auth, roleCheck('supervisor'), async (req, res) 
 // @route   POST /api/supervisor/attendance
 // @desc    Mark attendance and deduct tokens
 // @access  Supervisor
-router.post('/attendance', auth, roleCheck('supervisor'), async (req, res) => {
-  try {
-    const { bookingId, status } = req.body; // status: 'present' or 'absent'
+router.post(
+  '/attendance',
+  auth,
+  roleCheck('supervisor'),
+  [
+    body('bookingId', 'Booking ID must be a valid MongoId').isMongoId(),
+    body('status', 'Status must be present or absent').isIn(['present', 'absent']),
+  ],
+  async (req, res) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
 
-    const booking = await Booking.findById(bookingId).populate('student');
-    if (!booking) {
-      return res.status(404).json({ message: 'Booking not found' });
+      const { bookingId, status } = req.body; // status: 'present' or 'absent'
+
+      const booking = await Booking.findById(bookingId).populate('student');
+      if (!booking) {
+        return res.status(404).json({ message: 'Booking not found' });
+      }
+
+      if (booking.attendance !== 'pending') {
+        return res.status(400).json({ message: 'Attendance already marked for this booking' });
+      }
+
+      const bus = await Bus.findById(booking.bus);
+      if (!bus.supervisors.includes(req.user._id)) {
+        return res.status(403).json({ message: 'Not authorized for this bus' });
+      }
+
+      // Update attendance and complete status atomically to prevent concurrency issues (e.g. double-marking attendance points deductions)
+      const updatedBooking = await Booking.findOneAndUpdate(
+        { _id: bookingId, attendance: 'pending' },
+        { attendance: status, status: 'completed' },
+        { new: true }
+      );
+
+      if (!updatedBooking) {
+        return res.status(400).json({ message: 'Attendance already marked for this booking' });
+      }
+
+      // Deduct tokens: present = 0 extra points (since 1 point was already deducted during booking)
+      // absent = 2 extra penalty points (making it a total of 3 points deducted)
+      const deduction = status === 'present' ? 0 : 2;
+      let student = null;
+      if (deduction > 0) {
+        student = await User.findById(booking.student._id);
+        if (student) {
+          student.points = Math.max(0, student.points - deduction);
+          await student.save();
+        }
+      } else {
+        student = await User.findById(booking.student._id);
+      }
+
+      res.json({
+        message:
+          status === 'present'
+            ? 'Attendance marked as present. 0 extra tokens deducted.'
+            : `Attendance marked as absent. ${deduction} penalty token(s) deducted.`,
+        booking,
+        newBalance: student ? student.points : booking.student.points,
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Server error' });
     }
-
-    if (booking.attendance !== 'pending') {
-      return res.status(400).json({ message: 'Attendance already marked for this booking' });
-    }
-
-    const bus = await Bus.findById(booking.bus);
-    if (!bus.supervisors.includes(req.user._id)) {
-      return res.status(403).json({ message: 'Not authorized for this bus' });
-    }
-
-    // Update attendance
-    booking.attendance = status;
-    await booking.save();
-
-    // Deduct tokens: present = -1, absent = -3
-    const deduction = status === 'present' ? 1 : 3;
-    const student = await User.findById(booking.student._id);
-    student.points -= deduction;
-    await student.save();
-
-    res.json({
-      message: `Attendance marked as ${status}. ${deduction} token(s) deducted.`,
-      booking,
-      newBalance: student.points,
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Server error' });
   }
-});
+);
 
 // @route   POST /api/supervisor/attendance/bulk
 // @desc    Mark attendance for multiple students
 // @access  Supervisor
-router.post('/attendance/bulk', auth, roleCheck('supervisor'), async (req, res) => {
-  try {
-    const { attendanceList } = req.body; // [{ bookingId, status }]
-    const results = [];
+//
+// NOTE: This endpoint performs sequential DB operations per student (N+1 pattern).
+// For a high-traffic production system, this should be refactored to use MongoDB
+// bulkWrite() for batch updates and Promise.all() for parallel execution.
+// Current approach is acceptable for the expected scale (~50 students/bus).
+router.post(
+  '/attendance/bulk',
+  auth,
+  roleCheck('supervisor'),
+  [
+    body('attendanceList', 'Attendance list must be an array').isArray({ min: 1 }),
+    body('attendanceList.*.bookingId', 'Each booking ID must be a valid MongoId').isMongoId(),
+    body('attendanceList.*.status', 'Each status must be present or absent').isIn([
+      'present',
+      'absent',
+    ]),
+  ],
+  async (req, res) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
 
-    for (const item of attendanceList) {
-      const booking = await Booking.findById(item.bookingId).populate('student');
-      if (!booking || booking.attendance !== 'pending') continue;
+      const { attendanceList } = req.body; // [{ bookingId, status }]
+      const results = [];
 
-      const bus = await Bus.findById(booking.bus);
-      if (!bus.supervisors.includes(req.user._id)) continue;
+      for (const item of attendanceList) {
+        const booking = await Booking.findById(item.bookingId);
+        if (!booking || booking.attendance !== 'pending') continue;
 
-      booking.attendance = item.status;
-      await booking.save();
+        const bus = await Bus.findById(booking.bus);
+        if (!bus || !bus.supervisors.includes(req.user._id)) continue;
 
-      const deduction = item.status === 'present' ? 1 : 3;
-      const student = await User.findById(booking.student._id);
-      student.points -= deduction;
-      await student.save();
+        const updatedBooking = await Booking.findOneAndUpdate(
+          { _id: item.bookingId, attendance: 'pending' },
+          { attendance: item.status, status: 'completed' },
+          { new: true }
+        ).populate('student');
 
-      results.push({
-        studentName: student.name,
-        status: item.status,
-        deduction,
-        newBalance: student.points,
-      });
+        if (!updatedBooking) continue;
+
+        const deduction = item.status === 'present' ? 0 : 2;
+        const student = await User.findById(updatedBooking.student._id);
+        if (student) {
+          if (deduction > 0) {
+            student.points = Math.max(0, student.points - deduction);
+            await student.save();
+          }
+          results.push({
+            studentName: student.name,
+            status: item.status,
+            deduction,
+            newBalance: student.points,
+          });
+        }
+      }
+
+      res.json({ message: 'Bulk attendance marked successfully', results });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Server error' });
     }
-
-    res.json({ message: 'Bulk attendance marked successfully', results });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Server error' });
   }
-});
+);
 
 // @route   PUT /api/supervisor/route/:id
 // @desc    Update bus route

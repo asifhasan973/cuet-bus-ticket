@@ -1,8 +1,14 @@
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import {
-  HiHome, HiTicket, HiMap, HiUser, HiUsers, HiClipboardCheck,
-  HiCog, HiChartBar,
+  HiHome,
+  HiTicket,
+  HiMap,
+  HiUser,
+  HiUsers,
+  HiClipboardCheck,
+  HiCog,
+  HiChartBar,
 } from 'react-icons/hi';
 import { FaBus } from 'react-icons/fa';
 
@@ -28,24 +34,32 @@ const Sidebar = ({ isOpen, onClose }) => {
     { to: '/admin/routes', icon: HiMap, label: 'Routes & Schedule' },
   ];
 
-  const links = user?.role === 'admin' ? adminLinks 
-    : user?.role === 'supervisor' ? supervisorLinks 
-    : studentLinks;
+  const links =
+    user?.role === 'admin'
+      ? adminLinks
+      : user?.role === 'supervisor'
+        ? supervisorLinks
+        : studentLinks;
 
   return (
     <>
       {/* Overlay for mobile */}
       {isOpen && (
-        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 lg:hidden" onClick={onClose} />
+        <div
+          className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 lg:hidden"
+          onClick={onClose}
+        />
       )}
 
-      <aside className={`
+      <aside
+        className={`
         fixed lg:sticky top-16 left-0 z-40 h-[calc(100vh-4rem)]
         w-64 bg-white dark:bg-dark-700 border-r border-dark-100 dark:border-dark-600
         transform transition-transform duration-300 ease-in-out
         ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
         overflow-y-auto transition-colors duration-300
-      `}>
+      `}
+      >
         {/* User Info Card */}
         <div className="p-4 border-b border-dark-100 dark:border-dark-600">
           <div className="bg-gradient-to-br from-primary-500 to-primary-700 rounded-xl p-4 text-white shadow-sm">
@@ -80,9 +94,11 @@ const Sidebar = ({ isOpen, onClose }) => {
               className={({ isActive }) => `
                 flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium
                 transition-all duration-200
-                ${isActive 
-                  ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300 shadow-sm' 
-                  : 'text-dark-500 dark:text-dark-300 hover:text-dark-800 dark:hover:text-white hover:bg-dark-50 dark:hover:bg-dark-600/50'}
+                ${
+                  isActive
+                    ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300 shadow-sm'
+                    : 'text-dark-500 dark:text-dark-300 hover:text-dark-800 dark:hover:text-white hover:bg-dark-50 dark:hover:bg-dark-600/50'
+                }
               `}
             >
               <link.icon className="text-lg flex-shrink-0" />

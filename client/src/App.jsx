@@ -27,25 +27,35 @@ import NotFound from './pages/NotFound';
 // Protected Route Component
 const ProtectedRoute = ({ children, roles }) => {
   const { user, loading } = useAuth();
-  
-  if (loading) return <div className="min-h-screen flex items-center justify-center"><LoadingSpinner /></div>;
+
+  if (loading)
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <LoadingSpinner />
+      </div>
+    );
   if (!user) return <Navigate to="/" replace />;
   if (roles && !roles.includes(user.role)) return <Navigate to="/" replace />;
-  
+
   return children;
 };
 
 // Guest Route (redirect if logged in)
 const GuestRoute = ({ children }) => {
   const { user, loading } = useAuth();
-  
-  if (loading) return <div className="min-h-screen flex items-center justify-center"><LoadingSpinner /></div>;
+
+  if (loading)
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <LoadingSpinner />
+      </div>
+    );
   if (user) {
     if (user.role === 'admin') return <Navigate to="/admin/dashboard" replace />;
     if (user.role === 'supervisor') return <Navigate to="/supervisor/dashboard" replace />;
     return <Navigate to="/student/dashboard" replace />;
   }
-  
+
   return children;
 };
 
@@ -69,44 +79,191 @@ const AnimatedRoutes = () => {
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
         {/* Public Routes */}
-        <Route path="/" element={<PageWrapper><Home /></PageWrapper>} />
-        <Route path="/routes" element={<PageWrapper><RoutePage /></PageWrapper>} />
+        <Route
+          path="/"
+          element={
+            <PageWrapper>
+              <Home />
+            </PageWrapper>
+          }
+        />
+        <Route
+          path="/routes"
+          element={
+            <PageWrapper>
+              <RoutePage />
+            </PageWrapper>
+          }
+        />
 
         {/* Auth Routes */}
-        <Route path="/student/login" element={<GuestRoute><PageWrapper><StudentLogin /></PageWrapper></GuestRoute>} />
-        <Route path="/student/register" element={<GuestRoute><PageWrapper><StudentRegister /></PageWrapper></GuestRoute>} />
-        <Route path="/supervisor/login" element={<GuestRoute><PageWrapper><SupervisorLogin /></PageWrapper></GuestRoute>} />
-        <Route path="/supervisor/register" element={<GuestRoute><PageWrapper><SupervisorRegister /></PageWrapper></GuestRoute>} />
+        <Route
+          path="/student/login"
+          element={
+            <GuestRoute>
+              <PageWrapper>
+                <StudentLogin />
+              </PageWrapper>
+            </GuestRoute>
+          }
+        />
+        <Route
+          path="/student/register"
+          element={
+            <GuestRoute>
+              <PageWrapper>
+                <StudentRegister />
+              </PageWrapper>
+            </GuestRoute>
+          }
+        />
+        <Route
+          path="/supervisor/login"
+          element={
+            <GuestRoute>
+              <PageWrapper>
+                <SupervisorLogin />
+              </PageWrapper>
+            </GuestRoute>
+          }
+        />
+        <Route
+          path="/supervisor/register"
+          element={
+            <GuestRoute>
+              <PageWrapper>
+                <SupervisorRegister />
+              </PageWrapper>
+            </GuestRoute>
+          }
+        />
 
         {/* Student Routes */}
-        <Route path="/student" element={<ProtectedRoute roles={['student']}><DashboardLayout /></ProtectedRoute>}>
-          <Route path="dashboard" element={<PageWrapper><StudentDashboard /></PageWrapper>} />
-          <Route path="booking" element={<PageWrapper><SeatBooking /></PageWrapper>} />
-          <Route path="routes" element={<PageWrapper><RoutePage /></PageWrapper>} />
-          <Route path="profile" element={<PageWrapper><ProfilePage /></PageWrapper>} />
+        <Route
+          path="/student"
+          element={
+            <ProtectedRoute roles={['student']}>
+              <DashboardLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route
+            path="dashboard"
+            element={
+              <PageWrapper>
+                <StudentDashboard />
+              </PageWrapper>
+            }
+          />
+          <Route
+            path="booking"
+            element={
+              <PageWrapper>
+                <SeatBooking />
+              </PageWrapper>
+            }
+          />
+          <Route
+            path="routes"
+            element={
+              <PageWrapper>
+                <RoutePage />
+              </PageWrapper>
+            }
+          />
+          <Route
+            path="profile"
+            element={
+              <PageWrapper>
+                <ProfilePage />
+              </PageWrapper>
+            }
+          />
         </Route>
 
         {/* Supervisor Routes */}
-        <Route path="/supervisor" element={<ProtectedRoute roles={['supervisor']}><DashboardLayout /></ProtectedRoute>}>
-          <Route path="dashboard" element={<PageWrapper><SupervisorDashboard /></PageWrapper>} />
-          <Route path="attendance" element={<PageWrapper><AttendancePage /></PageWrapper>} />
-          <Route path="routes" element={<PageWrapper><RoutePage /></PageWrapper>} />
+        <Route
+          path="/supervisor"
+          element={
+            <ProtectedRoute roles={['supervisor']}>
+              <DashboardLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route
+            path="dashboard"
+            element={
+              <PageWrapper>
+                <SupervisorDashboard />
+              </PageWrapper>
+            }
+          />
+          <Route
+            path="attendance"
+            element={
+              <PageWrapper>
+                <AttendancePage />
+              </PageWrapper>
+            }
+          />
+          <Route
+            path="routes"
+            element={
+              <PageWrapper>
+                <RoutePage />
+              </PageWrapper>
+            }
+          />
         </Route>
 
         {/* Admin Routes */}
-        <Route path="/admin" element={<ProtectedRoute roles={['admin']}><DashboardLayout /></ProtectedRoute>}>
-          <Route path="dashboard" element={<PageWrapper><AdminDashboard /></PageWrapper>} />
-          <Route path="buses" element={<PageWrapper><AdminBusManagement /></PageWrapper>} />
-          <Route path="routes" element={<PageWrapper><RoutePage /></PageWrapper>} />
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute roles={['admin']}>
+              <DashboardLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route
+            path="dashboard"
+            element={
+              <PageWrapper>
+                <AdminDashboard />
+              </PageWrapper>
+            }
+          />
+          <Route
+            path="buses"
+            element={
+              <PageWrapper>
+                <AdminBusManagement />
+              </PageWrapper>
+            }
+          />
+          <Route
+            path="routes"
+            element={
+              <PageWrapper>
+                <RoutePage />
+              </PageWrapper>
+            }
+          />
         </Route>
 
         {/* Catch all */}
-        <Route path="*" element={<PageWrapper><NotFound /></PageWrapper>} />
+        <Route
+          path="*"
+          element={
+            <PageWrapper>
+              <NotFound />
+            </PageWrapper>
+          }
+        />
       </Routes>
     </AnimatePresence>
   );
 };
-
 
 function App() {
   return (
