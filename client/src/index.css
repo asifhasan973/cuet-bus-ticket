@@ -151,33 +151,63 @@
 
 /* Print styles */
 @media print {
-  /* Hide everything on the page */
-  body * {
-    visibility: hidden !important;
-    background: none !important;
+  /* 1. Hide global layout elements */
+  nav,
+  aside,
+  main > div.lg\:hidden,
+  .p-4.border-b,
+  button[aria-label='Close modal'] {
+    display: none !important;
   }
 
-  /* Show only the ticket container */
-  #print-ticket,
-  #print-ticket * {
-    visibility: visible !important;
+  /* 2. Hide everything in the dashboard content EXCEPT the modal */
+  div.space-y-6 > *:not(div[role='dialog']) {
+    display: none !important;
   }
 
-  /* Position the ticket on the page */
-  #print-ticket {
+  /* 3. Hide other non-printable modal elements */
+  div[role='dialog'] h3,
+  div[role='dialog'] button,
+  #print-ticket + div {
+    display: none !important;
+  }
+
+  /* 4. Reset modal background/padding to center the ticket */
+  div[role='dialog'] {
     position: absolute !important;
-    left: 50% !important;
-    top: 20px !important;
-    transform: translateX(-50%) !important;
+    inset: 0 !important;
+    background: white !important;
+    display: block !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: visible !important;
+  }
+
+  div[role='dialog'] > div {
+    background: white !important;
+    box-shadow: none !important;
+    max-width: 100% !important;
+    max-height: none !important;
+    overflow: visible !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: none !important;
+  }
+
+  /* 5. Style and center the ticket card */
+  #print-ticket {
+    display: block !important;
+    margin: 40px auto !important;
     width: 100% !important;
     max-width: 480px !important;
-    margin: 0 auto !important;
     border: 2px dashed #475569 !important;
+    border-radius: 1rem !important;
     box-shadow: none !important;
     background-color: white !important;
     background-image: none !important;
     color: #0f172a !important;
     padding: 24px !important;
+    page-break-inside: avoid !important;
   }
 
   /* Ensure text colors are readable on white background when printing */
