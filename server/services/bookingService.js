@@ -68,12 +68,6 @@ class BookingService {
 
     // Run transaction
     return await runInTransaction(async (session) => {
-      // Find student to verify points
-      const student = await User.findById(studentId).session(session);
-      if (!student || student.points <= 0) {
-        throw new AppError('Insufficient points.', 400);
-      }
-
       // Check if student already has a booking for this shift + date
       const existingBooking = await Booking.findOne({
         student: studentId,
@@ -99,9 +93,16 @@ class BookingService {
         throw new AppError('This seat is already booked for the selected date and shift', 400);
       }
 
-      // Deduct 1 point atomically
-      student.points -= 1;
-      await student.save({ session });
+      // Deduct 1 point atomically using findOneAndUpdate with condition points > 0
+      const student = await User.findOneAndUpdate(
+        { _id: studentId, points: { $gt: 0 } },
+        { $inc: { points: -1 } },
+        { new: true, session }
+      );
+
+      if (!student) {
+        throw new AppError('Insufficient points.', 400);
+      }
 
       // Create booking record
       const booking = new Booking({
@@ -114,7 +115,16 @@ class BookingService {
         isActive: true,
       });
 
-      await booking.save({ session });
+      try {
+        await booking.save({ session });
+      } catch (error) {
+        // Fallback safety: If transactions are NOT supported by the database, session will be null.
+        // In that case, we must manually refund the point to prevent point loss if booking save fails.
+        if (!session) {
+          await User.findByIdAndUpdate(studentId, { $inc: { points: 1 } });
+        }
+        throw error;
+      }
       return booking;
     });
   }

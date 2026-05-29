@@ -1,5 +1,6 @@
 const request = require('supertest');
 const mongoose = require('mongoose');
+const jwt = require('jsonwebtoken');
 
 // Mock connectDB to prevent connecting to database during tests
 jest.mock('../config/db', () => jest.fn());
@@ -417,6 +418,228 @@ describe('CUETGo API Tests', () => {
 
       expect(res.statusCode).toEqual(400);
       expect(res.body.message).toContain('already been booked');
+    });
+
+    it('should deduct 1 point on successful booking and call findOneAndUpdate', async () => {
+      mockUserInstance.points = 5;
+      mockUserFindOneAndUpdate.mockResolvedValue({ ...mockUserInstance, points: 4 });
+      mockBusFindById.mockResolvedValue({ _id: 'mock_bus_id', status: 'active', totalSeats: 50 });
+      mockBookingFindOne.mockResolvedValue(null);
+      mockBookingSave.mockResolvedValue(true);
+
+      const res = await request(app)
+        .post('/api/bookings')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          busId: '507f1f77bcf86cd799439011',
+          seatNumber: 5,
+          travelDate: '2026-06-01',
+          shift: 1,
+        });
+
+      expect(res.statusCode).toEqual(201);
+      expect(mockUserFindOneAndUpdate).toHaveBeenCalledWith(
+        { _id: 'mock_user_id', points: { $gt: 0 } },
+        { $inc: { points: -1 } },
+        expect.any(Object)
+      );
+    });
+
+    it('should allow student with exactly 1 point to book and end with 0 points', async () => {
+      mockUserInstance.points = 1;
+      mockUserFindOneAndUpdate.mockResolvedValue({ ...mockUserInstance, points: 0 });
+      mockBusFindById.mockResolvedValue({ _id: 'mock_bus_id', status: 'active', totalSeats: 50 });
+      mockBookingFindOne.mockResolvedValue(null);
+      mockBookingSave.mockResolvedValue(true);
+
+      const res = await request(app)
+        .post('/api/bookings')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          busId: '507f1f77bcf86cd799439011',
+          seatNumber: 5,
+          travelDate: '2026-06-01',
+          shift: 1,
+        });
+
+      expect(res.statusCode).toEqual(201);
+      expect(mockUserFindOneAndUpdate).toHaveBeenCalledWith(
+        { _id: 'mock_user_id', points: { $gt: 0 } },
+        { $inc: { points: -1 } },
+        expect.any(Object)
+      );
+    });
+
+    it('should refund points if booking save fails and session/transaction is not active', async () => {
+      mockUserInstance.points = 5;
+      mockUserFindOneAndUpdate.mockResolvedValue({ ...mockUserInstance, points: 4 });
+      mockBusFindById.mockResolvedValue({ _id: 'mock_bus_id', status: 'active', totalSeats: 50 });
+      mockBookingFindOne.mockResolvedValue(null);
+      mockBookingSave.mockRejectedValue(new Error('DB Save Error'));
+      mockUserFindByIdAndUpdate.mockClear();
+
+      const res = await request(app)
+        .post('/api/bookings')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          busId: '507f1f77bcf86cd799439011',
+          seatNumber: 5,
+          travelDate: '2026-06-01',
+          shift: 1,
+        });
+
+      expect(res.statusCode).toEqual(500);
+      expect(mockUserFindByIdAndUpdate).toHaveBeenCalledWith('mock_user_id', {
+        $inc: { points: 1 },
+      });
+    });
+
+    it('should not deduct points if seat is already booked', async () => {
+      mockUserFindOneAndUpdate.mockClear();
+      mockBusFindById.mockResolvedValue({ _id: 'mock_bus_id', status: 'active', totalSeats: 50 });
+
+      mockBookingFindOne.mockImplementation((query) => {
+        if (query.bus) return { _id: 'existing_booking' };
+        return null;
+      });
+
+      const res = await request(app)
+        .post('/api/bookings')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          busId: '507f1f77bcf86cd799439011',
+          seatNumber: 5,
+          travelDate: '2026-06-01',
+          shift: 1,
+        });
+
+      expect(res.statusCode).toEqual(400);
+      expect(res.body.message).toContain('already booked');
+      expect(mockUserFindOneAndUpdate).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('Supervisor Attendance Token Rules', () => {
+    let superToken;
+
+    beforeAll(() => {
+      superToken = jwt.sign({ id: 'mock_supervisor_id' }, process.env.JWT_SECRET);
+    });
+
+    beforeEach(() => {
+      mockUserFindById.mockImplementation((id) => {
+        if (id === 'mock_supervisor_id') {
+          return {
+            _id: 'mock_supervisor_id',
+            name: 'Supervisor User',
+            email: 'super@cuet.ac.bd',
+            role: 'supervisor',
+            isApproved: true,
+          };
+        }
+        return mockUserInstance;
+      });
+    });
+
+    it('should not deduct extra points when student is marked present', async () => {
+      const mockBooking = {
+        _id: '507f1f77bcf86cd799439011',
+        student: { _id: 'mock_student_id', points: 5 },
+        bus: 'mock_bus_id',
+        attendance: 'pending',
+      };
+
+      mockBookingFindById.mockResolvedValue(mockBooking);
+      mockBookingFindOneAndUpdate.mockResolvedValue({
+        ...mockBooking,
+        attendance: 'present',
+        status: 'completed',
+      });
+      mockBusFindById.mockResolvedValue({
+        _id: 'mock_bus_id',
+        supervisors: ['mock_supervisor_id'],
+      });
+
+      mockUserFindByIdAndUpdate.mockClear();
+      mockUserFindById.mockImplementation((id) => {
+        if (id === 'mock_student_id') return { _id: 'mock_student_id', points: 5, save: jest.fn() };
+        if (id === 'mock_supervisor_id') {
+          return {
+            _id: 'mock_supervisor_id',
+            name: 'Supervisor User',
+            email: 'super@cuet.ac.bd',
+            role: 'supervisor',
+            isApproved: true,
+          };
+        }
+        return mockUserInstance;
+      });
+
+      const res = await request(app)
+        .post('/api/supervisor/attendance')
+        .set('Authorization', `Bearer ${superToken}`)
+        .send({
+          bookingId: '507f1f77bcf86cd799439011',
+          status: 'present',
+        });
+
+      expect(res.statusCode).toEqual(200);
+      expect(res.body.message).toContain('0 extra tokens');
+      expect(res.body.newBalance).toEqual(5);
+    });
+
+    it('should deduct exactly 2 penalty points when student is marked absent', async () => {
+      const mockBooking = {
+        _id: '507f1f77bcf86cd799439011',
+        student: { _id: 'mock_student_id', points: 5 },
+        bus: 'mock_bus_id',
+        attendance: 'pending',
+      };
+
+      mockBookingFindById.mockResolvedValue(mockBooking);
+      mockBookingFindOneAndUpdate.mockResolvedValue({
+        ...mockBooking,
+        attendance: 'absent',
+        status: 'completed',
+      });
+      mockBusFindById.mockResolvedValue({
+        _id: 'mock_bus_id',
+        supervisors: ['mock_supervisor_id'],
+      });
+
+      const mockStudentSave = jest.fn();
+      const mockStudentInstance = {
+        _id: 'mock_student_id',
+        points: 5,
+        save: mockStudentSave.mockResolvedValue(true),
+      };
+
+      mockUserFindById.mockImplementation((id) => {
+        if (id === 'mock_student_id') return mockStudentInstance;
+        if (id === 'mock_supervisor_id') {
+          return {
+            _id: 'mock_supervisor_id',
+            name: 'Supervisor User',
+            email: 'super@cuet.ac.bd',
+            role: 'supervisor',
+            isApproved: true,
+          };
+        }
+        return mockUserInstance;
+      });
+
+      const res = await request(app)
+        .post('/api/supervisor/attendance')
+        .set('Authorization', `Bearer ${superToken}`)
+        .send({
+          bookingId: '507f1f77bcf86cd799439011',
+          status: 'absent',
+        });
+
+      expect(res.statusCode).toEqual(200);
+      expect(res.body.message).toContain('2 penalty token');
+      expect(mockStudentInstance.points).toEqual(3); // 5 - 2 = 3
+      expect(mockStudentSave).toHaveBeenCalled();
     });
   });
 });
