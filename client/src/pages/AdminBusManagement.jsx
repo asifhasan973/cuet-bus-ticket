@@ -68,7 +68,9 @@ const AdminBusManagement = () => {
   };
 
   const removeStop = (index) => {
-    const newStops = formData.stops.filter((_, i) => i !== index).map((s, i) => ({ ...s, order: i + 1 }));
+    const newStops = formData.stops
+      .filter((_, i) => i !== index)
+      .map((s, i) => ({ ...s, order: i + 1 }));
     setFormData({ ...formData, stops: newStops });
   };
 
@@ -94,8 +96,12 @@ const AdminBusManagement = () => {
       toast.success('Bus added successfully!');
       setShowAddForm(false);
       setFormData({
-        busName: '', busType: 'regular', routeName: '', totalSeats: 50,
-        supervisors: [], stops: [{ name: '', order: 1 }],
+        busName: '',
+        busType: 'regular',
+        routeName: '',
+        totalSeats: 50,
+        supervisors: [],
+        stops: [{ name: '', order: 1 }],
       });
       fetchBuses();
     } catch (error) {
@@ -113,7 +119,7 @@ const AdminBusManagement = () => {
       routeName: bus.route?.name || '',
       totalSeats: bus.totalSeats || 50,
       status: bus.status,
-      supervisors: bus.supervisors ? bus.supervisors.map(s => s._id) : [],
+      supervisors: bus.supervisors ? bus.supervisors.map((s) => s._id) : [],
       stops: bus.route?.stops || [],
     });
   };
@@ -126,7 +132,9 @@ const AdminBusManagement = () => {
   };
 
   const removeEditStop = (index) => {
-    const newStops = editData.stops.filter((_, i) => i !== index).map((s, i) => ({ ...s, order: i + 1 }));
+    const newStops = editData.stops
+      .filter((_, i) => i !== index)
+      .map((s, i) => ({ ...s, order: i + 1 }));
     setEditData({ ...editData, stops: newStops });
   };
 
@@ -159,7 +167,12 @@ const AdminBusManagement = () => {
 
   // ─── Delete Bus ───
   const handleDeleteBus = async (busId, busName) => {
-    if (!window.confirm(`Are you sure you want to delete bus "${busName}"? This action cannot be undone.`)) return;
+    if (
+      !window.confirm(
+        `Are you sure you want to delete bus "${busName}"? This action cannot be undone.`
+      )
+    )
+      return;
     try {
       await API.delete(`/buses/${busId}`);
       toast.success('Bus deleted');
@@ -176,7 +189,9 @@ const AdminBusManagement = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-extrabold text-dark-900 dark:text-white">Bus Management</h1>
-          <p className="text-dark-500 dark:text-dark-400 text-sm mt-1">Manage {buses.length} buses • Schedules are shift-based (system-level)</p>
+          <p className="text-dark-500 dark:text-dark-400 text-sm mt-1">
+            Manage {buses.length} buses • Schedules are shift-based (system-level)
+          </p>
         </div>
         <button
           onClick={() => setShowAddForm(!showAddForm)}
@@ -186,7 +201,15 @@ const AdminBusManagement = () => {
               : 'bg-primary-600 text-white hover:bg-primary-700 shadow-sm'
           }`}
         >
-          {showAddForm ? <><FaTimes /> Cancel</> : <><FaPlus /> Add New Bus</>}
+          {showAddForm ? (
+            <>
+              <FaTimes /> Cancel
+            </>
+          ) : (
+            <>
+              <FaPlus /> Add New Bus
+            </>
+          )}
         </button>
       </div>
 
@@ -198,15 +221,53 @@ const AdminBusManagement = () => {
         <div className="p-4">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
             {[
-              { shift: 1, icon: '', label: 'Morning', time: '6:30 AM → 8:00 AM', dir: 'CUET-bound', note: 'Weekdays only', color: 'bg-teal-50 dark:bg-teal-950/20 border-teal-200 dark:border-teal-800 text-teal-700 dark:text-teal-300' },
-              { shift: 2, icon: '', label: 'Afternoon', time: '2:00 PM → 3:00 PM', dir: 'Outbound', note: 'All days • Kaptai Rastar Matha', color: 'bg-sky-50 dark:bg-sky-950/20 border-sky-200 dark:border-sky-800 text-sky-700 dark:text-sky-300' },
-              { shift: 3, icon: '', label: 'Evening', time: '5:00 PM → 7:00 PM', dir: 'Outbound', note: 'Weekdays only', color: 'bg-indigo-50 dark:bg-indigo-950/20 border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300' },
-              { shift: 4, icon: '', label: 'Night', time: '9:00 PM → 10:30 PM', dir: 'CUET-bound', note: 'All days • From New Market', color: 'bg-slate-50 dark:bg-dark-800/40 border-slate-200 dark:border-dark-600 text-slate-700 dark:text-dark-300' },
-            ].map(s => (
+              {
+                shift: 1,
+                icon: '',
+                label: 'Morning',
+                time: '6:30 AM → 8:00 AM',
+                dir: 'CUET-bound',
+                note: 'Weekdays only',
+                color:
+                  'bg-teal-50 dark:bg-teal-950/20 border-teal-200 dark:border-teal-800 text-teal-700 dark:text-teal-300',
+              },
+              {
+                shift: 2,
+                icon: '',
+                label: 'Afternoon',
+                time: '2:00 PM → 3:00 PM',
+                dir: 'Outbound',
+                note: 'All days • Kaptai Rastar Matha',
+                color:
+                  'bg-sky-50 dark:bg-sky-950/20 border-sky-200 dark:border-sky-800 text-sky-700 dark:text-sky-300',
+              },
+              {
+                shift: 3,
+                icon: '',
+                label: 'Evening',
+                time: '5:00 PM → 7:00 PM',
+                dir: 'Outbound',
+                note: 'Weekdays only',
+                color:
+                  'bg-indigo-50 dark:bg-indigo-950/20 border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300',
+              },
+              {
+                shift: 4,
+                icon: '',
+                label: 'Night',
+                time: '9:00 PM → 10:30 PM',
+                dir: 'CUET-bound',
+                note: 'All days • From New Market',
+                color:
+                  'bg-slate-50 dark:bg-dark-800/40 border-slate-200 dark:border-dark-600 text-slate-700 dark:text-dark-300',
+              },
+            ].map((s) => (
               <div key={s.shift} className={`rounded-xl border-2 p-3 ${s.color}`}>
                 <div className="flex items-center gap-2 mb-1">
                   <span className="text-lg">{s.icon}</span>
-                  <span className="font-bold text-sm text-dark-900 dark:text-white">Shift {s.shift}</span>
+                  <span className="font-bold text-sm text-dark-900 dark:text-white">
+                    Shift {s.shift}
+                  </span>
                 </div>
                 <p className="text-xs font-semibold text-dark-700 dark:text-dark-200">{s.label}</p>
                 <p className="text-[11px] text-dark-500 dark:text-dark-400 mt-1">{s.time}</p>
@@ -215,7 +276,7 @@ const AdminBusManagement = () => {
             ))}
           </div>
           <p className="text-[11px] text-dark-400 dark:text-dark-500 mt-3">
-           Weekend shifts (Fri-Sat): Shift 2 → 2:30 PM, Shift 4 → 8:30 PM. Shifts 1 & 3 don't run.
+            Weekend shifts (Fri-Sat): Shift 2 → 2:30 PM, Shift 4 → 8:30 PM. Shifts 1 & 3 don't run.
           </p>
         </div>
       </div>
@@ -231,74 +292,118 @@ const AdminBusManagement = () => {
           <form onSubmit={handleAddBus} className="p-6 space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
               <div>
-                <label className="block text-sm font-semibold text-dark-700 dark:text-dark-200 mb-1.5">Bus Name *</label>
-                <input type="text" value={formData.busName}
+                <label className="block text-sm font-semibold text-dark-700 dark:text-dark-200 mb-1.5">
+                  Bus Name *
+                </label>
+                <input
+                  type="text"
+                  value={formData.busName}
                   onChange={(e) => setFormData({ ...formData, busName: e.target.value })}
-                  className="input-field" placeholder="e.g. Halda" required />
+                  className="input-field"
+                  placeholder="e.g. Halda"
+                  required
+                />
               </div>
               <div>
-                <label className="block text-sm font-semibold text-dark-700 dark:text-dark-200 mb-1.5">Bus Type *</label>
+                <label className="block text-sm font-semibold text-dark-700 dark:text-dark-200 mb-1.5">
+                  Bus Type *
+                </label>
                 <div className="flex gap-2 mt-1">
-                  {['regular', 'flyover'].map(t => (
-                    <button key={t} type="button"
+                  {['regular', 'flyover'].map((t) => (
+                    <button
+                      key={t}
+                      type="button"
                       onClick={() => setFormData({ ...formData, busType: t })}
                       className={`px-4 py-2.5 rounded-xl text-sm font-semibold capitalize transition-all flex-1 ${
-                        formData.busType === t 
-                          ? 'bg-primary-600 text-white' 
+                        formData.busType === t
+                          ? 'bg-primary-600 text-white'
                           : 'bg-dark-100 dark:bg-dark-800 text-dark-500 dark:text-dark-400 hover:bg-dark-200 dark:hover:bg-dark-700'
-                      }`}>
+                      }`}
+                    >
                       {t}
                     </button>
                   ))}
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-semibold text-dark-700 dark:text-dark-200 mb-1.5">Route Name *</label>
-                <input type="text" value={formData.routeName}
+                <label className="block text-sm font-semibold text-dark-700 dark:text-dark-200 mb-1.5">
+                  Route Name *
+                </label>
+                <input
+                  type="text"
+                  value={formData.routeName}
                   onChange={(e) => setFormData({ ...formData, routeName: e.target.value })}
-                  className="input-field" placeholder="e.g. CUET → GEC → New Market" required />
+                  className="input-field"
+                  placeholder="e.g. CUET → GEC → New Market"
+                  required
+                />
               </div>
               <div>
-                <label className="block text-sm font-semibold text-dark-700 dark:text-dark-200 mb-1.5">Total Seats</label>
-                <input type="number" value={formData.totalSeats} min="10" max="80"
-                  onChange={(e) => setFormData({ ...formData, totalSeats: parseInt(e.target.value) })}
-                  className="input-field" />
+                <label className="block text-sm font-semibold text-dark-700 dark:text-dark-200 mb-1.5">
+                  Total Seats
+                </label>
+                <input
+                  type="number"
+                  value={formData.totalSeats}
+                  min="10"
+                  max="80"
+                  onChange={(e) =>
+                    setFormData({ ...formData, totalSeats: parseInt(e.target.value) })
+                  }
+                  className="input-field"
+                />
               </div>
             </div>
 
             {/* Supervisors */}
             <div>
-              <label className="block text-sm font-semibold text-dark-700 dark:text-dark-200 mb-1.5">Assign Supervisors</label>
+              <label className="block text-sm font-semibold text-dark-700 dark:text-dark-200 mb-1.5">
+                Assign Supervisors
+              </label>
               <div className="flex flex-wrap gap-2">
-                {supervisors.map(s => {
+                {supervisors.map((s) => {
                   const isSelected = formData.supervisors.includes(s._id);
                   return (
-                    <button key={s._id} type="button"
+                    <button
+                      key={s._id}
+                      type="button"
                       onClick={() => {
-                        setFormData({ ...formData, supervisors: isSelected
-                          ? formData.supervisors.filter(id => id !== s._id)
-                          : [...formData.supervisors, s._id]
+                        setFormData({
+                          ...formData,
+                          supervisors: isSelected
+                            ? formData.supervisors.filter((id) => id !== s._id)
+                            : [...formData.supervisors, s._id],
                         });
                       }}
                       className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                        isSelected 
-                          ? 'bg-primary-600 text-white' 
+                        isSelected
+                          ? 'bg-primary-600 text-white'
                           : 'bg-dark-100 dark:bg-dark-800 text-dark-500 dark:text-dark-400 hover:bg-dark-200 dark:hover:bg-dark-700'
-                      }`}>
+                      }`}
+                    >
                       {s.name}
                     </button>
                   );
                 })}
-                {supervisors.length === 0 && <span className="text-xs text-dark-400 dark:text-dark-500">No supervisors available</span>}
+                {supervisors.length === 0 && (
+                  <span className="text-xs text-dark-400 dark:text-dark-500">
+                    No supervisors available
+                  </span>
+                )}
               </div>
             </div>
 
             {/* Stops */}
             <div>
               <div className="flex items-center justify-between mb-2">
-                <label className="block text-sm font-semibold text-dark-700 dark:text-dark-200">Route Stops</label>
-                <button type="button" onClick={addStop}
-                  className="text-xs text-primary-600 dark:text-primary-400 font-semibold hover:text-primary-700 flex items-center gap-1">
+                <label className="block text-sm font-semibold text-dark-700 dark:text-dark-200">
+                  Route Stops
+                </label>
+                <button
+                  type="button"
+                  onClick={addStop}
+                  className="text-xs text-primary-600 dark:text-primary-400 font-semibold hover:text-primary-700 flex items-center gap-1"
+                >
                   <FaPlus className="text-[10px]" /> Add Stop
                 </button>
               </div>
@@ -308,12 +413,20 @@ const AdminBusManagement = () => {
                     <span className="w-6 h-6 flex items-center justify-center bg-primary-100 dark:bg-primary-950/40 text-primary-700 dark:text-primary-300 rounded-full text-xs font-bold flex-shrink-0">
                       {i + 1}
                     </span>
-                    <input type="text" value={stop.name} placeholder="Stop name"
+                    <input
+                      type="text"
+                      value={stop.name}
+                      placeholder="Stop name"
                       onChange={(e) => updateStop(i, 'name', e.target.value)}
-                      className="input-field !py-2 text-sm flex-1" required />
+                      className="input-field !py-2 text-sm flex-1"
+                      required
+                    />
                     {formData.stops.length > 1 && (
-                      <button type="button" onClick={() => removeStop(i)}
-                        className="text-danger-500 hover:text-danger-600 p-1.5">
+                      <button
+                        type="button"
+                        onClick={() => removeStop(i)}
+                        className="text-danger-500 hover:text-danger-600 p-1.5"
+                      >
                         <FaTimes className="text-xs" />
                       </button>
                     )}
@@ -323,12 +436,17 @@ const AdminBusManagement = () => {
             </div>
 
             <div className="flex justify-end gap-3 pt-2">
-              <button type="button" onClick={() => setShowAddForm(false)}
-                className="px-5 py-2.5 rounded-xl text-sm font-semibold bg-dark-100 dark:bg-dark-800 text-dark-600 dark:text-dark-300 hover:bg-dark-200 dark:hover:bg-dark-700 transition-all">
+              <button
+                type="button"
+                onClick={() => setShowAddForm(false)}
+                className="px-5 py-2.5 rounded-xl text-sm font-semibold bg-dark-100 dark:bg-dark-800 text-dark-600 dark:text-dark-300 hover:bg-dark-200 dark:hover:bg-dark-700 transition-all"
+              >
                 Cancel
               </button>
-              <button type="submit"
-                className="btn-primary flex items-center gap-2 text-sm !px-5 !py-2.5">
+              <button
+                type="submit"
+                className="btn-primary flex items-center gap-2 text-sm !px-5 !py-2.5"
+              >
                 <FaPlus /> Create Bus
               </button>
             </div>
@@ -338,40 +456,55 @@ const AdminBusManagement = () => {
 
       {/* Bus List */}
       <div className="space-y-3">
-        {buses.map(bus => (
-          <div key={bus._id} className="card !p-0 overflow-hidden border border-dark-100 dark:border-dark-600">
+        {buses.map((bus) => (
+          <div
+            key={bus._id}
+            className="card !p-0 overflow-hidden border border-dark-100 dark:border-dark-600"
+          >
             {/* Header Row */}
             <div className="flex items-center justify-between px-5 py-4">
               <div
                 className="flex items-center gap-4 flex-1 cursor-pointer"
                 onClick={() => setExpandedBus(expandedBus === bus._id ? null : bus._id)}
               >
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-                  bus.status === 'active' ? 'bg-accent-100 dark:bg-accent-950/40 text-accent-600 dark:text-accent-400' :
-                  bus.status === 'maintenance' ? 'bg-warning-50 dark:bg-warning-950/20 text-warning-500 dark:text-warning-400' :
-                  'bg-dark-100 dark:bg-dark-800 text-dark-400 dark:text-dark-500'
-                }`}>
+                <div
+                  className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                    bus.status === 'active'
+                      ? 'bg-accent-100 dark:bg-accent-950/40 text-accent-600 dark:text-accent-400'
+                      : bus.status === 'maintenance'
+                        ? 'bg-warning-50 dark:bg-warning-950/20 text-warning-500 dark:text-warning-400'
+                        : 'bg-dark-100 dark:bg-dark-800 text-dark-400 dark:text-dark-500'
+                  }`}
+                >
                   <FaBus />
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
                     <h3 className="font-bold text-dark-900 dark:text-white">{bus.busName}</h3>
-                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
-                      bus.busType === 'flyover' 
-                        ? 'bg-violet-100 dark:bg-violet-950/40 text-violet-700 dark:text-violet-300' 
-                        : 'bg-dark-100 dark:bg-dark-600 text-dark-500 dark:text-dark-300'
-                    }`}>
+                    <span
+                      className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
+                        bus.busType === 'flyover'
+                          ? 'bg-violet-100 dark:bg-violet-950/40 text-violet-700 dark:text-violet-300'
+                          : 'bg-dark-100 dark:bg-dark-600 text-dark-500 dark:text-dark-300'
+                      }`}
+                    >
                       {bus.busType}
                     </span>
-                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
-                      bus.status === 'active' ? 'bg-accent-100 dark:bg-accent-950/40 text-accent-700 dark:text-accent-300' :
-                      bus.status === 'maintenance' ? 'bg-warning-50 dark:bg-warning-950/30 text-warning-600 dark:text-warning-400' :
-                      'bg-dark-100 dark:bg-dark-600 text-dark-500 dark:text-dark-300'
-                    }`}>
+                    <span
+                      className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
+                        bus.status === 'active'
+                          ? 'bg-accent-100 dark:bg-accent-950/40 text-accent-700 dark:text-accent-300'
+                          : bus.status === 'maintenance'
+                            ? 'bg-warning-50 dark:bg-warning-950/30 text-warning-600 dark:text-warning-400'
+                            : 'bg-dark-100 dark:bg-dark-600 text-dark-500 dark:text-dark-300'
+                      }`}
+                    >
                       {bus.status}
                     </span>
                   </div>
-                  <p className="text-sm text-dark-500 dark:text-dark-400 line-clamp-1">{bus.route?.name}</p>
+                  <p className="text-sm text-dark-500 dark:text-dark-400 line-clamp-1">
+                    {bus.route?.name}
+                  </p>
                 </div>
               </div>
 
@@ -380,16 +513,22 @@ const AdminBusManagement = () => {
                   <span>{bus.totalSeats} seats</span>
                 </div>
                 <div className="flex items-center gap-1">
-                  <button onClick={() => startEdit(bus)}
-                    className="p-2 rounded-lg text-dark-400 dark:text-dark-500 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-950/20 transition-all">
+                  <button
+                    onClick={() => startEdit(bus)}
+                    className="p-2 rounded-lg text-dark-400 dark:text-dark-500 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-950/20 transition-all"
+                  >
                     <FaEdit />
                   </button>
-                  <button onClick={() => handleDeleteBus(bus._id, bus.busName)}
-                    className="p-2 rounded-lg text-dark-400 dark:text-dark-500 hover:text-danger-500 dark:hover:text-danger-400 hover:bg-danger-50 dark:hover:bg-danger-950/20 transition-all">
+                  <button
+                    onClick={() => handleDeleteBus(bus._id, bus.busName)}
+                    className="p-2 rounded-lg text-dark-400 dark:text-dark-500 hover:text-danger-500 dark:hover:text-danger-400 hover:bg-danger-50 dark:hover:bg-danger-950/20 transition-all"
+                  >
                     <FaTrash />
                   </button>
-                  <button onClick={() => setExpandedBus(expandedBus === bus._id ? null : bus._id)}
-                    className="p-2 rounded-lg text-dark-400 dark:text-dark-500 hover:text-dark-600 dark:hover:text-dark-300 hover:bg-dark-100 dark:hover:bg-dark-800 transition-all">
+                  <button
+                    onClick={() => setExpandedBus(expandedBus === bus._id ? null : bus._id)}
+                    className="p-2 rounded-lg text-dark-400 dark:text-dark-500 hover:text-dark-600 dark:hover:text-dark-300 hover:bg-dark-100 dark:hover:bg-dark-800 transition-all"
+                  >
                     {expandedBus === bus._id ? <HiChevronUp /> : <HiChevronDown />}
                   </button>
                 </div>
@@ -404,55 +543,86 @@ const AdminBusManagement = () => {
                   <div className="space-y-4">
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                       <div>
-                        <label className="block text-xs font-semibold text-dark-500 dark:text-dark-400 mb-1">Bus Name</label>
-                        <input type="text" value={editData.busName}
+                        <label className="block text-xs font-semibold text-dark-500 dark:text-dark-400 mb-1">
+                          Bus Name
+                        </label>
+                        <input
+                          type="text"
+                          value={editData.busName}
                           onChange={(e) => setEditData({ ...editData, busName: e.target.value })}
-                          className="input-field text-sm" />
+                          className="input-field text-sm"
+                        />
                       </div>
                       <div>
-                        <label className="block text-xs font-semibold text-dark-500 dark:text-dark-400 mb-1">Bus Type</label>
+                        <label className="block text-xs font-semibold text-dark-500 dark:text-dark-400 mb-1">
+                          Bus Type
+                        </label>
                         <div className="flex gap-2">
-                          {['regular', 'flyover'].map(t => (
-                            <button key={t} type="button"
+                          {['regular', 'flyover'].map((t) => (
+                            <button
+                              key={t}
+                              type="button"
                               onClick={() => setEditData({ ...editData, busType: t })}
                               className={`px-3 py-2 rounded-lg text-xs font-semibold capitalize transition-all flex-1 ${
-                                editData.busType === t 
-                                  ? 'bg-primary-600 text-white' 
+                                editData.busType === t
+                                  ? 'bg-primary-600 text-white'
                                   : 'bg-dark-100 dark:bg-dark-800 text-dark-500 dark:text-dark-400 hover:bg-dark-200 dark:hover:bg-dark-700'
-                              }`}>
+                              }`}
+                            >
                               {t}
                             </button>
                           ))}
                         </div>
                       </div>
                       <div>
-                        <label className="block text-xs font-semibold text-dark-500 dark:text-dark-400 mb-1">Route Name</label>
-                        <input type="text" value={editData.routeName}
+                        <label className="block text-xs font-semibold text-dark-500 dark:text-dark-400 mb-1">
+                          Route Name
+                        </label>
+                        <input
+                          type="text"
+                          value={editData.routeName}
                           onChange={(e) => setEditData({ ...editData, routeName: e.target.value })}
-                          className="input-field text-sm" />
+                          className="input-field text-sm"
+                        />
                       </div>
                       <div>
-                        <label className="block text-xs font-semibold text-dark-500 dark:text-dark-400 mb-1">Total Seats</label>
-                        <input type="number" min="10" max="80" value={editData.totalSeats}
-                          onChange={(e) => setEditData({ ...editData, totalSeats: parseInt(e.target.value) })}
-                          className="input-field text-sm" />
+                        <label className="block text-xs font-semibold text-dark-500 dark:text-dark-400 mb-1">
+                          Total Seats
+                        </label>
+                        <input
+                          type="number"
+                          min="10"
+                          max="80"
+                          value={editData.totalSeats}
+                          onChange={(e) =>
+                            setEditData({ ...editData, totalSeats: parseInt(e.target.value) })
+                          }
+                          className="input-field text-sm"
+                        />
                       </div>
                     </div>
 
                     {/* Status */}
                     <div>
-                      <label className="block text-xs font-semibold text-dark-500 dark:text-dark-400 mb-1">Status</label>
+                      <label className="block text-xs font-semibold text-dark-500 dark:text-dark-400 mb-1">
+                        Status
+                      </label>
                       <div className="flex gap-2">
-                        {['active', 'inactive', 'maintenance'].map(s => (
-                          <button key={s} type="button"
+                        {['active', 'inactive', 'maintenance'].map((s) => (
+                          <button
+                            key={s}
+                            type="button"
                             onClick={() => setEditData({ ...editData, status: s })}
                             className={`px-3 py-1.5 rounded-lg text-xs font-semibold capitalize transition-all ${
                               editData.status === s
-                                ? s === 'active' ? 'bg-accent-600 text-white'
-                                : s === 'maintenance' ? 'bg-warning-500 text-white'
-                                : 'bg-dark-600 text-white'
+                                ? s === 'active'
+                                  ? 'bg-accent-600 text-white'
+                                  : s === 'maintenance'
+                                    ? 'bg-warning-500 text-white'
+                                    : 'bg-dark-600 text-white'
                                 : 'bg-dark-100 dark:bg-dark-800 text-dark-500 dark:text-dark-400 hover:bg-dark-200 dark:hover:bg-dark-700'
-                            }`}>
+                            }`}
+                          >
                             {s}
                           </button>
                         ))}
@@ -461,23 +631,30 @@ const AdminBusManagement = () => {
 
                     {/* Supervisors */}
                     <div>
-                      <label className="block text-xs font-semibold text-dark-500 dark:text-dark-400 mb-1">Assign Supervisors</label>
+                      <label className="block text-xs font-semibold text-dark-500 dark:text-dark-400 mb-1">
+                        Assign Supervisors
+                      </label>
                       <div className="flex flex-wrap gap-2">
-                        {supervisors.map(s => {
+                        {supervisors.map((s) => {
                           const isSelected = editData.supervisors.includes(s._id);
                           return (
-                            <button key={s._id} type="button"
+                            <button
+                              key={s._id}
+                              type="button"
                               onClick={() => {
-                                setEditData({ ...editData, supervisors: isSelected
-                                  ? editData.supervisors.filter(id => id !== s._id)
-                                  : [...editData.supervisors, s._id]
+                                setEditData({
+                                  ...editData,
+                                  supervisors: isSelected
+                                    ? editData.supervisors.filter((id) => id !== s._id)
+                                    : [...editData.supervisors, s._id],
                                 });
                               }}
                               className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                                isSelected 
-                                  ? 'bg-primary-600 text-white' 
+                                isSelected
+                                  ? 'bg-primary-600 text-white'
                                   : 'bg-dark-100 dark:bg-dark-800 text-dark-500 dark:text-dark-400 hover:bg-dark-200 dark:hover:bg-dark-700'
-                              }`}>
+                              }`}
+                            >
                               {s.name}
                             </button>
                           );
@@ -488,9 +665,14 @@ const AdminBusManagement = () => {
                     {/* Editable Stops */}
                     <div>
                       <div className="flex items-center justify-between mb-2">
-                        <label className="block text-xs font-semibold text-dark-500 dark:text-dark-400">Route Stops</label>
-                        <button type="button" onClick={addEditStop}
-                          className="text-xs text-primary-600 dark:text-primary-400 font-semibold hover:text-primary-700 flex items-center gap-1">
+                        <label className="block text-xs font-semibold text-dark-500 dark:text-dark-400">
+                          Route Stops
+                        </label>
+                        <button
+                          type="button"
+                          onClick={addEditStop}
+                          className="text-xs text-primary-600 dark:text-primary-400 font-semibold hover:text-primary-700 flex items-center gap-1"
+                        >
                           <FaPlus className="text-[10px]" /> Add Stop
                         </button>
                       </div>
@@ -500,12 +682,19 @@ const AdminBusManagement = () => {
                             <span className="w-5 h-5 flex items-center justify-center bg-primary-100 dark:bg-primary-950/40 text-primary-700 dark:text-primary-300 rounded-full text-[10px] font-bold flex-shrink-0">
                               {i + 1}
                             </span>
-                            <input type="text" value={stop.name} placeholder="Stop name"
+                            <input
+                              type="text"
+                              value={stop.name}
+                              placeholder="Stop name"
                               onChange={(e) => updateEditStop(i, 'name', e.target.value)}
-                              className="input-field !py-1.5 text-sm flex-1" />
+                              className="input-field !py-1.5 text-sm flex-1"
+                            />
                             {editData.stops.length > 1 && (
-                              <button type="button" onClick={() => removeEditStop(i)}
-                                className="text-danger-500 hover:text-danger-600 p-1">
+                              <button
+                                type="button"
+                                onClick={() => removeEditStop(i)}
+                                className="text-danger-500 hover:text-danger-600 p-1"
+                              >
                                 <FaTimes className="text-xs" />
                               </button>
                             )}
@@ -515,12 +704,16 @@ const AdminBusManagement = () => {
                     </div>
 
                     <div className="flex gap-3 pt-1">
-                      <button onClick={() => handleSaveEdit(bus._id)}
-                        className="btn-primary flex items-center gap-2 text-sm !px-4 !py-2">
+                      <button
+                        onClick={() => handleSaveEdit(bus._id)}
+                        className="btn-primary flex items-center gap-2 text-sm !px-4 !py-2"
+                      >
                         <FaSave /> Save Changes
                       </button>
-                      <button onClick={() => setEditingBus(null)}
-                        className="px-4 py-2 rounded-xl text-sm font-semibold bg-dark-100 dark:bg-dark-800 text-dark-600 dark:text-dark-300 hover:bg-dark-200 dark:hover:bg-dark-700 transition-all">
+                      <button
+                        onClick={() => setEditingBus(null)}
+                        className="px-4 py-2 rounded-xl text-sm font-semibold bg-dark-100 dark:bg-dark-800 text-dark-600 dark:text-dark-300 hover:bg-dark-200 dark:hover:bg-dark-700 transition-all"
+                      >
                         Cancel
                       </button>
                     </div>
@@ -530,29 +723,46 @@ const AdminBusManagement = () => {
                   <div>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-4">
                       <div>
-                        <p className="text-xs text-dark-400 dark:text-dark-500 font-medium">Supervisors</p>
+                        <p className="text-xs text-dark-400 dark:text-dark-500 font-medium">
+                          Supervisors
+                        </p>
                         <p className="text-sm font-semibold text-dark-800 dark:text-dark-200">
-                          {bus.supervisors?.length > 0 ? bus.supervisors.map(s => s.name).join(', ') : 'Unassigned'}
+                          {bus.supervisors?.length > 0
+                            ? bus.supervisors.map((s) => s.name).join(', ')
+                            : 'Unassigned'}
                         </p>
                       </div>
                       <div>
-                        <p className="text-xs text-dark-400 dark:text-dark-500 font-medium">Total Seats</p>
-                        <p className="text-sm font-semibold text-dark-800 dark:text-dark-200">{bus.totalSeats}</p>
+                        <p className="text-xs text-dark-400 dark:text-dark-500 font-medium">
+                          Total Seats
+                        </p>
+                        <p className="text-sm font-semibold text-dark-800 dark:text-dark-200">
+                          {bus.totalSeats}
+                        </p>
                       </div>
                       <div>
                         <p className="text-xs text-dark-400 dark:text-dark-500 font-medium">Type</p>
-                        <p className="text-sm font-semibold text-dark-800 dark:text-dark-200 capitalize">{bus.busType}</p>
+                        <p className="text-sm font-semibold text-dark-800 dark:text-dark-200 capitalize">
+                          {bus.busType}
+                        </p>
                       </div>
                     </div>
                     <div>
-                      <p className="text-xs text-dark-400 dark:text-dark-500 font-medium mb-2">Route Stops</p>
+                      <p className="text-xs text-dark-400 dark:text-dark-500 font-medium mb-2">
+                        Route Stops
+                      </p>
                       <div className="flex flex-wrap gap-2">
                         {bus.route?.stops?.map((stop, i) => (
-                          <div key={i} className="flex items-center gap-1.5 bg-white dark:bg-dark-700 px-3 py-1.5 rounded-lg border border-dark-100 dark:border-dark-600 text-sm">
+                          <div
+                            key={i}
+                            className="flex items-center gap-1.5 bg-white dark:bg-dark-700 px-3 py-1.5 rounded-lg border border-dark-100 dark:border-dark-600 text-sm"
+                          >
                             <span className="w-4 h-4 flex items-center justify-center bg-primary-100 dark:bg-primary-950/40 text-primary-700 dark:text-primary-300 rounded-full text-[9px] font-bold">
                               {stop.order}
                             </span>
-                            <span className="font-medium text-dark-800 dark:text-dark-200">{stop.name}</span>
+                            <span className="font-medium text-dark-800 dark:text-dark-200">
+                              {stop.name}
+                            </span>
                           </div>
                         ))}
                       </div>
@@ -568,7 +778,9 @@ const AdminBusManagement = () => {
           <div className="card text-center py-10">
             <FaBus className="text-4xl text-dark-300 dark:text-dark-600 mx-auto mb-3" />
             <h3 className="font-bold text-dark-900 dark:text-white text-lg">No Buses Yet</h3>
-            <p className="text-dark-500 dark:text-dark-400 text-sm mt-1">Click "Add New Bus" to create one</p>
+            <p className="text-dark-500 dark:text-dark-400 text-sm mt-1">
+              Click "Add New Bus" to create one
+            </p>
           </div>
         )}
       </div>

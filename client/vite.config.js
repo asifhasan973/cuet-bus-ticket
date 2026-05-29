@@ -1,10 +1,10 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import tailwindcss from '@tailwindcss/vite'
-import path from 'path'
-import { fileURLToPath } from 'url'
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import tailwindcss from '@tailwindcss/vite';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -19,7 +19,10 @@ export default defineConfig({
       'es-toolkit/compat/minBy': path.resolve(__dirname, 'src/compat-shims/minBy.js'),
       'es-toolkit/compat/uniqBy': path.resolve(__dirname, 'src/compat-shims/uniqBy.js'),
       'es-toolkit/compat/sortBy': path.resolve(__dirname, 'src/compat-shims/sortBy.js'),
-      'es-toolkit/compat/isPlainObject': path.resolve(__dirname, 'src/compat-shims/isPlainObject.js'),
+      'es-toolkit/compat/isPlainObject': path.resolve(
+        __dirname,
+        'src/compat-shims/isPlainObject.js'
+      ),
       'es-toolkit/compat/sumBy': path.resolve(__dirname, 'src/compat-shims/sumBy.js'),
       'es-toolkit/compat/throttle': path.resolve(__dirname, 'src/compat-shims/throttle.js'),
     },
@@ -33,4 +36,4 @@ export default defineConfig({
       },
     },
   },
-})
+});

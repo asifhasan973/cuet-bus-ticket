@@ -35,7 +35,10 @@ export const SkeletonCard = () => (
 );
 
 // Grid of cards
-export const SkeletonCardGrid = ({ count = 4, className = 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4' }) => (
+export const SkeletonCardGrid = ({
+  count = 4,
+  className = 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4',
+}) => (
   <div className={className}>
     {Array.from({ length: count }).map((_, i) => (
       <SkeletonCard key={i} />

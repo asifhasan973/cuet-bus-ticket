@@ -7,15 +7,20 @@ import { SHIFT_ICONS, SHIFT_LABELS, SHIFT_COLORS } from '../utils/shifts';
 import StatsCard from '../components/ui/StatsCard';
 import Modal from '../components/ui/Modal';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
-import { HiTicket, HiCurrencyDollar, HiClock, HiArrowRight, HiQrcode, HiPrinter } from 'react-icons/hi';
+import {
+  HiTicket,
+  HiCurrencyDollar,
+  HiClock,
+  HiArrowRight,
+  HiQrcode,
+  HiPrinter,
+} from 'react-icons/hi';
 import { FaBus } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 import { motion } from 'framer-motion';
 import { FadeIn, StaggerContainer, StaggerItem } from '../components/ui/AnimatedComponents';
 import { QRCodeSVG } from 'qrcode.react';
 import { SkeletonCardGrid, SkeletonTable, SkeletonLine } from '../components/ui/Skeleton';
-
-
 
 const StudentDashboard = () => {
   const { user, loadUser } = useAuth();
@@ -29,7 +34,6 @@ const StudentDashboard = () => {
     fetchBookings();
     loadUser();
   }, []);
-
 
   const fetchBookings = async () => {
     try {
@@ -58,7 +62,7 @@ const StudentDashboard = () => {
     }
   };
 
-  const activeBookings = bookings.filter(b => b.status === 'confirmed');
+  const activeBookings = bookings.filter((b) => b.status === 'confirmed');
   const todayStr = new Date().toISOString().split('T')[0];
 
   if (loading) {
@@ -87,20 +91,37 @@ const StudentDashboard = () => {
           <h1 className="text-2xl font-extrabold text-dark-900 dark:text-white">
             Welcome back, {user?.name?.split(' ')[0]}! 👋
           </h1>
-          <p className="text-dark-500 dark:text-dark-400 text-sm mt-1">Here's your booking overview</p>
+          <p className="text-dark-500 dark:text-dark-400 text-sm mt-1">
+            Here's your booking overview
+          </p>
         </div>
       </FadeIn>
 
       {/* Stats */}
       <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StaggerItem>
-          <StatsCard icon={HiCurrencyDollar} label="Points" value={user?.points ?? 0} color="primary" />
+          <StatsCard
+            icon={HiCurrencyDollar}
+            label="Points"
+            value={user?.points ?? 0}
+            color="primary"
+          />
         </StaggerItem>
         <StaggerItem>
-          <StatsCard icon={HiTicket} label="Active Bookings" value={activeBookings.length} color="accent" />
+          <StatsCard
+            icon={HiTicket}
+            label="Active Bookings"
+            value={activeBookings.length}
+            color="accent"
+          />
         </StaggerItem>
         <StaggerItem>
-          <StatsCard icon={FaBus} label="Total Trips" value={bookings.filter(b => b.attendance === 'present').length} color="warning" />
+          <StatsCard
+            icon={FaBus}
+            label="Total Trips"
+            value={bookings.filter((b) => b.attendance === 'present').length}
+            color="warning"
+          />
         </StaggerItem>
         <StaggerItem>
           <StatsCard icon={HiClock} label="Total Bookings" value={bookings.length} color="danger" />
@@ -113,7 +134,7 @@ const StudentDashboard = () => {
           <div className="space-y-3">
             <h2 className="font-bold text-dark-900 dark:text-white text-lg">Active Bookings</h2>
             <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 gap-4" staggerDelay={0.1}>
-              {activeBookings.map(booking => (
+              {activeBookings.map((booking) => (
                 <StaggerItem key={booking._id}>
                   <motion.div
                     className="card !p-0 overflow-hidden"
@@ -125,31 +146,47 @@ const StudentDashboard = () => {
                         <FaBus className="text-white" />
                         <span className="font-bold text-white">{booking.bus?.busName}</span>
                       </div>
-                      <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${SHIFT_COLORS[booking.shift]}`}>
-                        {SHIFT_ICONS[booking.shift]} Shift {booking.shift} — {SHIFT_LABELS[booking.shift]}
+                      <span
+                        className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${SHIFT_COLORS[booking.shift]}`}
+                      >
+                        {SHIFT_ICONS[booking.shift]} Shift {booking.shift} —{' '}
+                        {SHIFT_LABELS[booking.shift]}
                       </span>
                     </div>
                     <div className="p-5">
                       <div className="grid grid-cols-3 gap-4 mb-4">
                         <div>
-                          <p className="text-xs text-dark-400 dark:text-dark-500 font-medium">Seat</p>
-                          <p className="font-bold text-dark-900 dark:text-white text-lg">{getSeatLabel(booking.seatNumber)}</p>
-                        </div>
-                        <div>
-                          <p className="text-xs text-dark-400 dark:text-dark-500 font-medium">Date</p>
-                          <p className="font-bold text-accent-600 dark:text-accent-400">
-                            {new Date(booking.travelDate + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+                          <p className="text-xs text-dark-400 dark:text-dark-500 font-medium">
+                            Seat
+                          </p>
+                          <p className="font-bold text-dark-900 dark:text-white text-lg">
+                            {getSeatLabel(booking.seatNumber)}
                           </p>
                         </div>
                         <div>
-                          <p className="text-xs text-dark-400 dark:text-dark-500 font-medium">Status</p>
+                          <p className="text-xs text-dark-400 dark:text-dark-500 font-medium">
+                            Date
+                          </p>
+                          <p className="font-bold text-accent-600 dark:text-accent-400">
+                            {new Date(booking.travelDate + 'T00:00:00').toLocaleDateString(
+                              'en-US',
+                              { weekday: 'short', month: 'short', day: 'numeric' }
+                            )}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-dark-400 dark:text-dark-500 font-medium">
+                            Status
+                          </p>
                           <span className="inline-flex px-2.5 py-1 rounded-full text-xs font-bold bg-accent-100 dark:bg-accent-950/40 text-accent-700 dark:text-accent-400">
                             {booking.status}
                           </span>
                         </div>
                       </div>
-                      <p className="text-xs text-dark-400 dark:text-dark-500 mb-4 line-clamp-1">📍 {booking.bus?.route?.name}</p>
-                      
+                      <p className="text-xs text-dark-400 dark:text-dark-500 mb-4 line-clamp-1">
+                        📍 {booking.bus?.route?.name}
+                      </p>
+
                       <div className="flex gap-2">
                         <button
                           onClick={() => setSelectedTicket(booking)}
@@ -179,15 +216,17 @@ const StudentDashboard = () => {
             animate={{ scale: 1 }}
             transition={{ type: 'spring', stiffness: 200 }}
           >
-            <motion.div
-              animate={{ y: [-4, 4, -4] }}
-              transition={{ duration: 2, repeat: Infinity }}
-            >
+            <motion.div animate={{ y: [-4, 4, -4] }} transition={{ duration: 2, repeat: Infinity }}>
               <FaBus className="text-4xl text-dark-300 dark:text-dark-600 mx-auto mb-3" />
             </motion.div>
             <h3 className="font-bold text-dark-900 dark:text-white text-lg">No Active Bookings</h3>
-            <p className="text-dark-500 dark:text-dark-400 text-sm mt-1">Book a seat to get started</p>
-            <Link to="/student/booking" className="btn-primary inline-flex items-center gap-2 mt-4 text-sm">
+            <p className="text-dark-500 dark:text-dark-400 text-sm mt-1">
+              Book a seat to get started
+            </p>
+            <Link
+              to="/student/booking"
+              className="btn-primary inline-flex items-center gap-2 mt-4 text-sm"
+            >
               Book Now <HiArrowRight />
             </Link>
           </motion.div>
@@ -205,12 +244,24 @@ const StudentDashboard = () => {
               <table className="w-full">
                 <thead className="bg-dark-50 dark:bg-dark-800 border-b border-dark-100 dark:border-dark-600">
                   <tr>
-                    <th className="text-left px-6 py-3 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">Bus</th>
-                    <th className="text-left px-6 py-3 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">Shift</th>
-                    <th className="text-left px-6 py-3 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">Seat</th>
-                    <th className="text-left px-6 py-3 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">Date</th>
-                    <th className="text-left px-6 py-3 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">Status</th>
-                    <th className="text-left px-6 py-3 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">Attendance</th>
+                    <th className="text-left px-6 py-3 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">
+                      Bus
+                    </th>
+                    <th className="text-left px-6 py-3 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">
+                      Shift
+                    </th>
+                    <th className="text-left px-6 py-3 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">
+                      Seat
+                    </th>
+                    <th className="text-left px-6 py-3 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">
+                      Date
+                    </th>
+                    <th className="text-left px-6 py-3 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">
+                      Status
+                    </th>
+                    <th className="text-left px-6 py-3 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">
+                      Attendance
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-dark-100 dark:divide-dark-600">
@@ -222,31 +273,45 @@ const StudentDashboard = () => {
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: index * 0.03 }}
                     >
-                      <td className="px-6 py-4 text-sm font-medium text-dark-900 dark:text-dark-100">{booking.bus?.busName}</td>
+                      <td className="px-6 py-4 text-sm font-medium text-dark-900 dark:text-dark-100">
+                        {booking.bus?.busName}
+                      </td>
                       <td className="px-6 py-4">
-                        <span className={`px-2 py-1 rounded-full text-[10px] font-bold ${SHIFT_COLORS[booking.shift]}`}>
+                        <span
+                          className={`px-2 py-1 rounded-full text-[10px] font-bold ${SHIFT_COLORS[booking.shift]}`}
+                        >
                           {SHIFT_ICONS[booking.shift]} {SHIFT_LABELS[booking.shift]}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-sm font-bold text-dark-600 dark:text-dark-300">{getSeatLabel(booking.seatNumber)}</td>
+                      <td className="px-6 py-4 text-sm font-bold text-dark-600 dark:text-dark-300">
+                        {getSeatLabel(booking.seatNumber)}
+                      </td>
                       <td className="px-6 py-4 text-sm font-semibold text-accent-700 dark:text-accent-400">
                         {new Date(booking.travelDate + 'T00:00:00').toLocaleDateString()}
                       </td>
                       <td className="px-6 py-4">
-                        <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${
-                          booking.status === 'confirmed' ? 'bg-accent-100 dark:bg-accent-950/40 text-accent-700 dark:text-accent-400' :
-                          booking.status === 'cancelled' ? 'bg-danger-100 dark:bg-danger-950/30 text-danger-700 dark:text-danger-400' :
-                          'bg-dark-100 dark:bg-dark-800 text-dark-600 dark:text-dark-400'
-                        }`}>
+                        <span
+                          className={`px-2.5 py-1 rounded-full text-xs font-bold ${
+                            booking.status === 'confirmed'
+                              ? 'bg-accent-100 dark:bg-accent-950/40 text-accent-700 dark:text-accent-400'
+                              : booking.status === 'cancelled'
+                                ? 'bg-danger-100 dark:bg-danger-950/30 text-danger-700 dark:text-danger-400'
+                                : 'bg-dark-100 dark:bg-dark-800 text-dark-600 dark:text-dark-400'
+                          }`}
+                        >
                           {booking.status}
                         </span>
                       </td>
                       <td className="px-6 py-4">
-                        <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${
-                          booking.attendance === 'present' ? 'bg-accent-100 dark:bg-accent-950/40 text-accent-700 dark:text-accent-400' :
-                          booking.attendance === 'absent' ? 'bg-danger-100 dark:bg-danger-950/30 text-danger-700 dark:text-danger-400' :
-                          'bg-warning-50 dark:bg-warning-950/20 text-warning-600 dark:text-warning-400'
-                        }`}>
+                        <span
+                          className={`px-2.5 py-1 rounded-full text-xs font-bold ${
+                            booking.attendance === 'present'
+                              ? 'bg-accent-100 dark:bg-accent-950/40 text-accent-700 dark:text-accent-400'
+                              : booking.attendance === 'absent'
+                                ? 'bg-danger-100 dark:bg-danger-950/30 text-danger-700 dark:text-danger-400'
+                                : 'bg-warning-50 dark:bg-warning-950/20 text-warning-600 dark:text-warning-400'
+                          }`}
+                        >
                           {booking.attendance}
                         </span>
                       </td>
@@ -260,7 +325,11 @@ const StudentDashboard = () => {
       )}
 
       {/* Cancel Confirmation Modal */}
-      <Modal isOpen={!!bookingToCancel} onClose={() => !cancelling && setBookingToCancel(null)} title="Cancel Booking">
+      <Modal
+        isOpen={!!bookingToCancel}
+        onClose={() => !cancelling && setBookingToCancel(null)}
+        title="Cancel Booking"
+      >
         <div className="space-y-4 text-center">
           <motion.div
             className="w-16 h-16 bg-danger-50 dark:bg-danger-950/30 rounded-full flex items-center justify-center mx-auto mb-2 text-danger-500 text-2xl"
@@ -292,30 +361,43 @@ const StudentDashboard = () => {
                   animate={{ rotate: 360 }}
                   transition={{ duration: 0.8, repeat: Infinity, ease: 'linear' }}
                 />
-              ) : 'Yes, Cancel'}
+              ) : (
+                'Yes, Cancel'
+              )}
             </button>
           </div>
         </div>
       </Modal>
 
       {/* Ticket QR Modal */}
-      <Modal isOpen={!!selectedTicket} onClose={() => setSelectedTicket(null)} title="Transit Ticket">
+      <Modal
+        isOpen={!!selectedTicket}
+        onClose={() => setSelectedTicket(null)}
+        title="Transit Ticket"
+      >
         {selectedTicket && (
           <div className="space-y-6">
             {/* Boarding Pass Ticket Layout */}
-            <div id="print-ticket" className="border-2 border-dashed border-dark-200 dark:border-dark-600 rounded-2xl p-6 bg-gradient-to-b from-white to-dark-50/50 dark:from-dark-800 dark:to-dark-900/50 shadow-sm relative overflow-hidden">
+            <div
+              id="print-ticket"
+              className="border-2 border-dashed border-dark-200 dark:border-dark-600 rounded-2xl p-6 bg-gradient-to-b from-white to-dark-50/50 dark:from-dark-800 dark:to-dark-900/50 shadow-sm relative overflow-hidden"
+            >
               {/* Decorative side cutouts */}
               <div className="absolute -left-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-dark-50 dark:bg-dark-800 border-r border-dark-200 dark:border-dark-600" />
               <div className="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-dark-50 dark:bg-dark-800 border-l border-dark-200 dark:border-dark-600" />
-              
+
               {/* Header */}
               <div className="flex justify-between items-center pb-4 border-b border-dark-100 dark:border-dark-600">
                 <div>
-                  <span className="text-[10px] uppercase font-bold tracking-wider text-primary-500">Official Ticket</span>
+                  <span className="text-[10px] uppercase font-bold tracking-wider text-primary-500">
+                    Official Ticket
+                  </span>
                   <h4 className="font-extrabold text-xl text-dark-900 dark:text-white">CUETGo</h4>
                 </div>
                 <div className="text-right">
-                  <span className="text-[10px] text-dark-400 dark:text-dark-500 block">Ticket Code</span>
+                  <span className="text-[10px] text-dark-400 dark:text-dark-500 block">
+                    Ticket Code
+                  </span>
                   <span className="text-xs font-mono font-bold text-dark-700 dark:text-dark-300">
                     {selectedTicket._id.substring(selectedTicket._id.length - 8).toUpperCase()}
                   </span>
@@ -325,11 +407,17 @@ const StudentDashboard = () => {
               {/* Passenger Info */}
               <div className="py-4 grid grid-cols-2 gap-3 border-b border-dark-100 dark:border-dark-600">
                 <div>
-                  <span className="text-[10px] text-dark-400 dark:text-dark-500 block">Passenger</span>
-                  <span className="text-sm font-bold text-dark-800 dark:text-dark-200">{user?.name}</span>
+                  <span className="text-[10px] text-dark-400 dark:text-dark-500 block">
+                    Passenger
+                  </span>
+                  <span className="text-sm font-bold text-dark-800 dark:text-dark-200">
+                    {user?.name}
+                  </span>
                 </div>
                 <div>
-                  <span className="text-[10px] text-dark-400 dark:text-dark-500 block">Student ID / Dept</span>
+                  <span className="text-[10px] text-dark-400 dark:text-dark-500 block">
+                    Student ID / Dept
+                  </span>
                   <span className="text-sm font-semibold text-dark-700 dark:text-dark-300">
                     {user?.studentId || 'N/A'} • {user?.department || 'N/A'}
                   </span>
@@ -342,23 +430,36 @@ const StudentDashboard = () => {
                   <span className="text-[10px] text-dark-400 dark:text-dark-500 block">Bus</span>
                   <div className="flex items-center gap-1.5 mt-0.5">
                     <FaBus className="text-primary-500 text-xs" />
-                    <span className="text-sm font-bold text-dark-800 dark:text-dark-200">{selectedTicket.bus?.busName}</span>
+                    <span className="text-sm font-bold text-dark-800 dark:text-dark-200">
+                      {selectedTicket.bus?.busName}
+                    </span>
                   </div>
                 </div>
                 <div>
-                  <span className="text-[10px] text-dark-400 dark:text-dark-500 block">Seat Number</span>
-                  <span className="text-sm font-bold text-accent-600 dark:text-accent-400">{getSeatLabel(selectedTicket.seatNumber)}</span>
+                  <span className="text-[10px] text-dark-400 dark:text-dark-500 block">
+                    Seat Number
+                  </span>
+                  <span className="text-sm font-bold text-accent-600 dark:text-accent-400">
+                    {getSeatLabel(selectedTicket.seatNumber)}
+                  </span>
                 </div>
                 <div>
-                  <span className="text-[10px] text-dark-400 dark:text-dark-500 block">Travel Date</span>
+                  <span className="text-[10px] text-dark-400 dark:text-dark-500 block">
+                    Travel Date
+                  </span>
                   <span className="text-sm font-bold text-dark-800 dark:text-dark-200">
-                    {new Date(selectedTicket.travelDate + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+                    {new Date(selectedTicket.travelDate + 'T00:00:00').toLocaleDateString('en-US', {
+                      weekday: 'short',
+                      month: 'short',
+                      day: 'numeric',
+                    })}
                   </span>
                 </div>
                 <div>
                   <span className="text-[10px] text-dark-400 dark:text-dark-500 block">Shift</span>
                   <span className="text-sm font-bold text-dark-800 dark:text-dark-200">
-                    {SHIFT_ICONS[selectedTicket.shift]} {SHIFT_LABELS[selectedTicket.shift]} (Shift {selectedTicket.shift})
+                    {SHIFT_ICONS[selectedTicket.shift]} {SHIFT_LABELS[selectedTicket.shift]} (Shift{' '}
+                    {selectedTicket.shift})
                   </span>
                 </div>
               </div>
@@ -366,8 +467,8 @@ const StudentDashboard = () => {
               {/* QR Code */}
               <div className="pt-6 flex flex-col items-center justify-center">
                 <div className="bg-white p-3 rounded-xl shadow-sm border border-dark-100 dark:border-dark-600">
-                  <QRCodeSVG 
-                    value={selectedTicket._id} 
+                  <QRCodeSVG
+                    value={selectedTicket._id}
                     size={160}
                     level="H"
                     includeMargin={false}
@@ -387,10 +488,7 @@ const StudentDashboard = () => {
               >
                 <HiPrinter className="text-lg" /> Print Ticket
               </button>
-              <button
-                onClick={() => setSelectedTicket(null)}
-                className="btn-primary flex-1"
-              >
+              <button onClick={() => setSelectedTicket(null)} className="btn-primary flex-1">
                 Done
               </button>
             </div>

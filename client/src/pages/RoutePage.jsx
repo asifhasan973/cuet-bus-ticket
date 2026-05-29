@@ -11,10 +11,42 @@ const ROUTE_GROUPS = [
 ];
 
 const SHIFT_SCHEDULE = [
-  { shift: 1, icon: '', label: 'Morning', weekday: '6:30 AM → 8:00 AM', weekend: '—', dir: 'CUET-bound', desc: 'Each bus from its own route endpoint' },
-  { shift: 2, icon: '', label: 'Afternoon', weekday: '2:00 PM → 3:00 PM', weekend: '2:30 PM → 3:30 PM', dir: 'Outbound', desc: 'All buses → Kaptai Rastar Matha' },
-  { shift: 3, icon: '', label: 'Evening', weekday: '5:00 PM → 7:00 PM', weekend: '—', dir: 'Outbound', desc: 'Each bus follows own normal route' },
-  { shift: 4, icon: '', label: 'Night', weekday: '9:00 PM → 10:30 PM', weekend: '8:30 PM → 10:00 PM', dir: 'CUET-bound', desc: 'All buses from New Market' },
+  {
+    shift: 1,
+    icon: '',
+    label: 'Morning',
+    weekday: '6:30 AM → 8:00 AM',
+    weekend: '—',
+    dir: 'CUET-bound',
+    desc: 'Each bus from its own route endpoint',
+  },
+  {
+    shift: 2,
+    icon: '',
+    label: 'Afternoon',
+    weekday: '2:00 PM → 3:00 PM',
+    weekend: '2:30 PM → 3:30 PM',
+    dir: 'Outbound',
+    desc: 'All buses → Kaptai Rastar Matha',
+  },
+  {
+    shift: 3,
+    icon: '',
+    label: 'Evening',
+    weekday: '5:00 PM → 7:00 PM',
+    weekend: '—',
+    dir: 'Outbound',
+    desc: 'Each bus follows own normal route',
+  },
+  {
+    shift: 4,
+    icon: '',
+    label: 'Night',
+    weekday: '9:00 PM → 10:30 PM',
+    weekend: '8:30 PM → 10:00 PM',
+    dir: 'CUET-bound',
+    desc: 'All buses from New Market',
+  },
 ];
 
 const RoutePage = () => {
@@ -51,12 +83,12 @@ const RoutePage = () => {
 
   if (loading) return <LoadingSpinner />;
 
-  const flyoverBuses = buses.filter(b => b.busType === 'flyover');
-  const regularBuses = buses.filter(b => b.busType === 'regular');
+  const flyoverBuses = buses.filter((b) => b.busType === 'flyover');
+  const regularBuses = buses.filter((b) => b.busType === 'regular');
 
   // Group regular buses by route name
   const routeGroups = {};
-  regularBuses.forEach(bus => {
+  regularBuses.forEach((bus) => {
     const routeName = bus.route?.name || 'Unknown Route';
     if (!routeGroups[routeName]) {
       routeGroups[routeName] = [];
@@ -82,26 +114,47 @@ const RoutePage = () => {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b-2 border-dark-100 dark:border-dark-600">
-                  <th className="text-left py-3 px-4 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">Shift</th>
-                  <th className="text-left py-3 px-4 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">Weekday (Sun-Thu)</th>
-                  <th className="text-left py-3 px-4 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">Weekend (Fri-Sat)</th>
-                  <th className="text-left py-3 px-4 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">Direction</th>
-                  <th className="text-left py-3 px-4 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">Note</th>
+                  <th className="text-left py-3 px-4 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">
+                    Shift
+                  </th>
+                  <th className="text-left py-3 px-4 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">
+                    Weekday (Sun-Thu)
+                  </th>
+                  <th className="text-left py-3 px-4 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">
+                    Weekend (Fri-Sat)
+                  </th>
+                  <th className="text-left py-3 px-4 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">
+                    Direction
+                  </th>
+                  <th className="text-left py-3 px-4 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">
+                    Note
+                  </th>
                 </tr>
               </thead>
               <tbody>
-                {SHIFT_SCHEDULE.map(s => (
-                  <tr key={s.shift} className="border-b border-dark-50 dark:border-dark-600 hover:bg-dark-50 dark:hover:bg-dark-600/30 transition-colors">
+                {SHIFT_SCHEDULE.map((s) => (
+                  <tr
+                    key={s.shift}
+                    className="border-b border-dark-50 dark:border-dark-600 hover:bg-dark-50 dark:hover:bg-dark-600/30 transition-colors"
+                  >
                     <td className="py-3 px-4 font-bold text-dark-900 dark:text-dark-100">
                       <span className="mr-1.5">{s.icon}</span>
                       Shift {s.shift} — {s.label}
                     </td>
-                    <td className="py-3 px-4 font-semibold text-dark-700 dark:text-dark-200">{s.weekday}</td>
-                    <td className="py-3 px-4 font-semibold text-dark-500 dark:text-dark-400">{s.weekend}</td>
+                    <td className="py-3 px-4 font-semibold text-dark-700 dark:text-dark-200">
+                      {s.weekday}
+                    </td>
+                    <td className="py-3 px-4 font-semibold text-dark-500 dark:text-dark-400">
+                      {s.weekend}
+                    </td>
                     <td className="py-3 px-4">
-                      <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${
-                        s.dir === 'CUET-bound' ? 'bg-accent-100 text-accent-700' : 'bg-teal-100 text-teal-700'
-                      }`}>
+                      <span
+                        className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${
+                          s.dir === 'CUET-bound'
+                            ? 'bg-accent-100 text-accent-700'
+                            : 'bg-teal-100 text-teal-700'
+                        }`}
+                      >
                         {s.dir}
                       </span>
                     </td>
@@ -118,12 +171,14 @@ const RoutePage = () => {
       {flyoverBuses.length > 0 && (
         <div className="mb-8">
           <h2 className="text-lg font-bold text-dark-900 dark:text-white mb-4 flex items-center gap-2">
-           Flyover Buses
-            <span className="text-xs font-normal text-dark-400 dark:text-dark-500">({flyoverBuses.length} buses)</span>
+            Flyover Buses
+            <span className="text-xs font-normal text-dark-400 dark:text-dark-500">
+              ({flyoverBuses.length} buses)
+            </span>
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {flyoverBuses.map(bus => (
-              <div 
+            {flyoverBuses.map((bus) => (
+              <div
                 key={bus._id}
                 className="card !p-0 overflow-hidden cursor-pointer hover:shadow-lg transition-all group"
                 onClick={() => handleBusClick(bus._id)}
@@ -133,20 +188,31 @@ const RoutePage = () => {
                     <FaBus className="text-white" />
                     <h3 className="font-bold text-white">{bus.busName}</h3>
                   </div>
-                  <span className="bg-white/20 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">FLYOVER</span>
+                  <span className="bg-white/20 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+                    FLYOVER
+                  </span>
                 </div>
                 <div className="p-4">
-                  <p className="text-sm text-dark-600 dark:text-dark-300 font-medium mb-3">{bus.route?.name}</p>
+                  <p className="text-sm text-dark-600 dark:text-dark-300 font-medium mb-3">
+                    {bus.route?.name}
+                  </p>
                   <div className="flex flex-wrap gap-1.5">
                     {bus.route?.stops?.map((stop, i) => (
-                      <span key={i} className="text-xs bg-dark-50 dark:bg-dark-600/50 text-dark-600 dark:text-dark-300 px-2 py-1 rounded-md font-medium border border-dark-100 dark:border-dark-600">
+                      <span
+                        key={i}
+                        className="text-xs bg-dark-50 dark:bg-dark-600/50 text-dark-600 dark:text-dark-300 px-2 py-1 rounded-md font-medium border border-dark-100 dark:border-dark-600"
+                      >
                         {stop.name}
                       </span>
                     ))}
                   </div>
                   <div className="mt-3 flex items-center justify-between text-xs text-dark-400 dark:text-dark-500">
-                    <span className="flex items-center gap-1"><FaMapMarkerAlt /> {bus.route?.stops?.length} stops</span>
-                    <span className="font-bold text-dark-600 dark:text-dark-300">{bus.totalSeats} seats</span>
+                    <span className="flex items-center gap-1">
+                      <FaMapMarkerAlt /> {bus.route?.stops?.length} stops
+                    </span>
+                    <span className="font-bold text-dark-600 dark:text-dark-300">
+                      {bus.totalSeats} seats
+                    </span>
                   </div>
                 </div>
               </div>
@@ -158,8 +224,10 @@ const RoutePage = () => {
       {/* Regular Buses grouped by route */}
       <div>
         <h2 className="text-lg font-bold text-dark-900 dark:text-white mb-4 flex items-center gap-2">
-         Regular Buses
-          <span className="text-xs font-normal text-dark-400 dark:text-dark-500">({regularBuses.length} buses)</span>
+          Regular Buses
+          <span className="text-xs font-normal text-dark-400 dark:text-dark-500">
+            ({regularBuses.length} buses)
+          </span>
         </h2>
         {Object.entries(routeGroups).map(([routeName, routeBuses]) => (
           <div key={routeName} className="mb-6">
@@ -176,17 +244,25 @@ const RoutePage = () => {
               <div className="p-5">
                 {/* Route stops timeline */}
                 <div className="mb-5">
-                   <p className="text-xs font-bold text-dark-500 dark:text-dark-400 uppercase mb-3">Route Stops</p>
+                  <p className="text-xs font-bold text-dark-500 dark:text-dark-400 uppercase mb-3">
+                    Route Stops
+                  </p>
                   <div className="flex flex-wrap items-center gap-2">
                     {routeBuses[0]?.route?.stops?.map((stop, i) => (
                       <div key={i} className="flex items-center">
                         <div className="flex items-center gap-1.5 bg-white dark:bg-dark-600/60 px-3 py-1.5 rounded-lg border border-dark-100 dark:border-dark-600">
-                          <div className={`w-2.5 h-2.5 rounded-full ${
-                            i === 0 ? 'bg-accent-500' :
-                            i === routeBuses[0].route.stops.length - 1 ? 'bg-primary-500' :
-                            'bg-dark-300'
-                          }`} />
-                          <span className="text-sm font-medium text-dark-800 dark:text-dark-200">{stop.name}</span>
+                          <div
+                            className={`w-2.5 h-2.5 rounded-full ${
+                              i === 0
+                                ? 'bg-accent-500'
+                                : i === routeBuses[0].route.stops.length - 1
+                                  ? 'bg-primary-500'
+                                  : 'bg-dark-300'
+                            }`}
+                          />
+                          <span className="text-sm font-medium text-dark-800 dark:text-dark-200">
+                            {stop.name}
+                          </span>
                         </div>
                         {i < routeBuses[0].route.stops.length - 1 && (
                           <span className="text-dark-300 dark:text-dark-500 mx-1">→</span>
@@ -197,27 +273,39 @@ const RoutePage = () => {
                 </div>
 
                 {/* Bus names */}
-                 <p className="text-xs font-bold text-dark-500 dark:text-dark-400 uppercase mb-2">Buses</p>
+                <p className="text-xs font-bold text-dark-500 dark:text-dark-400 uppercase mb-2">
+                  Buses
+                </p>
                 <div className="flex flex-wrap gap-2">
-                  {routeBuses.map(bus => (
+                  {routeBuses.map((bus) => (
                     <button
                       key={bus._id}
                       onClick={() => handleBusClick(bus._id)}
                       className="flex items-center gap-2 bg-dark-50 dark:bg-dark-600/50 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:border-primary-200 dark:hover:border-primary-800 px-3 py-2 rounded-xl border border-dark-100 dark:border-dark-600 transition-all group"
                     >
                       <FaBus className="text-dark-400 group-hover:text-primary-600 dark:group-hover:text-primary-400 text-xs" />
-                      <span className="text-sm font-bold text-dark-700 dark:text-dark-200 group-hover:text-primary-700 dark:group-hover:text-primary-400">{bus.busName}</span>
-                      <span className="text-[10px] text-dark-400 dark:text-dark-500">{bus.totalSeats}s</span>
+                      <span className="text-sm font-bold text-dark-700 dark:text-dark-200 group-hover:text-primary-700 dark:group-hover:text-primary-400">
+                        {bus.busName}
+                      </span>
+                      <span className="text-[10px] text-dark-400 dark:text-dark-500">
+                        {bus.totalSeats}s
+                      </span>
                     </button>
                   ))}
                 </div>
 
                 {/* Supervisor info */}
-                {routeBuses.some(b => b.supervisors?.length > 0) && (
+                {routeBuses.some((b) => b.supervisors?.length > 0) && (
                   <div className="mt-4 pt-3 border-t border-dark-100 dark:border-dark-600">
-                    <span className="text-xs font-bold text-dark-500 dark:text-dark-400">Supervisors: </span>
+                    <span className="text-xs font-bold text-dark-500 dark:text-dark-400">
+                      Supervisors:{' '}
+                    </span>
                     <span className="text-xs text-dark-600 dark:text-dark-300">
-                      {[...new Set(routeBuses.flatMap(b => b.supervisors?.map(s => s.name) || []))].join(', ') || 'None assigned'}
+                      {[
+                        ...new Set(
+                          routeBuses.flatMap((b) => b.supervisors?.map((s) => s.name) || [])
+                        ),
+                      ].join(', ') || 'None assigned'}
                     </span>
                   </div>
                 )}

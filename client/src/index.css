@@ -1,7 +1,6 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @custom-variant dark (&:where(.dark, .dark *));
-
 
 @theme {
   --color-primary-50: #eff6ff;
@@ -137,8 +136,13 @@
 
 /* Loading animation */
 @keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4); }
-  50% { box-shadow: 0 0 0 10px rgba(59, 130, 246, 0); }
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba(59, 130, 246, 0);
+  }
 }
 
 .animate-pulse-glow {
@@ -152,13 +156,13 @@
     visibility: hidden !important;
     background: none !important;
   }
-  
+
   /* Show only the ticket container */
   #print-ticket,
   #print-ticket * {
     visibility: visible !important;
   }
-  
+
   /* Position the ticket on the page */
   #print-ticket {
     position: absolute !important;
@@ -177,8 +181,8 @@
   }
 
   /* Ensure text colors are readable on white background when printing */
-  #print-ticket span, 
-  #print-ticket h4, 
+  #print-ticket span,
+  #print-ticket h4,
   #print-ticket p {
     color: #0f172a !important;
   }
@@ -192,7 +196,7 @@
   #print-ticket .text-dark-500 {
     color: #475569 !important;
   }
-  
+
   /* Hide cutout border backgrounds so they don't look weird when printing */
   #print-ticket .absolute {
     background-color: white !important;

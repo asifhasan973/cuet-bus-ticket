@@ -5,16 +5,19 @@ import LoadingSpinner from '../components/ui/LoadingSpinner';
 import { FaBus, FaUsers, FaUserTie, FaTrash, FaTimes, FaSave } from 'react-icons/fa';
 import { HiTicket } from 'react-icons/hi';
 import toast from 'react-hot-toast';
-import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, BarChart, Bar, Cell, CartesianGrid } from 'recharts';
-
-const SHIFT_ICONS = { 1: '', 2: '', 3: '', 4: '' };
-const SHIFT_LABELS = { 1: 'Morning', 2: 'Afternoon', 3: 'Evening', 4: 'Night' };
-const SHIFT_COLORS = {
-  1: 'bg-teal-100 dark:bg-teal-950/40 text-teal-700 dark:text-teal-300',
-  2: 'bg-sky-100 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300',
-  3: 'bg-indigo-100 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300',
-  4: 'bg-slate-200 dark:bg-dark-600 text-slate-700 dark:text-dark-300',
-};
+import {
+  ResponsiveContainer,
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  Tooltip,
+  BarChart,
+  Bar,
+  Cell,
+  CartesianGrid,
+} from 'recharts';
+import { SHIFT_ICONS, SHIFT_LABELS, SHIFT_COLORS } from '../utils/shifts';
 
 const AdminDashboard = () => {
   const [stats, setStats] = useState(null);
@@ -25,7 +28,7 @@ const AdminDashboard = () => {
   const [analyticsLoading, setAnalyticsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
   const [userFilter, setUserFilter] = useState('');
-  
+
   // Modal states for assigning buses
   const [showBusModal, setShowBusModal] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState(null);
@@ -148,7 +151,8 @@ const AdminDashboard = () => {
   };
 
   const rejectSupervisor = async (id, name) => {
-    if (!window.confirm(`Are you sure you want to reject and delete the application for ${name}?`)) return;
+    if (!window.confirm(`Are you sure you want to reject and delete the application for ${name}?`))
+      return;
     try {
       await API.delete(`/admin/users/${id}`);
       toast.success(`${name} application rejected`);
@@ -180,27 +184,54 @@ const AdminDashboard = () => {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-extrabold text-dark-900 dark:text-white">Admin Dashboard</h1>
-        <p className="text-dark-500 dark:text-dark-400 text-sm mt-1">System overview and management</p>
+        <p className="text-dark-500 dark:text-dark-400 text-sm mt-1">
+          System overview and management
+        </p>
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-        <StatsCard icon={FaUsers} label="Students" value={stats?.totalStudents || 0} color="primary" />
-        <StatsCard icon={FaUserTie} label="Supervisors" value={stats?.totalSupervisors || 0} color="accent" />
-        <StatsCard icon={FaBus} label="Total Buses" value={stats?.totalBuses || 0} color="warning" />
-        <StatsCard icon={FaBus} label="Active Buses" value={stats?.activeBuses || 0} color="accent" />
-        <StatsCard icon={HiTicket} label="Active Bookings" value={stats?.totalBookings || 0} color="danger" />
+        <StatsCard
+          icon={FaUsers}
+          label="Students"
+          value={stats?.totalStudents || 0}
+          color="primary"
+        />
+        <StatsCard
+          icon={FaUserTie}
+          label="Supervisors"
+          value={stats?.totalSupervisors || 0}
+          color="accent"
+        />
+        <StatsCard
+          icon={FaBus}
+          label="Total Buses"
+          value={stats?.totalBuses || 0}
+          color="warning"
+        />
+        <StatsCard
+          icon={FaBus}
+          label="Active Buses"
+          value={stats?.activeBuses || 0}
+          color="accent"
+        />
+        <StatsCard
+          icon={HiTicket}
+          label="Active Bookings"
+          value={stats?.totalBookings || 0}
+          color="danger"
+        />
       </div>
 
       {/* Tabs */}
       <div className="flex gap-1 bg-dark-100 dark:bg-dark-800 p-1 rounded-xl w-fit">
-        {['overview', 'users', 'approvals'].map(tab => (
+        {['overview', 'users', 'approvals'].map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all capitalize ${
-              activeTab === tab 
-                ? 'bg-white dark:bg-dark-600 text-dark-900 dark:text-white shadow-sm' 
+              activeTab === tab
+                ? 'bg-white dark:bg-dark-600 text-dark-900 dark:text-white shadow-sm'
                 : 'text-dark-500 dark:text-dark-400 hover:text-dark-700 dark:hover:text-dark-200'
             }`}
           >
@@ -216,29 +247,41 @@ const AdminDashboard = () => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Booking Trends Chart */}
               <div className="card dark:border-dark-600">
-                <h3 className="font-bold text-dark-900 dark:text-white mb-4">Booking Trends (Last 7 Days)</h3>
+                <h3 className="font-bold text-dark-900 dark:text-white mb-4">
+                  Booking Trends (Last 7 Days)
+                </h3>
                 <div className="h-80">
                   <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={analytics.bookingsByDate} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                    <AreaChart
+                      data={analytics.bookingsByDate}
+                      margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
+                    >
                       <defs>
                         <linearGradient id="colorBookings" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.4}/>
-                          <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                          <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.4} />
+                          <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
                         </linearGradient>
                       </defs>
                       <CartesianGrid strokeDasharray="3 3" stroke="#374151" opacity={0.1} />
                       <XAxis dataKey="date" stroke="#9ca3af" fontSize={11} />
                       <YAxis stroke="#9ca3af" fontSize={11} allowDecimals={false} />
-                      <Tooltip 
-                        contentStyle={{ 
-                          backgroundColor: '#1e293b', 
-                          border: 'none', 
-                          borderRadius: '8px', 
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: '#1e293b',
+                          border: 'none',
+                          borderRadius: '8px',
                           color: '#fff',
-                          fontSize: '12px' 
-                        }} 
+                          fontSize: '12px',
+                        }}
                       />
-                      <Area type="monotone" dataKey="bookings" stroke="#3b82f6" strokeWidth={2} fillOpacity={1} fill="url(#colorBookings)" />
+                      <Area
+                        type="monotone"
+                        dataKey="bookings"
+                        stroke="#3b82f6"
+                        strokeWidth={2}
+                        fillOpacity={1}
+                        fill="url(#colorBookings)"
+                      />
                     </AreaChart>
                   </ResponsiveContainer>
                 </div>
@@ -246,21 +289,26 @@ const AdminDashboard = () => {
 
               {/* Bus Popularity Chart */}
               <div className="card dark:border-dark-600">
-                <h3 className="font-bold text-dark-900 dark:text-white mb-4">Top 5 Popular Buses</h3>
+                <h3 className="font-bold text-dark-900 dark:text-white mb-4">
+                  Top 5 Popular Buses
+                </h3>
                 <div className="h-80">
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={analytics.bookingsByBus} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                    <BarChart
+                      data={analytics.bookingsByBus}
+                      margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
+                    >
                       <CartesianGrid strokeDasharray="3 3" stroke="#374151" opacity={0.1} />
                       <XAxis dataKey="name" stroke="#9ca3af" fontSize={11} />
                       <YAxis stroke="#9ca3af" fontSize={11} allowDecimals={false} />
-                      <Tooltip 
-                        contentStyle={{ 
-                          backgroundColor: '#1e293b', 
-                          border: 'none', 
-                          borderRadius: '8px', 
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: '#1e293b',
+                          border: 'none',
+                          borderRadius: '8px',
                           color: '#fff',
-                          fontSize: '12px' 
-                        }} 
+                          fontSize: '12px',
+                        }}
                       />
                       <Bar dataKey="bookings" fill="#10b981" radius={[4, 4, 0, 0]}>
                         {analytics.bookingsByBus.map((entry, index) => (
@@ -276,63 +324,89 @@ const AdminDashboard = () => {
 
           {/* Recent Bookings */}
           <div className="card !p-0 overflow-hidden">
-          <div className="px-6 py-4 border-b border-dark-100 dark:border-dark-600">
-            <h2 className="font-bold text-dark-900 dark:text-white">Recent Bookings</h2>
-          </div>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-dark-50 dark:bg-dark-800">
-                <tr>
-                  <th className="text-left px-6 py-3 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">Student</th>
-                  <th className="text-left px-6 py-3 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">Bus</th>
-                  <th className="text-left px-6 py-3 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">Shift</th>
-                  <th className="text-left px-6 py-3 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">Seat</th>
-                  <th className="text-left px-6 py-3 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">Date</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-dark-100 dark:divide-dark-600">
-                {stats?.recentBookings?.map(booking => (
-                  <tr key={booking._id} className="hover:bg-dark-50 dark:hover:bg-dark-600/20 transition-colors">
-                    <td className="px-6 py-4 text-sm font-medium text-dark-900 dark:text-dark-100">
-                      {booking.student?.name} <span className="text-dark-400 dark:text-dark-500">({booking.student?.studentId})</span>
-                    </td>
-                    <td className="px-6 py-4 text-sm text-dark-600 dark:text-dark-300">{booking.bus?.busName}</td>
-                    <td className="px-6 py-4">
-                      <span className={`px-2 py-1 rounded-full text-[10px] font-bold ${SHIFT_COLORS[booking.shift]}`}>
-                        {SHIFT_ICONS[booking.shift]} {SHIFT_LABELS[booking.shift]}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-sm font-bold text-dark-900 dark:text-dark-100">
-                      {String.fromCharCode(65 + Math.floor((booking.seatNumber - 1) / 5))}{((booking.seatNumber - 1) % 5) + 1}
-                    </td>
-                    <td className="px-6 py-4 text-sm font-semibold text-accent-700 dark:text-accent-400">
-                      {new Date(booking.travelDate + 'T00:00:00').toLocaleDateString()}
-                    </td>
-                  </tr>
-                ))}
-                {(!stats?.recentBookings || stats.recentBookings.length === 0) && (
+            <div className="px-6 py-4 border-b border-dark-100 dark:border-dark-600">
+              <h2 className="font-bold text-dark-900 dark:text-white">Recent Bookings</h2>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-dark-50 dark:bg-dark-800">
                   <tr>
-                    <td colSpan="5" className="px-6 py-8 text-center text-dark-400 dark:text-dark-500 text-sm">No recent bookings</td>
+                    <th className="text-left px-6 py-3 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">
+                      Student
+                    </th>
+                    <th className="text-left px-6 py-3 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">
+                      Bus
+                    </th>
+                    <th className="text-left px-6 py-3 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">
+                      Shift
+                    </th>
+                    <th className="text-left px-6 py-3 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">
+                      Seat
+                    </th>
+                    <th className="text-left px-6 py-3 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">
+                      Date
+                    </th>
                   </tr>
-                )}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-dark-100 dark:divide-dark-600">
+                  {stats?.recentBookings?.map((booking) => (
+                    <tr
+                      key={booking._id}
+                      className="hover:bg-dark-50 dark:hover:bg-dark-600/20 transition-colors"
+                    >
+                      <td className="px-6 py-4 text-sm font-medium text-dark-900 dark:text-dark-100">
+                        {booking.student?.name}{' '}
+                        <span className="text-dark-400 dark:text-dark-500">
+                          ({booking.student?.studentId})
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-sm text-dark-600 dark:text-dark-300">
+                        {booking.bus?.busName}
+                      </td>
+                      <td className="px-6 py-4">
+                        <span
+                          className={`px-2 py-1 rounded-full text-[10px] font-bold ${SHIFT_COLORS[booking.shift]}`}
+                        >
+                          {SHIFT_ICONS[booking.shift]} {SHIFT_LABELS[booking.shift]}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-sm font-bold text-dark-900 dark:text-dark-100">
+                        {String.fromCharCode(65 + Math.floor((booking.seatNumber - 1) / 5))}
+                        {((booking.seatNumber - 1) % 5) + 1}
+                      </td>
+                      <td className="px-6 py-4 text-sm font-semibold text-accent-700 dark:text-accent-400">
+                        {new Date(booking.travelDate + 'T00:00:00').toLocaleDateString()}
+                      </td>
+                    </tr>
+                  ))}
+                  {(!stats?.recentBookings || stats.recentBookings.length === 0) && (
+                    <tr>
+                      <td
+                        colSpan="5"
+                        className="px-6 py-8 text-center text-dark-400 dark:text-dark-500 text-sm"
+                      >
+                        No recent bookings
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
-      </div>
       )}
 
       {activeTab === 'users' && (
         <div>
           {/* Filter */}
           <div className="flex gap-2 mb-4">
-            {['', 'student', 'supervisor'].map(filter => (
+            {['', 'student', 'supervisor'].map((filter) => (
               <button
                 key={filter}
                 onClick={() => setUserFilter(filter)}
                 className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all capitalize ${
-                  userFilter === filter 
-                    ? 'bg-primary-600 text-white' 
+                  userFilter === filter
+                    ? 'bg-primary-600 text-white'
                     : 'bg-dark-100 dark:bg-dark-800 text-dark-600 dark:text-dark-400 hover:bg-dark-200 dark:hover:bg-dark-700'
                 }`}
               >
@@ -346,27 +420,48 @@ const AdminDashboard = () => {
               <table className="w-full">
                 <thead className="bg-dark-50 dark:bg-dark-800">
                   <tr>
-                    <th className="text-left px-6 py-3 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">Name</th>
-                    <th className="text-left px-6 py-3 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">Email</th>
-                    <th className="text-left px-6 py-3 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">Role</th>
-                    <th className="text-left px-6 py-3 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">ID</th>
-                    <th className="text-left px-6 py-3 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">Points</th>
-                    <th className="text-right px-6 py-3 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">Actions</th>
+                    <th className="text-left px-6 py-3 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">
+                      Name
+                    </th>
+                    <th className="text-left px-6 py-3 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">
+                      Email
+                    </th>
+                    <th className="text-left px-6 py-3 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">
+                      Role
+                    </th>
+                    <th className="text-left px-6 py-3 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">
+                      ID
+                    </th>
+                    <th className="text-left px-6 py-3 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">
+                      Points
+                    </th>
+                    <th className="text-right px-6 py-3 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">
+                      Actions
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-dark-100 dark:divide-dark-600">
-                  {users.map(u => (
-                    <tr key={u._id} className="hover:bg-dark-50 dark:hover:bg-dark-600/20 transition-colors">
-                      <td className="px-6 py-4 text-sm font-semibold text-dark-900 dark:text-dark-100">{u.name}</td>
-                      <td className="px-6 py-4 text-sm text-dark-600 dark:text-dark-300">{u.email}</td>
+                  {users.map((u) => (
+                    <tr
+                      key={u._id}
+                      className="hover:bg-dark-50 dark:hover:bg-dark-600/20 transition-colors"
+                    >
+                      <td className="px-6 py-4 text-sm font-semibold text-dark-900 dark:text-dark-100">
+                        {u.name}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-dark-600 dark:text-dark-300">
+                        {u.email}
+                      </td>
                       <td className="px-6 py-4">
-                        <select 
+                        <select
                           value={u.role}
                           onChange={(e) => updateRole(u._id, e.target.value)}
                           className={`px-2 py-1 rounded-lg text-xs font-bold uppercase border-2 focus:outline-none bg-white dark:bg-dark-600 ${
-                            u.role === 'admin' ? 'bg-purple-50 dark:bg-purple-950/30 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-800' :
-                            u.role === 'supervisor' ? 'bg-accent-50 dark:bg-accent-950/30 text-accent-700 dark:text-accent-300 border-accent-200 dark:border-accent-800' :
-                            'bg-primary-50 dark:bg-primary-950/30 text-primary-700 dark:text-primary-300 border-primary-200 dark:border-primary-800'
+                            u.role === 'admin'
+                              ? 'bg-purple-50 dark:bg-purple-950/30 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-800'
+                              : u.role === 'supervisor'
+                                ? 'bg-accent-50 dark:bg-accent-950/30 text-accent-700 dark:text-accent-300 border-accent-200 dark:border-accent-800'
+                                : 'bg-primary-50 dark:bg-primary-950/30 text-primary-700 dark:text-primary-300 border-primary-200 dark:border-primary-800'
                           }`}
                         >
                           <option value="student">STUDENT</option>
@@ -376,31 +471,56 @@ const AdminDashboard = () => {
                         {u.role === 'supervisor' && (
                           <div className="mt-2">
                             <div className="flex flex-wrap gap-1 mb-1">
-                              {buses.filter(b => b.supervisors?.some(s => (s._id || s) === u._id)).map(bus => (
-                                <span key={bus._id} className="text-[10px] bg-dark-100 dark:bg-dark-600 text-dark-600 dark:text-dark-300 px-1.5 py-0.5 rounded font-semibold">
-                                  {bus.busName}
-                                </span>
-                              ))}
+                              {buses
+                                .filter((b) => b.supervisors?.some((s) => (s._id || s) === u._id))
+                                .map((bus) => (
+                                  <span
+                                    key={bus._id}
+                                    className="text-[10px] bg-dark-100 dark:bg-dark-600 text-dark-600 dark:text-dark-300 px-1.5 py-0.5 rounded font-semibold"
+                                  >
+                                    {bus.busName}
+                                  </span>
+                                ))}
                             </div>
-                            <button onClick={() => { 
-                                setSelectedUserId(u._id); 
-                                setSelectedBuses(buses.filter(b => b.supervisors?.some(s => (s._id || s) === u._id)).map(b => b._id)); 
-                                setShowBusModal(true); 
+                            <button
+                              onClick={() => {
+                                setSelectedUserId(u._id);
+                                setSelectedBuses(
+                                  buses
+                                    .filter((b) =>
+                                      b.supervisors?.some((s) => (s._id || s) === u._id)
+                                    )
+                                    .map((b) => b._id)
+                                );
+                                setShowBusModal(true);
                               }}
-                              className="text-[10px] text-primary-600 dark:text-primary-400 font-bold hover:underline">
+                              className="text-[10px] text-primary-600 dark:text-primary-400 font-bold hover:underline"
+                            >
                               + Manage Buses
                             </button>
                           </div>
                         )}
                       </td>
-                      <td className="px-6 py-4 text-sm text-dark-500 dark:text-dark-400">{u.studentId || u.employeeId || '-'}</td>
+                      <td className="px-6 py-4 text-sm text-dark-500 dark:text-dark-400">
+                        {u.studentId || u.employeeId || '-'}
+                      </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-1">
-                          <button onClick={() => updatePoints(u._id, u.points, -1)}
-                            className="w-6 h-6 flex items-center justify-center bg-dark-100 dark:bg-dark-600 hover:bg-dark-200 dark:hover:bg-dark-500 rounded text-dark-600 dark:text-dark-300 font-bold">-</button>
-                          <span className="w-8 text-center text-sm font-bold text-dark-900 dark:text-dark-100">{u.points}</span>
-                          <button onClick={() => updatePoints(u._id, u.points, 1)}
-                            className="w-6 h-6 flex items-center justify-center bg-dark-100 dark:bg-dark-600 hover:bg-dark-200 dark:hover:bg-dark-500 rounded text-dark-600 dark:text-dark-300 font-bold">+</button>
+                          <button
+                            onClick={() => updatePoints(u._id, u.points, -1)}
+                            className="w-6 h-6 flex items-center justify-center bg-dark-100 dark:bg-dark-600 hover:bg-dark-200 dark:hover:bg-dark-500 rounded text-dark-600 dark:text-dark-300 font-bold"
+                          >
+                            -
+                          </button>
+                          <span className="w-8 text-center text-sm font-bold text-dark-900 dark:text-dark-100">
+                            {u.points}
+                          </span>
+                          <button
+                            onClick={() => updatePoints(u._id, u.points, 1)}
+                            className="w-6 h-6 flex items-center justify-center bg-dark-100 dark:bg-dark-600 hover:bg-dark-200 dark:hover:bg-dark-500 rounded text-dark-600 dark:text-dark-300 font-bold"
+                          >
+                            +
+                          </button>
                         </div>
                       </td>
                       <td className="px-6 py-4 text-right">
@@ -426,25 +546,46 @@ const AdminDashboard = () => {
         <div className="space-y-4">
           <div className="card !p-0 overflow-hidden dark:border-dark-600">
             <div className="px-6 py-4 border-b border-dark-100 dark:border-dark-600">
-              <h2 className="font-bold text-dark-900 dark:text-white">Pending Supervisor Registrations</h2>
+              <h2 className="font-bold text-dark-900 dark:text-white">
+                Pending Supervisor Registrations
+              </h2>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead className="bg-dark-50 dark:bg-dark-800">
                   <tr>
-                    <th className="text-left px-6 py-3 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">Name</th>
-                    <th className="text-left px-6 py-3 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">Email</th>
-                    <th className="text-left px-6 py-3 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">Employee ID</th>
-                    <th className="text-left px-6 py-3 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">Registered Date</th>
-                    <th className="text-right px-6 py-3 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">Actions</th>
+                    <th className="text-left px-6 py-3 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">
+                      Name
+                    </th>
+                    <th className="text-left px-6 py-3 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">
+                      Email
+                    </th>
+                    <th className="text-left px-6 py-3 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">
+                      Employee ID
+                    </th>
+                    <th className="text-left px-6 py-3 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">
+                      Registered Date
+                    </th>
+                    <th className="text-right px-6 py-3 text-xs font-bold text-dark-500 dark:text-dark-400 uppercase">
+                      Actions
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-dark-100 dark:divide-dark-600">
-                  {pendingSupervisors.map(u => (
-                    <tr key={u._id} className="hover:bg-dark-50 dark:hover:bg-dark-800/30 transition-colors">
-                      <td className="px-6 py-4 text-sm font-semibold text-dark-900 dark:text-dark-100">{u.name}</td>
-                      <td className="px-6 py-4 text-sm text-dark-600 dark:text-dark-300">{u.email}</td>
-                      <td className="px-6 py-4 text-sm font-medium text-dark-700 dark:text-dark-300">{u.employeeId || '-'}</td>
+                  {pendingSupervisors.map((u) => (
+                    <tr
+                      key={u._id}
+                      className="hover:bg-dark-50 dark:hover:bg-dark-800/30 transition-colors"
+                    >
+                      <td className="px-6 py-4 text-sm font-semibold text-dark-900 dark:text-dark-100">
+                        {u.name}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-dark-600 dark:text-dark-300">
+                        {u.email}
+                      </td>
+                      <td className="px-6 py-4 text-sm font-medium text-dark-700 dark:text-dark-300">
+                        {u.employeeId || '-'}
+                      </td>
                       <td className="px-6 py-4 text-sm text-dark-500 dark:text-dark-400">
                         {new Date(u.createdAt).toLocaleDateString()}
                       </td>
@@ -468,7 +609,10 @@ const AdminDashboard = () => {
                   ))}
                   {pendingSupervisors.length === 0 && (
                     <tr>
-                      <td colSpan="5" className="px-6 py-12 text-center text-dark-400 dark:text-dark-500 text-sm">
+                      <td
+                        colSpan="5"
+                        className="px-6 py-12 text-center text-dark-400 dark:text-dark-500 text-sm"
+                      >
                         No pending supervisor registration approvals.
                       </td>
                     </tr>
@@ -488,46 +632,96 @@ const AdminDashboard = () => {
               <h2 className="font-bold text-white flex items-center gap-2">
                 <FaBus /> Assign Supervised Buses
               </h2>
-              <button onClick={() => setShowBusModal(false)} className="text-white/80 hover:text-white">
+              <button
+                onClick={() => setShowBusModal(false)}
+                className="text-white/80 hover:text-white"
+              >
                 <FaTimes />
               </button>
             </div>
             <div className="p-6">
-              <p className="text-sm font-medium text-dark-600 dark:text-dark-300 mb-4">Select the buses this supervisor will manage:</p>
+              <p className="text-sm font-medium text-dark-600 dark:text-dark-300 mb-4">
+                Select the buses this supervisor will manage:
+              </p>
               <div className="space-y-2 max-h-64 overflow-y-auto pr-2">
-                {buses.map(bus => {
+                {buses.map((bus) => {
                   const isSelected = selectedBuses.includes(bus._id);
                   return (
-                    <div key={bus._id} 
-                      onClick={() => setSelectedBuses(prev => isSelected ? prev.filter(id => id !== bus._id) : [...prev, bus._id])}
+                    <div
+                      key={bus._id}
+                      onClick={() =>
+                        setSelectedBuses((prev) =>
+                          isSelected ? prev.filter((id) => id !== bus._id) : [...prev, bus._id]
+                        )
+                      }
                       className={`flex items-center justify-between p-3 rounded-xl border-2 cursor-pointer transition-all ${
-                        isSelected 
-                          ? 'border-primary-500 bg-primary-50 dark:bg-primary-950/20' 
+                        isSelected
+                          ? 'border-primary-500 bg-primary-50 dark:bg-primary-950/20'
                           : 'border-dark-100 dark:border-dark-600 hover:border-dark-300 dark:hover:border-dark-500'
                       }`}
                     >
                       <div className="flex items-center gap-3">
-                        <FaBus className={isSelected ? 'text-primary-600 dark:text-primary-400' : 'text-dark-400 dark:text-dark-500'} />
+                        <FaBus
+                          className={
+                            isSelected
+                              ? 'text-primary-600 dark:text-primary-400'
+                              : 'text-dark-400 dark:text-dark-500'
+                          }
+                        />
                         <div>
-                          <p className={`font-bold ${isSelected ? 'text-primary-900 dark:text-primary-200' : 'text-dark-900 dark:text-dark-100'}`}>{bus.busName}</p>
-                          <p className="text-xs text-dark-500 dark:text-dark-400">{bus.route?.name}</p>
+                          <p
+                            className={`font-bold ${isSelected ? 'text-primary-900 dark:text-primary-200' : 'text-dark-900 dark:text-dark-100'}`}
+                          >
+                            {bus.busName}
+                          </p>
+                          <p className="text-xs text-dark-500 dark:text-dark-400">
+                            {bus.route?.name}
+                          </p>
                         </div>
                       </div>
-                      <div className={`w-5 h-5 rounded flex items-center justify-center border-2 ${
-                        isSelected ? 'bg-primary-500 border-primary-500' : 'border-dark-300 dark:border-dark-500'
-                      }`}>
-                        {isSelected && <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>}
+                      <div
+                        className={`w-5 h-5 rounded flex items-center justify-center border-2 ${
+                          isSelected
+                            ? 'bg-primary-500 border-primary-500'
+                            : 'border-dark-300 dark:border-dark-500'
+                        }`}
+                      >
+                        {isSelected && (
+                          <svg
+                            className="w-3 h-3 text-white"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={3}
+                              d="M5 13l4 4L19 7"
+                            />
+                          </svg>
+                        )}
                       </div>
                     </div>
                   );
                 })}
-                {buses.length === 0 && <p className="text-sm text-dark-400 dark:text-dark-500 text-center py-4">No buses currently active.</p>}
+                {buses.length === 0 && (
+                  <p className="text-sm text-dark-400 dark:text-dark-500 text-center py-4">
+                    No buses currently active.
+                  </p>
+                )}
               </div>
               <div className="flex justify-end gap-3 mt-6">
-                <button onClick={() => setShowBusModal(false)} className="px-4 py-2 rounded-xl text-sm font-semibold bg-dark-100 dark:bg-dark-600 text-dark-600 dark:text-dark-300 hover:bg-dark-200 dark:hover:bg-dark-500">
+                <button
+                  onClick={() => setShowBusModal(false)}
+                  className="px-4 py-2 rounded-xl text-sm font-semibold bg-dark-100 dark:bg-dark-600 text-dark-600 dark:text-dark-300 hover:bg-dark-200 dark:hover:bg-dark-500"
+                >
                   Cancel
                 </button>
-                <button onClick={handleAssignBuses} className="btn-primary flex items-center gap-2 text-sm !px-4 !py-2">
+                <button
+                  onClick={handleAssignBuses}
+                  className="btn-primary flex items-center gap-2 text-sm !px-4 !py-2"
+                >
                   <FaSave /> Save Assignments
                 </button>
               </div>

@@ -2,6 +2,8 @@ const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
 const cors = require('cors');
+const helmet = require('helmet');
+const mongoSanitize = require('express-mongo-sanitize');
 const rateLimit = require('express-rate-limit');
 const dotenv = require('dotenv');
 const connectDB = require('./config/db');
@@ -22,7 +24,7 @@ const io = new Server(server, {
       ? process.env.ALLOWED_ORIGINS.split(',')
       : ['http://localhost:5173'],
     credentials: true,
-  }
+  },
 });
 
 app.set('io', io);
@@ -35,13 +37,17 @@ io.on('connection', (socket) => {
 });
 
 // Middleware
-app.use(cors({
-  origin: process.env.ALLOWED_ORIGINS
-    ? process.env.ALLOWED_ORIGINS.split(',')
-    : ['http://localhost:5173'],
-  credentials: true,
-}));
+app.use(
+  cors({
+    origin: process.env.ALLOWED_ORIGINS
+      ? process.env.ALLOWED_ORIGINS.split(',')
+      : ['http://localhost:5173'],
+    credentials: true,
+  })
+);
+app.use(helmet());
 app.use(express.json());
+app.use(mongoSanitize());
 
 // Rate limiting for auth endpoints
 const authLimiter = rateLimit({
@@ -90,10 +96,7 @@ app.get('/api/cron/reset-points', async (req, res) => {
 
     const User = require('./models/User');
     console.log('Running daily point allocation job via Vercel Cron...');
-    const result = await User.updateMany(
-      { role: 'student' },
-      { $inc: { points: 2 } }
-    );
+    const result = await User.updateMany({ role: 'student' }, { $inc: { points: 2 } });
     console.log(`Successfully added 2 points to ${result.modifiedCount} students.`);
     res.status(200).json({ message: 'Points successfully allocated' });
   } catch (error) {

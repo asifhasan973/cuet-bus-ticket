@@ -3,18 +3,20 @@ import { FaUser } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getSeatLabel } from '../../utils/seat';
 
-const SeatGrid = ({ seats = [], onSelectSeat, selectedSeat, readOnly = false }) => {
+const SeatGrid = ({ seats = [], onSelectSeat, selectedSeat, readOnly = false, currentUserId }) => {
   const [hoveredSeat, setHoveredSeat] = useState(null);
-  
+
   // Arrange seats in bus layout: 2 seats | aisle | 3 seats per row
   const rows = [];
   for (let i = 0; i < seats.length; i += 5) {
     rows.push(seats.slice(i, i + 5));
   }
 
-
   const getSeatClass = (seat) => {
     if (seat.isBooked) {
+      if (currentUserId && seat.bookedBy === currentUserId) {
+        return 'bg-gradient-to-br from-warning-400 to-warning-500 text-white cursor-pointer shadow-md ring-2 ring-warning-300';
+      }
       return 'bg-gradient-to-br from-danger-400 to-danger-500 text-white cursor-not-allowed shadow-sm';
     }
     if (selectedSeat === seat.number) {
@@ -53,7 +55,7 @@ const SeatGrid = ({ seats = [], onSelectSeat, selectedSeat, readOnly = false }) 
 
       {/* Legend */}
       <motion.div
-        className="flex justify-center gap-6 mb-4"
+        className="flex flex-wrap justify-center gap-4 mb-4"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.2 }}
@@ -69,6 +71,10 @@ const SeatGrid = ({ seats = [], onSelectSeat, selectedSeat, readOnly = false }) 
         <div className="flex items-center gap-2">
           <div className="w-4 h-4 rounded bg-gradient-to-br from-primary-400 to-primary-600 shadow-sm" />
           <span className="text-xs text-dark-500 dark:text-dark-400 font-medium">Selected</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="w-4 h-4 rounded bg-gradient-to-br from-warning-400 to-warning-500 shadow-sm" />
+          <span className="text-xs text-dark-500 dark:text-dark-400 font-medium">My Booking</span>
         </div>
       </motion.div>
 
@@ -97,10 +103,10 @@ const SeatGrid = ({ seats = [], onSelectSeat, selectedSeat, readOnly = false }) 
                   whileHover={!seat.isBooked && !readOnly ? { scale: 1.12 } : {}}
                   whileTap={!seat.isBooked && !readOnly ? { scale: 0.95 } : {}}
                   aria-label={`Seat ${getSeatLabel(seat.number)}${
-                    seat.isBooked 
-                      ? ` (Booked${seat.studentName ? ` by ${seat.studentName}` : ''})` 
-                      : selectedSeat === seat.number 
-                        ? ' (Selected)' 
+                    seat.isBooked
+                      ? ` (Booked${seat.studentName ? ` by ${seat.studentName}` : ''})`
+                      : selectedSeat === seat.number
+                        ? ' (Selected)'
                         : ' (Available)'
                   }`}
                   className={`
@@ -146,10 +152,10 @@ const SeatGrid = ({ seats = [], onSelectSeat, selectedSeat, readOnly = false }) 
                   whileHover={!seat.isBooked && !readOnly ? { scale: 1.12 } : {}}
                   whileTap={!seat.isBooked && !readOnly ? { scale: 0.95 } : {}}
                   aria-label={`Seat ${getSeatLabel(seat.number)}${
-                    seat.isBooked 
-                      ? ` (Booked${seat.studentName ? ` by ${seat.studentName}` : ''})` 
-                      : selectedSeat === seat.number 
-                        ? ' (Selected)' 
+                    seat.isBooked
+                      ? ` (Booked${seat.studentName ? ` by ${seat.studentName}` : ''})`
+                      : selectedSeat === seat.number
+                        ? ' (Selected)'
                         : ' (Available)'
                   }`}
                   className={`
@@ -189,9 +195,15 @@ const SeatGrid = ({ seats = [], onSelectSeat, selectedSeat, readOnly = false }) 
           >
             <div className="inline-flex items-center gap-2 bg-dark-800 dark:bg-dark-900 border dark:border-dark-600 text-white px-4 py-2 rounded-lg text-sm shadow-md">
               <FaUser className="text-xs" />
-              <span>{hoveredSeat.studentName || 'Student'}</span>
-              {hoveredSeat.studentId && (
-                <span className="text-dark-300 dark:text-dark-400">| ID: {hoveredSeat.studentId}</span>
+              <span>
+                {currentUserId && hoveredSeat.bookedBy === currentUserId
+                  ? 'Your Booking'
+                  : hoveredSeat.studentName || 'Student'}
+              </span>
+              {hoveredSeat.studentId && hoveredSeat.bookedBy !== currentUserId && (
+                <span className="text-dark-300 dark:text-dark-400">
+                  | ID: {hoveredSeat.studentId}
+                </span>
               )}
             </div>
           </motion.div>

@@ -11,7 +11,10 @@ const {
 } = require('../utils/emailDomain');
 
 const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '30d' });
+  // 7-day expiry balances UX with security. In production, implement
+  // short-lived access tokens (15m) + refresh token rotation for
+  // stronger session management.
+  return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '7d' });
 };
 
 // Lazy-load firebase admin to avoid crashes if not configured
@@ -22,7 +25,7 @@ const getFirebaseAdmin = () => {
       const admin = require('firebase-admin');
       if (!admin.apps.length) {
         admin.initializeApp({
-          projectId: 'cuet-bus-ticket'
+          projectId: 'cuet-bus-ticket',
         });
       }
       firebaseAdmin = admin;
@@ -36,137 +39,147 @@ const getFirebaseAdmin = () => {
 // @route   POST /api/auth/register
 // @desc    Register a new user
 // @access  Public
-router.post('/register', [
-  body('name', 'Name is required').notEmpty(),
-  body('email', 'Please include a valid email').isEmail(),
-  body('password', 'Password must be at least 6 characters').isLength({ min: 6 }),
-  body('role', 'Role must be student or supervisor').isIn(['student', 'supervisor']),
-], async (req, res) => {
-  try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
+router.post(
+  '/register',
+  [
+    body('name', 'Name is required').notEmpty(),
+    body('email', 'Please include a valid email').isEmail(),
+    body('password', 'Password must be at least 6 characters').isLength({ min: 6 }),
+    body('role', 'Role must be student or supervisor').isIn(['student', 'supervisor']),
+  ],
+  async (req, res) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
 
-    const { name, email, password, role, studentId, employeeId, department } = req.body;
-    const normalizedEmail = normalizeEmail(email);
+      const { name, email, password, role, studentId, employeeId, department } = req.body;
+      const normalizedEmail = normalizeEmail(email);
 
-    if (!isAllowedInstitutionEmail(normalizedEmail)) {
-      return res.status(403).json({ message: ALLOWED_EMAIL_MESSAGE });
-    }
+      if (!isAllowedInstitutionEmail(normalizedEmail)) {
+        return res.status(403).json({ message: ALLOWED_EMAIL_MESSAGE });
+      }
 
-    // Check if user already exists
-    let user = await User.findOne({ email: normalizedEmail });
-    if (user) {
-      return res.status(400).json({ message: 'User already exists with this email' });
-    }
+      // Check if user already exists
+      let user = await User.findOne({ email: normalizedEmail });
+      if (user) {
+        return res.status(400).json({ message: 'User already exists with this email' });
+      }
 
-    // Validate role-specific fields
-    if (role === 'student' && !studentId) {
-      return res.status(400).json({ message: 'Student ID is required for students' });
-    }
-    if (role === 'supervisor' && !employeeId) {
-      return res.status(400).json({ message: 'Employee ID is required for supervisors' });
-    }
+      // Validate role-specific fields
+      if (role === 'student' && !studentId) {
+        return res.status(400).json({ message: 'Student ID is required for students' });
+      }
+      if (role === 'supervisor' && !employeeId) {
+        return res.status(400).json({ message: 'Employee ID is required for supervisors' });
+      }
 
-    const isApproved = role !== 'supervisor';
-    user = new User({
-      name,
-      email: normalizedEmail,
-      password,
-      role,
-      studentId: role === 'student' ? studentId : undefined,
-      employeeId: role === 'supervisor' ? employeeId : undefined,
-      department: role === 'student' ? department : undefined,
-      points: role === 'student' ? 5 : 0,
-      isApproved,
-    });
-
-    await user.save();
-
-    if (!isApproved) {
-      return res.status(201).json({
-        message: 'Registration successful! Your account is pending administrator approval.',
-        pendingApproval: true,
+      const isApproved = role !== 'supervisor';
+      user = new User({
+        name,
+        email: normalizedEmail,
+        password,
+        role,
+        studentId: role === 'student' ? studentId : undefined,
+        employeeId: role === 'supervisor' ? employeeId : undefined,
+        department: role === 'student' ? department : undefined,
+        points: role === 'student' ? 5 : 0,
+        isApproved,
       });
+
+      await user.save();
+
+      if (!isApproved) {
+        return res.status(201).json({
+          message: 'Registration successful! Your account is pending administrator approval.',
+          pendingApproval: true,
+        });
+      }
+
+      const token = generateToken(user._id);
+
+      res.status(201).json({
+        token,
+        user: {
+          _id: user._id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+          studentId: user.studentId,
+          employeeId: user.employeeId,
+          department: user.department,
+          points: user.points,
+        },
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Server error' });
     }
-
-    const token = generateToken(user._id);
-
-    res.status(201).json({
-      token,
-      user: {
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        studentId: user.studentId,
-        employeeId: user.employeeId,
-        department: user.department,
-        points: user.points,
-      },
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Server error' });
   }
-});
+);
 
 // @route   POST /api/auth/login
 // @desc    Login user
 // @access  Public
-router.post('/login', [
-  body('email', 'Please include a valid email').isEmail(),
-  body('password', 'Password is required').notEmpty(),
-], async (req, res) => {
-  try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+router.post(
+  '/login',
+  [
+    body('email', 'Please include a valid email').isEmail(),
+    body('password', 'Password is required').notEmpty(),
+  ],
+  async (req, res) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
+
+      const { email, password } = req.body;
+      const normalizedEmail = normalizeEmail(email);
+
+      if (!isAllowedInstitutionEmail(normalizedEmail)) {
+        return res.status(403).json({ message: ALLOWED_EMAIL_MESSAGE });
+      }
+
+      const user = await User.findOne({ email: normalizedEmail }).select('+password');
+      if (!user) {
+        return res.status(400).json({ message: 'Invalid credentials' });
+      }
+
+      if (user.role === 'supervisor' && !user.isApproved) {
+        return res
+          .status(403)
+          .json({ message: 'Your supervisor account is pending admin approval.' });
+      }
+
+      const isMatch = await user.matchPassword(password);
+      if (!isMatch) {
+        return res.status(400).json({ message: 'Invalid credentials' });
+      }
+
+      const token = generateToken(user._id);
+
+      res.json({
+        token,
+        user: {
+          _id: user._id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+          studentId: user.studentId,
+          employeeId: user.employeeId,
+          department: user.department,
+          points: user.points,
+          bookedSeat: user.bookedSeat,
+        },
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Server error' });
     }
-
-    const { email, password } = req.body;
-    const normalizedEmail = normalizeEmail(email);
-
-    if (!isAllowedInstitutionEmail(normalizedEmail)) {
-      return res.status(403).json({ message: ALLOWED_EMAIL_MESSAGE });
-    }
-
-    const user = await User.findOne({ email: normalizedEmail }).select('+password');
-    if (!user) {
-      return res.status(400).json({ message: 'Invalid credentials' });
-    }
-
-    if (user.role === 'supervisor' && !user.isApproved) {
-      return res.status(403).json({ message: 'Your supervisor account is pending admin approval.' });
-    }
-
-    const isMatch = await user.matchPassword(password);
-    if (!isMatch) {
-      return res.status(400).json({ message: 'Invalid credentials' });
-    }
-
-    const token = generateToken(user._id);
-
-    res.json({
-      token,
-      user: {
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        studentId: user.studentId,
-        employeeId: user.employeeId,
-        department: user.department,
-        points: user.points,
-        bookedSeat: user.bookedSeat,
-      },
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Server error' });
   }
-});
+);
 
 // @route   GET /api/auth/me
 // @desc    Get current user
@@ -206,7 +219,7 @@ router.put('/profile', auth, async (req, res) => {
 router.post('/google', async (req, res) => {
   try {
     const { credential, role } = req.body;
-    
+
     const admin = getFirebaseAdmin();
     if (!admin) {
       return res.status(500).json({ message: 'Firebase not configured on server' });
@@ -224,20 +237,23 @@ router.post('/google', async (req, res) => {
     if (!isAllowedInstitutionEmail(normalizedEmail)) {
       return res.status(403).json({ message: ALLOWED_EMAIL_MESSAGE });
     }
-    
+
     let user = await User.findOne({ email: normalizedEmail });
-    
+
     if (!user) {
       // Auto-register
       const assignedRole = ['student', 'supervisor'].includes(role) ? role : 'student';
       const studentId = assignedRole === 'student' ? normalizedEmail.split('@')[0] : undefined;
-      const employeeId = assignedRole === 'supervisor' ? 'EMP-' + Date.now().toString().slice(-4) : undefined;
+      const employeeId =
+        assignedRole === 'supervisor' ? 'EMP-' + Date.now().toString().slice(-4) : undefined;
       const isApproved = assignedRole !== 'supervisor';
-      
+
       user = new User({
         name: name || normalizedEmail.split('@')[0],
         email: normalizedEmail,
-        password: uid, // Use Firebase UID as random password
+        // Google OAuth users never use password login — generate a
+        // cryptographically random placeholder that cannot be guessed.
+        password: require('crypto').randomBytes(32).toString('hex'),
         role: assignedRole,
         studentId,
         employeeId,
@@ -248,11 +264,13 @@ router.post('/google', async (req, res) => {
     }
 
     if (user.role === 'supervisor' && !user.isApproved) {
-      return res.status(403).json({ message: 'Your supervisor account is pending admin approval.' });
+      return res
+        .status(403)
+        .json({ message: 'Your supervisor account is pending admin approval.' });
     }
-    
+
     const token = generateToken(user._id);
-    
+
     res.json({
       token,
       user: {

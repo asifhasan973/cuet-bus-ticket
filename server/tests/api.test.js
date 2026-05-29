@@ -20,6 +20,7 @@ const mockUserFindOne = jest.fn();
 const mockUserSave = jest.fn();
 const mockUserFindById = jest.fn().mockResolvedValue(mockUserInstance);
 const mockUserFindByIdAndUpdate = jest.fn().mockResolvedValue(mockUserInstance);
+const mockUserFindOneAndUpdate = jest.fn().mockResolvedValue(mockUserInstance);
 
 jest.mock('../models/User', () => {
   const Model = jest.fn().mockImplementation(() => mockUserInstance);
@@ -27,14 +28,33 @@ jest.mock('../models/User', () => {
   Model.findOne = (...args) => mockUserFindOne(...args);
   Model.findById = (...args) => mockUserFindById(...args);
   Model.findByIdAndUpdate = (...args) => mockUserFindByIdAndUpdate(...args);
+  Model.findOneAndUpdate = (...args) => mockUserFindOneAndUpdate(...args);
   return Model;
 });
 
 // Mock the Booking model
 const mockBookingFindById = jest.fn();
+const mockBookingFindOne = jest.fn();
+const mockBookingSave = jest.fn();
+const mockBookingFindOneAndUpdate = jest.fn();
 jest.mock('../models/Booking', () => {
-  const Model = jest.fn();
+  const Model = jest.fn().mockImplementation(() => ({
+    save: (...args) => mockBookingSave(...args),
+    populate: jest.fn().mockResolvedValue({
+      bus: { busName: 'Halda', route: { name: 'CUETRoute' } },
+    }),
+  }));
   Model.findById = (...args) => mockBookingFindById(...args);
+  Model.findOne = (...args) => mockBookingFindOne(...args);
+  Model.findOneAndUpdate = (...args) => mockBookingFindOneAndUpdate(...args);
+  return Model;
+});
+
+// Mock the Bus model
+const mockBusFindById = jest.fn();
+jest.mock('../models/Bus', () => {
+  const Model = jest.fn();
+  Model.findById = (...args) => mockBusFindById(...args);
   return Model;
 });
 
@@ -127,23 +147,23 @@ describe('CUETGo API Tests', () => {
       mockBookingFindById.mockResolvedValue(null);
 
       const res = await request(app)
-        .delete('/api/bookings/mock_booking_id')
+        .delete('/api/bookings/507f1f77bcf86cd799439011')
         .set('Authorization', `Bearer ${token}`);
 
       expect(res.statusCode).toEqual(404);
       expect(res.body.message).toEqual('Booking not found');
     });
 
-    it('should return 403 if student attempts to cancel another student\'s booking', async () => {
+    it("should return 403 if student attempts to cancel another student's booking", async () => {
       const mockBooking = {
-        _id: 'mock_booking_id',
+        _id: '507f1f77bcf86cd799439011',
         student: 'some_other_user_id',
         save: jest.fn(),
       };
       mockBookingFindById.mockResolvedValue(mockBooking);
 
       const res = await request(app)
-        .delete('/api/bookings/mock_booking_id')
+        .delete('/api/bookings/507f1f77bcf86cd799439011')
         .set('Authorization', `Bearer ${token}`);
 
       expect(res.statusCode).toEqual(403);
@@ -156,7 +176,7 @@ describe('CUETGo API Tests', () => {
       const yesterdayStr = yesterday.toISOString().split('T')[0];
 
       const mockBooking = {
-        _id: 'mock_booking_id',
+        _id: '507f1f77bcf86cd799439011',
         student: 'mock_user_id',
         shift: 1, // Morning shift
         travelDate: yesterdayStr,
@@ -166,7 +186,7 @@ describe('CUETGo API Tests', () => {
       mockBookingFindById.mockResolvedValue(mockBooking);
 
       const res = await request(app)
-        .delete('/api/bookings/mock_booking_id')
+        .delete('/api/bookings/507f1f77bcf86cd799439011')
         .set('Authorization', `Bearer ${token}`);
 
       expect(res.statusCode).toEqual(400);
@@ -179,7 +199,7 @@ describe('CUETGo API Tests', () => {
       const tomorrowStr = tomorrow.toISOString().split('T')[0];
 
       const mockBooking = {
-        _id: 'mock_booking_id',
+        _id: '507f1f77bcf86cd799439011',
         student: 'mock_user_id',
         shift: 4, // Night shift
         travelDate: tomorrowStr,
@@ -187,15 +207,16 @@ describe('CUETGo API Tests', () => {
         save: jest.fn().mockResolvedValue(true),
       };
       mockBookingFindById.mockResolvedValue(mockBooking);
+      mockBookingFindOneAndUpdate.mockResolvedValue(mockBooking);
 
       const res = await request(app)
-        .delete('/api/bookings/mock_booking_id')
+        .delete('/api/bookings/507f1f77bcf86cd799439011')
         .set('Authorization', `Bearer ${token}`);
 
       expect(res.statusCode).toEqual(200);
       expect(res.body.message).toEqual('Booking cancelled successfully');
       expect(mockUserFindByIdAndUpdate).toHaveBeenCalledWith('mock_user_id', {
-        $inc: { points: 1 }
+        $inc: { points: 1 },
       });
     });
   });
@@ -265,6 +286,102 @@ describe('CUETGo API Tests', () => {
 
       expect(res.statusCode).toEqual(403);
       expect(res.body.message).toContain('pending admin approval');
+    });
+  });
+
+  describe('POST /api/bookings (Seat booking constraints)', () => {
+    const jwt = require('jsonwebtoken');
+    let token;
+
+    beforeAll(() => {
+      process.env.JWT_SECRET = 'test_jwt_secret';
+      token = jwt.sign({ id: 'mock_user_id' }, process.env.JWT_SECRET);
+    });
+
+    it('should return 401 if user is not authenticated', async () => {
+      const res = await request(app)
+        .post('/api/bookings')
+        .send({
+          busId: '507f1f77bcf86cd799439011',
+          seatNumber: 5,
+          travelDate: '2026-06-01',
+          shift: 1,
+        });
+
+      expect(res.statusCode).toEqual(401);
+    });
+
+    it('should return 400 if user does not have enough points', async () => {
+      mockUserInstance.points = 0; // Set points to 0
+      mockBusFindById.mockResolvedValue({ _id: 'mock_bus_id', status: 'active', totalSeats: 50 });
+      mockUserFindOneAndUpdate.mockResolvedValue(null); // Simulate atomic check fail
+
+      const res = await request(app)
+        .post('/api/bookings')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          busId: '507f1f77bcf86cd799439011',
+          seatNumber: 5,
+          travelDate: '2026-06-01',
+          shift: 1,
+        });
+
+      expect(res.statusCode).toEqual(400);
+      expect(res.body.message).toContain('Insufficient points');
+    });
+
+    it('should return 400 if seat is already booked', async () => {
+      mockUserInstance.points = 5; // Reset points
+      mockUserFindOneAndUpdate.mockResolvedValue(mockUserInstance); // User has points
+      mockBusFindById.mockResolvedValue({ _id: 'mock_bus_id', status: 'active', totalSeats: 50 });
+      
+      // Dynamic Mocking for findOne:
+      mockBookingFindOne.mockImplementation((query) => {
+        if (query.student) return null; // First call: check student booking (available)
+        if (query.bus) return { _id: 'some_booking_id' }; // Second call: check seat booking (taken)
+        return null;
+      });
+
+      const res = await request(app)
+        .post('/api/bookings')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          busId: '507f1f77bcf86cd799439011',
+          seatNumber: 5,
+          travelDate: '2026-06-01',
+          shift: 1,
+        });
+
+      expect(res.statusCode).toEqual(400);
+      expect(res.body.message).toContain('already booked');
+    });
+
+    it('should return 400 with duplicate message when unique index key constraint is violated', async () => {
+      mockUserInstance.points = 5; // Reset points
+      mockUserFindOneAndUpdate.mockResolvedValue(mockUserInstance);
+      mockBusFindById.mockResolvedValue({ _id: 'mock_bus_id', status: 'active', totalSeats: 50 });
+      
+      // Both findOne checks pass
+      mockBookingFindOne.mockResolvedValue(null);
+      
+      // Simulate MongoDB unique key error (code 11000)
+      const duplicateError = new Error('Duplicate key');
+      duplicateError.code = 11000;
+      duplicateError.keyPattern = { bus: 1, travelDate: 1, shift: 1, seatNumber: 1 };
+      mockBookingSave.mockRejectedValue(duplicateError);
+
+      const res = await request(app)
+        .post('/api/bookings')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          busId: '507f1f77bcf86cd799439011',
+          seatNumber: 5,
+          travelDate: '2026-06-01',
+          shift: 1,
+        });
+
+      expect(res.statusCode).toEqual(400);
+      expect(res.body.message).toContain('already been booked');
     });
   });
 });

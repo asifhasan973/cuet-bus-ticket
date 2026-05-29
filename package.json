@@ -2,14 +2,17 @@
   "name": "cuet-bus-ticket",
   "version": "1.0.0",
   "description": "CUET Bus Seat Booking & Management System",
+  "license": "MIT",
   "scripts": {
     "server": "cd server && npm run dev",
     "client": "cd client && npm run dev",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "install-all": "npm install && cd server && npm install && cd ../client && npm install",
-    "seed": "cd server && node seed.js"
+    "seed": "cd server && node seed.js",
+    "format": "prettier --write \"**/*.{js,jsx,json,css,md}\" --ignore-path .prettierignore"
   },
   "devDependencies": {
-    "concurrently": "^8.2.2"
+    "concurrently": "^8.2.2",
+    "prettier": "^3.8.3"
   }
 }

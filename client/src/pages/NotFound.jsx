@@ -24,10 +24,7 @@ const NotFound = () => {
           transition={{ duration: 0.5, delay: 0.2 }}
         >
           <div className="w-16 h-16 bg-primary-50 dark:bg-primary-950/30 rounded-full flex items-center justify-center mx-auto mb-4">
-            <motion.div
-              animate={{ y: [-3, 3, -3] }}
-              transition={{ duration: 2, repeat: Infinity }}
-            >
+            <motion.div animate={{ y: [-3, 3, -3] }} transition={{ duration: 2, repeat: Infinity }}>
               <FaBus className="text-2xl text-primary-500" />
             </motion.div>
           </div>

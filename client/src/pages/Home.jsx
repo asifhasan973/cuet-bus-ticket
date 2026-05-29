@@ -1,16 +1,27 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FaBus, FaTicketAlt, FaRoute, FaShieldAlt, FaClock, FaMobileAlt, FaMapMarkerAlt } from 'react-icons/fa';
+import {
+  FaBus,
+  FaTicketAlt,
+  FaRoute,
+  FaShieldAlt,
+  FaClock,
+  FaMobileAlt,
+  FaMapMarkerAlt,
+} from 'react-icons/fa';
 import { HiArrowRight } from 'react-icons/hi';
 import { useAuth } from '../context/AuthContext';
 import { SHIFT_SCHEDULE } from '../utils/shifts';
 import API from '../utils/api';
 import { motion } from 'framer-motion';
 import {
-  FadeIn, StaggerContainer, StaggerItem, AnimatedCounter, ScaleOnHover, FloatingElement
+  FadeIn,
+  StaggerContainer,
+  StaggerItem,
+  AnimatedCounter,
+  ScaleOnHover,
+  FloatingElement,
 } from '../components/ui/AnimatedComponents';
-
-
 
 const Home = () => {
   const { user } = useAuth();
@@ -108,7 +119,7 @@ const Home = () => {
         <FloatingElement className="absolute top-40 right-[15%] opacity-5" duration={7}>
           <FaTicketAlt className="text-white text-8xl" />
         </FloatingElement>
-        
+
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28 lg:py-36">
           <div className="text-center max-w-3xl mx-auto">
             <FadeIn delay={0.1}>
@@ -118,10 +129,12 @@ const Home = () => {
                   animate={{ scale: [1, 1.5, 1], opacity: [1, 0.5, 1] }}
                   transition={{ duration: 2, repeat: Infinity }}
                 />
-                <span className="text-sm text-white/80 font-medium">CUET University Bus Service</span>
+                <span className="text-sm text-white/80 font-medium">
+                  CUET University Bus Service
+                </span>
               </div>
             </FadeIn>
-            
+
             <FadeIn delay={0.2}>
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white leading-tight tracking-tight">
                 Seamless Transit
@@ -135,32 +148,45 @@ const Home = () => {
                 </motion.span>
               </h1>
             </FadeIn>
-            
+
             <FadeIn delay={0.35}>
               <p className="mt-6 text-lg text-white/60 max-w-2xl mx-auto leading-relaxed">
-                14 buses, 4 daily shifts, seamless booking. Choose your date, shift, bus, and seat — travel hassle-free.
+                14 buses, 4 daily shifts, seamless booking. Choose your date, shift, bus, and seat —
+                travel hassle-free.
               </p>
             </FadeIn>
 
             <FadeIn delay={0.5}>
               <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
                 {user?.role === 'student' ? (
-                  <Link to="/student/booking" className="group bg-white text-dark-900 px-8 py-3.5 rounded-xl font-bold text-sm hover:bg-dark-50 transition-all shadow-lg hover:shadow-xl flex items-center gap-2">
+                  <Link
+                    to="/student/booking"
+                    className="group bg-white text-dark-900 px-8 py-3.5 rounded-xl font-bold text-sm hover:bg-dark-50 transition-all shadow-lg hover:shadow-xl flex items-center gap-2"
+                  >
                     Book Seat Now
                     <HiArrowRight className="group-hover:translate-x-1 transition-transform" />
                   </Link>
                 ) : user ? (
-                  <Link to={`/${user.role}/dashboard`} className="group bg-white text-dark-900 px-8 py-3.5 rounded-xl font-bold text-sm hover:bg-dark-50 transition-all shadow-lg hover:shadow-xl flex items-center gap-2">
+                  <Link
+                    to={`/${user.role}/dashboard`}
+                    className="group bg-white text-dark-900 px-8 py-3.5 rounded-xl font-bold text-sm hover:bg-dark-50 transition-all shadow-lg hover:shadow-xl flex items-center gap-2"
+                  >
                     Go to Dashboard
                     <HiArrowRight className="group-hover:translate-x-1 transition-transform" />
                   </Link>
                 ) : (
-                  <Link to="/student/register" className="group bg-white text-dark-900 px-8 py-3.5 rounded-xl font-bold text-sm hover:bg-dark-50 transition-all shadow-lg hover:shadow-xl flex items-center gap-2">
+                  <Link
+                    to="/student/register"
+                    className="group bg-white text-dark-900 px-8 py-3.5 rounded-xl font-bold text-sm hover:bg-dark-50 transition-all shadow-lg hover:shadow-xl flex items-center gap-2"
+                  >
                     Get Started
                     <HiArrowRight className="group-hover:translate-x-1 transition-transform" />
                   </Link>
                 )}
-                <Link to="/routes" className="text-white/80 hover:text-white border border-white/20 px-8 py-3.5 rounded-xl font-semibold text-sm hover:bg-white/10 transition-all">
+                <Link
+                  to="/routes"
+                  className="text-white/80 hover:text-white border border-white/20 px-8 py-3.5 rounded-xl font-semibold text-sm hover:bg-white/10 transition-all"
+                >
                   View Routes
                 </Link>
               </div>
@@ -193,7 +219,10 @@ const Home = () => {
 
         <div className="absolute bottom-0 left-0 right-0">
           <svg viewBox="0 0 1440 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M0,40 C360,80 720,0 1080,40 C1260,60 1380,60 1440,40 L1440,80 L0,80 Z" className="fill-dark-50 dark:fill-dark-800" />
+            <path
+              d="M0,40 C360,80 720,0 1080,40 C1260,60 1380,60 1440,40 L1440,80 L0,80 Z"
+              className="fill-dark-50 dark:fill-dark-800"
+            />
           </svg>
         </div>
       </section>
@@ -213,7 +242,7 @@ const Home = () => {
           </FadeIn>
 
           <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {SHIFT_SCHEDULE.map(s => (
+            {SHIFT_SCHEDULE.map((s) => (
               <StaggerItem key={s.shift}>
                 <ScaleOnHover>
                   <div className="card !p-0 overflow-hidden">
@@ -229,15 +258,21 @@ const Home = () => {
                       </div>
                       <div className="flex items-center justify-between text-sm">
                         <span className="text-dark-500 dark:text-dark-400">Direction</span>
-                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                          s.dir === 'CUET-bound' ? 'bg-accent-100 text-accent-700' : 'bg-teal-100 text-teal-700'
-                        }`}>
+                        <span
+                          className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                            s.dir === 'CUET-bound'
+                              ? 'bg-accent-100 text-accent-700'
+                              : 'bg-teal-100 text-teal-700'
+                          }`}
+                        >
                           {s.dir}
                         </span>
                       </div>
                       <div className="flex items-center justify-between text-sm">
                         <span className="text-dark-500 dark:text-dark-400">Days</span>
-                        <span className="font-semibold text-dark-700 dark:text-dark-200">{s.note}</span>
+                        <span className="font-semibold text-dark-700 dark:text-dark-200">
+                          {s.note}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -248,7 +283,7 @@ const Home = () => {
 
           <FadeIn delay={0.4}>
             <p className="text-center text-sm text-dark-400 dark:text-dark-500 mt-4">
-             On weekends (Fri-Sat): Only Shifts 2 & 4 operate. Timings adjusted by ±30 min.
+              On weekends (Fri-Sat): Only Shifts 2 & 4 operate. Timings adjusted by ±30 min.
             </p>
           </FadeIn>
         </div>
@@ -280,8 +315,12 @@ const Home = () => {
                     >
                       <feature.icon className="text-white text-lg" />
                     </motion.div>
-                    <h3 className="font-bold text-dark-900 dark:text-white text-lg">{feature.title}</h3>
-                    <p className="text-dark-500 dark:text-dark-300 text-sm mt-2 leading-relaxed">{feature.desc}</p>
+                    <h3 className="font-bold text-dark-900 dark:text-white text-lg">
+                      {feature.title}
+                    </h3>
+                    <p className="text-dark-500 dark:text-dark-300 text-sm mt-2 leading-relaxed">
+                      {feature.desc}
+                    </p>
                   </div>
                 </ScaleOnHover>
               </StaggerItem>
@@ -314,12 +353,16 @@ const Home = () => {
             </div>
           ) : buses.length > 0 ? (
             <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {buses.map(bus => (
+              {buses.map((bus) => (
                 <StaggerItem key={bus._id}>
-                  <motion.div 
+                  <motion.div
                     className="card !p-0 overflow-hidden cursor-pointer group bg-white dark:bg-dark-700 border border-dark-100 dark:border-dark-600"
                     onClick={() => handleBusClick(bus._id)}
-                    whileHover={{ y: -4, boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1)' }}
+                    whileHover={{
+                      y: -4,
+                      boxShadow:
+                        '0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1)',
+                    }}
                     transition={{ type: 'spring', stiffness: 300, damping: 20 }}
                   >
                     <div className="bg-gradient-to-r from-primary-600 to-primary-700 px-5 py-3 flex items-center justify-between">
@@ -327,20 +370,28 @@ const Home = () => {
                         <FaBus className="text-white" />
                         <h3 className="font-bold text-white">{bus.busName}</h3>
                       </div>
-                      <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${
-                        bus.busType === 'flyover' ? 'bg-white/30 text-white' : 'bg-white/20 text-white/90'
-                      }`}>
+                      <span
+                        className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${
+                          bus.busType === 'flyover'
+                            ? 'bg-white/30 text-white'
+                            : 'bg-white/20 text-white/90'
+                        }`}
+                      >
                         {bus.busType}
                       </span>
                     </div>
                     <div className="p-4">
-                      <p className="text-xs text-dark-500 dark:text-dark-400 mb-3 line-clamp-2">{bus.route?.name}</p>
+                      <p className="text-xs text-dark-500 dark:text-dark-400 mb-3 line-clamp-2">
+                        {bus.route?.name}
+                      </p>
                       <div className="flex items-center justify-between text-xs text-dark-400 dark:text-dark-500">
                         <span className="flex items-center gap-1">
                           <FaMapMarkerAlt className="text-[10px]" />
                           {bus.route?.stops?.length} stops
                         </span>
-                        <span className="font-bold text-accent-600 dark:text-accent-400">{bus.totalSeats} seats</span>
+                        <span className="font-bold text-accent-600 dark:text-accent-400">
+                          {bus.totalSeats} seats
+                        </span>
                       </div>
                     </div>
                     <div className="px-4 py-3 border-t border-dark-100 dark:border-dark-600 bg-dark-50/50 dark:bg-dark-800/30 group-hover:bg-primary-50 dark:group-hover:bg-primary-950/20 transition-colors flex items-center justify-between">
@@ -356,13 +407,18 @@ const Home = () => {
           ) : (
             <div className="text-center py-10 bg-white dark:bg-dark-700 rounded-2xl shadow-sm border border-dark-100 dark:border-dark-600">
               <FaBus className="text-4xl text-dark-300 dark:text-dark-600 mx-auto mb-3" />
-              <p className="text-dark-500 dark:text-dark-400 font-medium">No buses available at the moment</p>
+              <p className="text-dark-500 dark:text-dark-400 font-medium">
+                No buses available at the moment
+              </p>
             </div>
           )}
-          
+
           <FadeIn delay={0.3}>
             <div className="text-center mt-10">
-              <Link to="/routes" className="inline-flex items-center gap-2 bg-white dark:bg-dark-700 text-dark-900 dark:text-white border border-dark-200 dark:border-dark-600 px-6 py-3 rounded-xl font-bold text-sm hover:bg-dark-50 dark:hover:bg-dark-600 transition-all shadow-sm">
+              <Link
+                to="/routes"
+                className="inline-flex items-center gap-2 bg-white dark:bg-dark-700 text-dark-900 dark:text-white border border-dark-200 dark:border-dark-600 px-6 py-3 rounded-xl font-bold text-sm hover:bg-dark-50 dark:hover:bg-dark-600 transition-all shadow-sm"
+              >
                 View All Routes
                 <HiArrowRight />
               </Link>
@@ -390,28 +446,41 @@ const Home = () => {
                 animate={{ scale: [1.2, 1, 1.2], rotate: [0, -90, 0] }}
                 transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
               />
-              
+
               <h2 className="text-3xl font-extrabold text-white relative">
                 Ready to Book Your Seat?
               </h2>
               <p className="text-white/70 mt-4 max-w-lg mx-auto relative">
-                Join hundreds of CUET students who already use our platform for hassle-free commuting.
+                Join hundreds of CUET students who already use our platform for hassle-free
+                commuting.
               </p>
               <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4 relative">
                 {user?.role === 'student' ? (
-                  <Link to="/student/booking" className="bg-white text-primary-700 px-8 py-3.5 rounded-xl font-bold text-sm hover:bg-dark-50 transition-all shadow-lg">
+                  <Link
+                    to="/student/booking"
+                    className="bg-white text-primary-700 px-8 py-3.5 rounded-xl font-bold text-sm hover:bg-dark-50 transition-all shadow-lg"
+                  >
                     Book Your Seat
                   </Link>
                 ) : user ? (
-                  <Link to={`/${user.role}/dashboard`} className="bg-white text-primary-700 px-8 py-3.5 rounded-xl font-bold text-sm hover:bg-dark-50 transition-all shadow-lg">
+                  <Link
+                    to={`/${user.role}/dashboard`}
+                    className="bg-white text-primary-700 px-8 py-3.5 rounded-xl font-bold text-sm hover:bg-dark-50 transition-all shadow-lg"
+                  >
                     Go to Dashboard
                   </Link>
                 ) : (
                   <>
-                    <Link to="/student/register" className="bg-white text-primary-700 px-8 py-3.5 rounded-xl font-bold text-sm hover:bg-dark-50 transition-all shadow-lg">
+                    <Link
+                      to="/student/register"
+                      className="bg-white text-primary-700 px-8 py-3.5 rounded-xl font-bold text-sm hover:bg-dark-50 transition-all shadow-lg"
+                    >
                       Register as Student
                     </Link>
-                    <Link to="/supervisor/register" className="text-white border border-white/30 px-8 py-3.5 rounded-xl font-semibold text-sm hover:bg-white/10 transition-all">
+                    <Link
+                      to="/supervisor/register"
+                      className="text-white border border-white/30 px-8 py-3.5 rounded-xl font-semibold text-sm hover:bg-white/10 transition-all"
+                    >
                       Register as Supervisor
                     </Link>
                   </>

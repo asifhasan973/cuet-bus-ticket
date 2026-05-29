@@ -1,6 +1,6 @@
 /**
  * CUET Bus Shift Configuration
- * 
+ *
  * Shift 1 — Morning (CUET-bound, weekdays only)
  * Shift 2 — Afternoon (Outbound, special route to Kaptai Rastar Matha)
  * Shift 3 — Evening (Outbound, normal routes, weekdays only)
@@ -107,11 +107,11 @@ function getAvailableShifts(dateStr) {
 function getShiftInfo(shiftNumber, dateStr) {
   const weekend = isWeekend(dateStr);
   const shifts = weekend ? WEEKEND_SHIFTS : WEEKDAY_SHIFTS;
-  
+
   if (!shifts[shiftNumber]) {
     return null;
   }
-  
+
   return {
     shift: shiftNumber,
     ...shifts[shiftNumber],
@@ -125,7 +125,7 @@ function getShiftInfo(shiftNumber, dateStr) {
  */
 function getAllShiftsForDate(dateStr) {
   const shiftNumbers = getAvailableShifts(dateStr);
-  return shiftNumbers.map(num => getShiftInfo(num, dateStr));
+  return shiftNumbers.map((num) => getShiftInfo(num, dateStr));
 }
 
 /**

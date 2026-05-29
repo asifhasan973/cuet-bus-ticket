@@ -5,6 +5,7 @@ const Booking = require('../models/Booking');
 const auth = require('../middleware/auth');
 const roleCheck = require('../middleware/roleCheck');
 const { getShiftInfo, getAvailableShifts } = require('../utils/shifts');
+const { body, param, validationResult } = require('express-validator');
 
 // @route   GET /api/buses
 // @desc    Get all active buses with optional available seats count
@@ -18,15 +19,15 @@ router.get('/', async (req, res) => {
       const bookings = await Booking.find({
         travelDate: date,
         shift: parseInt(shift),
-        status: { $in: ['confirmed', 'completed'] }
+        isActive: true,
       });
-      
+
       const bookingsByBus = {};
-      bookings.forEach(b => {
+      bookings.forEach((b) => {
         bookingsByBus[b.bus] = (bookingsByBus[b.bus] || 0) + 1;
       });
-      
-      buses = buses.map(bus => {
+
+      buses = buses.map((bus) => {
         const busObj = bus.toObject();
         const booked = bookingsByBus[bus._id] || 0;
         busObj.availableSeats = bus.totalSeats - booked;
@@ -78,10 +79,10 @@ router.get('/:id', async (req, res) => {
         bus: bus._id,
         travelDate: date,
         shift: parseInt(shift),
-        status: { $in: ['confirmed', 'completed'] }
+        isActive: true,
       }).populate('student', 'name studentId');
 
-      bookings.forEach(b => {
+      bookings.forEach((b) => {
         const seatIndex = b.seatNumber - 1;
         if (seats[seatIndex]) {
           seats[seatIndex].isBooked = true;
@@ -94,7 +95,7 @@ router.get('/:id', async (req, res) => {
 
     const busObj = bus.toObject();
     busObj.seats = seats;
-    busObj.availableSeats = seats.filter(s => !s.isBooked).length;
+    busObj.availableSeats = seats.filter((s) => !s.isBooked).length;
 
     // Attach shift info if provided
     if (date && shift) {
@@ -109,70 +110,106 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// @route   POST /api/buses
-// @desc    Create a new bus
-// @access  Admin
-router.post('/', auth, roleCheck('admin'), async (req, res) => {
-  try {
-    const { busName, busType, route, totalSeats, supervisors } = req.body;
+router.post(
+  '/',
+  auth,
+  roleCheck('admin'),
+  [
+    body('busName', 'Bus name is required').trim().notEmpty(),
+    body('busType', 'Bus type must be regular or flyover').optional().isIn(['regular', 'flyover']),
+    body('totalSeats', 'Total seats must be a positive integer')
+      .optional()
+      .isInt({ min: 1, max: 100 }),
+    body('supervisors', 'Supervisors must be an array of valid IDs').optional().isArray(),
+    body('supervisors.*', 'Each supervisor must be a valid MongoId').isMongoId(),
+  ],
+  async (req, res) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
 
-    const existingBus = await Bus.findOne({ busName });
-    if (existingBus) {
-      return res.status(400).json({ message: 'Bus name already exists' });
+      const { busName, busType, route, totalSeats, supervisors } = req.body;
+
+      const existingBus = await Bus.findOne({ busName });
+      if (existingBus) {
+        return res.status(400).json({ message: 'Bus name already exists' });
+      }
+
+      const bus = new Bus({
+        busName,
+        busType: busType || 'regular',
+        route,
+        totalSeats: totalSeats || 50,
+        supervisors,
+      });
+
+      await bus.save();
+      res.status(201).json(bus);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Server error' });
     }
-
-    const bus = new Bus({
-      busName,
-      busType: busType || 'regular',
-      route,
-      totalSeats: totalSeats || 50,
-      supervisors,
-    });
-
-    await bus.save();
-    res.status(201).json(bus);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Server error' });
   }
-});
+);
 
 // @route   PUT /api/buses/:id
 // @desc    Update bus info
 // @access  Admin/Supervisor
-router.put('/:id', auth, roleCheck('admin', 'supervisor'), async (req, res) => {
-  try {
-    const bus = await Bus.findById(req.params.id);
-    if (!bus) {
-      return res.status(404).json({ message: 'Bus not found' });
-    }
-
-    const { busName, busType, route, status, totalSeats, supervisors } = req.body;
-
-    if (busName && busName !== bus.busName && req.user.role === 'admin') {
-      const existingBus = await Bus.findOne({ busName });
-      if (existingBus && existingBus._id.toString() !== req.params.id) {
-        return res.status(400).json({ message: 'Bus name already exists' });
+router.put(
+  '/:id',
+  auth,
+  roleCheck('admin', 'supervisor'),
+  [
+    param('id', 'Invalid bus ID format').isMongoId(),
+    body('busName', 'Bus name cannot be empty').optional().trim().notEmpty(),
+    body('busType', 'Bus type must be regular or flyover').optional().isIn(['regular', 'flyover']),
+    body('totalSeats', 'Total seats must be a positive integer')
+      .optional()
+      .isInt({ min: 1, max: 100 }),
+    body('supervisors', 'Supervisors must be an array of valid IDs').optional().isArray(),
+    body('supervisors.*', 'Each supervisor must be a valid MongoId').optional().isMongoId(),
+  ],
+  async (req, res) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
       }
-      bus.busName = busName;
+
+      const bus = await Bus.findById(req.params.id);
+      if (!bus) {
+        return res.status(404).json({ message: 'Bus not found' });
+      }
+
+      const { busName, busType, route, status, totalSeats, supervisors } = req.body;
+
+      if (busName && busName !== bus.busName && req.user.role === 'admin') {
+        const existingBus = await Bus.findOne({ busName });
+        if (existingBus && existingBus._id.toString() !== req.params.id) {
+          return res.status(400).json({ message: 'Bus name already exists' });
+        }
+        bus.busName = busName;
+      }
+
+      if (busType && req.user.role === 'admin') bus.busType = busType;
+      if (route) bus.route = route;
+      if (status) bus.status = status;
+      if (supervisors && req.user.role === 'admin') bus.supervisors = supervisors;
+
+      if (totalSeats !== undefined && req.user.role === 'admin') {
+        bus.totalSeats = parseInt(totalSeats, 10);
+      }
+
+      await bus.save();
+      res.json(bus);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Server error' });
     }
-
-    if (busType && req.user.role === 'admin') bus.busType = busType;
-    if (route) bus.route = route;
-    if (status) bus.status = status;
-    if (supervisors && req.user.role === 'admin') bus.supervisors = supervisors;
-
-    if (totalSeats !== undefined && req.user.role === 'admin') {
-      bus.totalSeats = parseInt(totalSeats, 10);
-    }
-
-    await bus.save();
-    res.json(bus);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Server error' });
   }
-});
+);
 
 // @route   DELETE /api/buses/:id
 // @desc    Delete a bus
