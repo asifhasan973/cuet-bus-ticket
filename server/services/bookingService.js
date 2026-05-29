@@ -173,11 +173,7 @@ class BookingService {
       }
 
       // Refund 1 point
-      await User.findByIdAndUpdate(
-        booking.student,
-        { $inc: { points: 1 } },
-        { session }
-      );
+      await User.findByIdAndUpdate(booking.student, { $inc: { points: 1 } }, { session });
 
       return updatedBooking;
     });

@@ -173,6 +173,7 @@ VITE_FIREBASE_APP_ID=your_app_id
     npm run seed
     ```
 5.  **Run Development Server**
+
     ```bash
     npm run dev
     ```

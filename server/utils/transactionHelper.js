@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
  * Runs the provided work function inside a MongoDB transaction session.
  * If transactions are not supported by the current MongoDB deployment (e.g., standalone instance),
  * it falls back to executing the work function without a transaction session.
- * 
+ *
  * @param {Function} workFn - Async function (session) => Promise<any>
  * @returns {Promise<any>}
  */

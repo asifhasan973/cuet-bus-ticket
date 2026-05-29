@@ -19,10 +19,7 @@ class SupervisorService {
     if (date) filter.travelDate = date;
     if (shift) filter.shift = parseInt(shift);
 
-    return await Booking.find(filter).populate(
-      'student',
-      'name email studentId department points'
-    );
+    return await Booking.find(filter).populate('student', 'name email studentId department points');
   }
 
   async markAttendance({ bookingId, supervisorId, status }) {

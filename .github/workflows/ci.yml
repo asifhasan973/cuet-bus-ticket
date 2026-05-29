@@ -27,6 +27,9 @@ jobs:
           cd server
           npm install
           npm test
+        env:
+          NODE_ENV: test
+          JWT_SECRET: testing_jwt_secret_must_be_long_and_secure
 
       - name: Install frontend dependencies & build
         run: |

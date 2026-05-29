@@ -1,12 +1,11 @@
 node_modules/
 dist/
 build/
-.env*
-*.local
 package-lock.json
-package.json
 client/package-lock.json
-client/package.json
 server/package-lock.json
-server/package.json
-server/tests/
+.vercel/
+.env
+.env.example
+client/.env
+server/.env
