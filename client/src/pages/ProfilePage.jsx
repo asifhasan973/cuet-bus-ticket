@@ -21,7 +21,7 @@ const ProfilePage = () => {
       updateUser(res.data);
       toast.success('Profile updated');
       setEditing(false);
-    } catch (error) {
+    } catch {
       toast.error('Failed to update profile');
     } finally {
       setLoading(false);

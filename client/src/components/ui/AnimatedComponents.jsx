@@ -148,7 +148,7 @@ export const PulseGlow = ({ children, className = '' }) => (
 );
 
 // ─── Modal animation wrapper ───
-export const ModalAnimation = ({ children, isOpen }) => (
+export const ModalAnimation = ({ children }) => (
   <motion.div
     initial={{ opacity: 0, scale: 0.9, y: 20 }}
     animate={{ opacity: 1, scale: 1, y: 0 }}

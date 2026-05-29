@@ -6,7 +6,7 @@ import { SkeletonSeatBooking } from '../components/ui/Skeleton';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 import Modal from '../components/ui/Modal';
 import { FaBus, FaClock, FaMapMarkerAlt, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
-import { HiArrowRight, HiArrowNarrowRight, HiSun, HiMoon } from 'react-icons/hi';
+import { HiArrowRight } from 'react-icons/hi';
 
 const SeatBooking = () => {
   const {
@@ -31,7 +31,6 @@ const SeatBooking = () => {
     handleShiftSelect,
     scrollDates,
     handleBookSeat,
-    step,
   } = useSeatBooking();
 
   if (loading) return <SkeletonSeatBooking />;

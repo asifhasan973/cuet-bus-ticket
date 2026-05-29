@@ -103,7 +103,3 @@ The frontend is configured for deployment to **Vercel** via the `vercel.json` ro
 
 - Vite config maps output assets to standard production folders.
 - Single Page Application (SPA) routing routes wildcard URL states back to `index.html` to avoid 404s.
-
-```,Description:
-
-```

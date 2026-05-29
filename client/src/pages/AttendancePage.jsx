@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import API from '../utils/api';
 import { getSeatLabel } from '../utils/seat';
@@ -6,7 +6,7 @@ import { SHIFT_ICONS, SHIFT_LABELS } from '../utils/shifts';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 import Modal from '../components/ui/Modal';
 import { toLocalDateInputValue } from '../utils/date';
-import { FaBus, FaUser, FaCheck, FaTimes } from 'react-icons/fa';
+import { FaBus, FaCheck, FaTimes } from 'react-icons/fa';
 import { HiQrcode } from 'react-icons/hi';
 import toast from 'react-hot-toast';
 import { Html5Qrcode } from 'html5-qrcode';
@@ -69,7 +69,7 @@ const AttendancePage = () => {
               });
             }
           },
-          (errorMessage) => {
+          () => {
             // Ignore scan errors
           }
         );
