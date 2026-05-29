@@ -14,7 +14,7 @@ class SupervisorService {
   async getStudents(busId, date, shift) {
     const filter = {
       bus: busId,
-      status: 'confirmed',
+      status: { $ne: 'cancelled' },
     };
     if (date) filter.travelDate = date;
     if (shift) filter.shift = parseInt(shift);
