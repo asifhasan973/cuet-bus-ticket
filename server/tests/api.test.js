@@ -152,21 +152,16 @@ describe('CUETGo API Tests', () => {
       const res = await request(app)
         .get('/api/cron/reset-points')
         .set('Authorization', 'Bearer test_cron_secret');
-      
+
       expect(res.statusCode).toEqual(200);
       expect(res.body.message).toEqual('Points successfully allocated');
-      expect(mockUserUpdateMany).toHaveBeenCalledWith(
-        { role: 'student' },
-        { $inc: { points: 2 } }
-      );
+      expect(mockUserUpdateMany).toHaveBeenCalledWith({ role: 'student' }, { $inc: { points: 2 } });
     });
   });
 
   describe('POST /api/auth/login validation', () => {
     it('should return 400 validation error if email or password is missing', async () => {
-      const res = await request(app)
-        .post('/api/auth/login')
-        .send({ email: '' });
+      const res = await request(app).post('/api/auth/login').send({ email: '' });
       expect(res.statusCode).toEqual(400);
       expect(res.body.errors).toBeDefined();
     });
@@ -274,16 +269,14 @@ describe('CUETGo API Tests', () => {
       mockUserFindOne.mockResolvedValue(null);
       mockUserSave.mockResolvedValue(true);
 
-      const res = await request(app)
-        .post('/api/auth/register')
-        .send({
-          name: 'New Student',
-          email: 'newstudent@student.cuet.ac.bd',
-          password: 'password123',
-          role: 'student',
-          studentId: '1704002',
-          department: 'CSE'
-        });
+      const res = await request(app).post('/api/auth/register').send({
+        name: 'New Student',
+        email: 'newstudent@student.cuet.ac.bd',
+        password: 'password123',
+        role: 'student',
+        studentId: '1704002',
+        department: 'CSE',
+      });
 
       expect(res.statusCode).toEqual(201);
       expect(res.body.token).toBeDefined();
@@ -295,15 +288,13 @@ describe('CUETGo API Tests', () => {
       mockUserFindOne.mockResolvedValue(null);
       mockUserSave.mockResolvedValue(true);
 
-      const res = await request(app)
-        .post('/api/auth/register')
-        .send({
-          name: 'New Supervisor',
-          email: 'newsuper@cuet.ac.bd',
-          password: 'password123',
-          role: 'supervisor',
-          employeeId: 'EMP-999'
-        });
+      const res = await request(app).post('/api/auth/register').send({
+        name: 'New Supervisor',
+        email: 'newsuper@cuet.ac.bd',
+        password: 'password123',
+        role: 'supervisor',
+        employeeId: 'EMP-999',
+      });
 
       expect(res.statusCode).toEqual(201);
       expect(res.body.pendingApproval).toEqual(true);
@@ -318,19 +309,17 @@ describe('CUETGo API Tests', () => {
         email: 'pendingsuper@cuet.ac.bd',
         role: 'supervisor',
         isApproved: false,
-        matchPassword: jest.fn().mockResolvedValue(true)
+        matchPassword: jest.fn().mockResolvedValue(true),
       };
-      
+
       mockUserFindOne.mockReturnValue({
-        select: jest.fn().mockResolvedValue(mockUnapprovedSuper)
+        select: jest.fn().mockResolvedValue(mockUnapprovedSuper),
       });
 
-      const res = await request(app)
-        .post('/api/auth/login')
-        .send({
-          email: 'pendingsuper@cuet.ac.bd',
-          password: 'password123'
-        });
+      const res = await request(app).post('/api/auth/login').send({
+        email: 'pendingsuper@cuet.ac.bd',
+        password: 'password123',
+      });
 
       expect(res.statusCode).toEqual(403);
       expect(res.body.message).toContain('pending admin approval');
@@ -347,14 +336,12 @@ describe('CUETGo API Tests', () => {
     });
 
     it('should return 401 if user is not authenticated', async () => {
-      const res = await request(app)
-        .post('/api/bookings')
-        .send({
-          busId: '507f1f77bcf86cd799439011',
-          seatNumber: 5,
-          travelDate: '2026-06-01',
-          shift: 1,
-        });
+      const res = await request(app).post('/api/bookings').send({
+        busId: '507f1f77bcf86cd799439011',
+        seatNumber: 5,
+        travelDate: '2026-06-01',
+        shift: 1,
+      });
 
       expect(res.statusCode).toEqual(401);
     });
@@ -382,7 +369,7 @@ describe('CUETGo API Tests', () => {
       mockUserInstance.points = 5; // Reset points
       mockUserFindOneAndUpdate.mockResolvedValue(mockUserInstance); // User has points
       mockBusFindById.mockResolvedValue({ _id: 'mock_bus_id', status: 'active', totalSeats: 50 });
-      
+
       // Dynamic Mocking for findOne:
       mockBookingFindOne.mockImplementation((query) => {
         if (query.student) return null; // First call: check student booking (available)
@@ -408,10 +395,10 @@ describe('CUETGo API Tests', () => {
       mockUserInstance.points = 5; // Reset points
       mockUserFindOneAndUpdate.mockResolvedValue(mockUserInstance);
       mockBusFindById.mockResolvedValue({ _id: 'mock_bus_id', status: 'active', totalSeats: 50 });
-      
+
       // Both findOne checks pass
       mockBookingFindOne.mockResolvedValue(null);
-      
+
       // Simulate MongoDB unique key error (code 11000)
       const duplicateError = new Error('Duplicate key');
       duplicateError.code = 11000;

@@ -9,10 +9,15 @@
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "install-all": "npm install && cd server && npm install && cd ../client && npm install",
     "seed": "cd server && node seed.js",
-    "format": "prettier --write \"**/*.{js,jsx,json,css,md}\" --ignore-path .prettierignore"
+    "format": "prettier --write \"**/*.{js,jsx,json,css,md}\" --ignore-path .prettierignore",
+    "lint:client": "cd client && npx eslint .",
+    "prepare": "husky"
   },
   "devDependencies": {
     "concurrently": "^8.2.2",
+    "eslint": "^10.4.0",
+    "husky": "^9.0.11",
+    "lint-staged": "^15.2.2",
     "prettier": "^3.8.3"
   }
 }
