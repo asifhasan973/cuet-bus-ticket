@@ -129,7 +129,7 @@ To ensure high performance and prevent race conditions, the Booking collection h
 PORT=5001
 MONGO_URI=your_mongodb_atlas_connection_string
 JWT_SECRET=your_jwt_secret_key
-CRON_SECRET=your_vercel_cron_secret
+CRON_SECRET=your_cron_secret_for_triggering_points_reset
 ALLOWED_ORIGINS=http://localhost:5173,https://cuet-bus-ticket-main.vercel.app
 ```
 
@@ -203,8 +203,7 @@ npm test
 
 ## ⚠️ Known Limitations
 
-- **Serverless WebSockets:** Real-time seat updates use Socket.io. However, since the server is deployed on Vercel's serverless environment, WebSockets cannot sustain active connection states.
-- **Solution:** For production real-time updates, host the backend on a persistent Node.js environment (e.g. Render, Railway, Fly.io, or digital VPS instances). On serverless deployments, the app falls back to API refetching upon booking.
+- **WebSockets on Free Tier Render:** Real-time seat updates use Socket.io. Deployed on Render's persistent environment, WebSockets are fully active and stable. However, if hosted on Render's Free tier, the server will spin down after 15 minutes of inactivity, causing the initial loading request to take ~50 seconds while it spins up. Once awake, Socket.io works instantly and persistently.
 
 ---
 

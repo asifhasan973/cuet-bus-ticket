@@ -96,23 +96,23 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', message: 'CUET Bus API is running' });
 });
 
-// Vercel Cron Job Endpoint (Reset points daily)
-// Protected: only Vercel's cron service (or requests with the secret) can trigger this
+// Cron Job Endpoint (Reset points daily)
+// Protected: only requests with the correct CRON_SECRET can trigger this (e.g. from a Render Cron Job or external service)
 app.get('/api/cron/reset-points', async (req, res) => {
   try {
-    // Verify the request is from Vercel Cron using the shared secret
+    // Verify the request using the shared secret
     const cronSecret = process.env.CRON_SECRET;
     if (cronSecret && req.headers.authorization !== `Bearer ${cronSecret}`) {
       return res.status(401).json({ message: 'Unauthorized' });
     }
 
     const User = require('./models/User');
-    console.log('Running daily point allocation job via Vercel Cron...');
+    console.log('Running daily point allocation job...');
     const result = await User.updateMany({ role: 'student' }, { $inc: { points: 2 } });
     console.log(`Successfully added 2 points to ${result.modifiedCount} students.`);
     res.status(200).json({ message: 'Points successfully allocated' });
   } catch (error) {
-    console.error('Error in Vercel Cron point allocation:', error);
+    console.error('Error in daily point allocation:', error);
     res.status(500).json({ error: 'Failed to allocate points' });
   }
 });
@@ -133,12 +133,12 @@ app.use((err, req, res, next) => {
 
 const PORT = process.env.PORT || 5001;
 
-// Only listen if not deployed on Vercel Serverless (local dev or traditional hosting) and not in a test environment
-if (process.env.NODE_ENV !== 'test' && !process.env.VERCEL) {
+// Start the server if not running in a test environment
+if (process.env.NODE_ENV !== 'test') {
   server.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
   });
 }
 
-// Export for Vercel Serverless Functions
+// Export for testing purposes
 module.exports = app;

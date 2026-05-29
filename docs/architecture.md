@@ -13,7 +13,7 @@ graph TD
         C -->|WebSockets| SC[Socket.io client]
     end
 
-    subgraph API [Express Backend API Node]
+    subgraph API [Express Backend API on Render]
         R[Express Routers] -->|Controller Routing| Ctrl[Controllers Layer]
         Ctrl -->|Business Workflows| Svc[Services Layer]
         Svc -->|DB Session Wrapper| Tx[Transaction helper]
