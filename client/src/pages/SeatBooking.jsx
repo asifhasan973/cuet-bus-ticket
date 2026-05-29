@@ -14,6 +14,7 @@ const SeatBooking = () => {
     buses,
     shifts,
     selectedBus,
+    setSelectedBus,
     selectedSeat,
     selectedShift,
     loading,
@@ -348,7 +349,7 @@ const SeatBooking = () => {
                 {/* Route */}
                 <div className="px-5 pb-5">
                   <p className="font-bold text-dark-900 dark:text-dark-100 text-sm mb-3">
-                    {selectedShift.specialRoute ? '🌟 Special Route' : '📍 Route'}
+                    {selectedShift.specialRoute ? 'Special Route' : 'Route'}
                   </p>
                   {selectedShift.specialRoute ? (
                     <div className="bg-teal-50 dark:bg-teal-950/20 border border-teal-200 dark:border-teal-800 rounded-xl p-3">
@@ -446,7 +447,7 @@ const SeatBooking = () => {
           </div>
           <div className="w-px h-6 bg-white/20 hidden sm:block" />
           <div className="flex items-center gap-2 text-sm">
-            <span className="text-white/50">⏰ Time:</span>
+            <span className="text-white/50">Time:</span>
             <span className="font-bold">
               {selectedShift.departure} → {selectedShift.arrival}
             </span>

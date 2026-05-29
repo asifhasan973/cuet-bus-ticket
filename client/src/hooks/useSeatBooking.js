@@ -210,6 +210,7 @@ export const useSeatBooking = () => {
     buses,
     shifts,
     selectedBus,
+    setSelectedBus,
     selectedSeat,
     selectedShift,
     loading,
