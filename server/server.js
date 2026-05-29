@@ -11,12 +11,14 @@ const connectDB = require('./config/db');
 // Load env vars
 dotenv.config();
 
-// Validate environment variables on startup
-const REQUIRED_ENV_VARS = ['MONGO_URI', 'JWT_SECRET'];
-const missingEnv = REQUIRED_ENV_VARS.filter((v) => !process.env[v]);
-if (missingEnv.length > 0) {
-  console.error(`❌ FATAL ERROR: Missing environment variables: ${missingEnv.join(', ')}`);
-  process.exit(1);
+// Validate environment variables on startup (skip in test environment)
+if (process.env.NODE_ENV !== 'test') {
+  const REQUIRED_ENV_VARS = ['MONGO_URI', 'JWT_SECRET'];
+  const missingEnv = REQUIRED_ENV_VARS.filter((v) => !process.env[v]);
+  if (missingEnv.length > 0) {
+    console.error(`❌ FATAL ERROR: Missing environment variables: ${missingEnv.join(', ')}`);
+    process.exit(1);
+  }
 }
 
 // Connect to database
