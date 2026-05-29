@@ -18,6 +18,7 @@ const SupervisorLogin = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const { login, googleLogin } = useAuth();
+  const navigate = useNavigate();
   const handleDemoSupervisorSignIn = async () => {
     const demoEmail = 'rahman@cuet.ac.bd';
     const demoPassword = ['super', '123'].join('');
