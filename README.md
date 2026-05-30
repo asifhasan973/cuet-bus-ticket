@@ -203,6 +203,16 @@ VITE_FIREBASE_APP_ID=your_app_id
 
 ---
 
+## Testing
+
+```bash
+npm test
+```
+
+Covers: duplicate booking prevention, zero-token guard, auth protection.
+
+---
+
 ## 🔒 Security Notes
 
 - **Helmet.js** for secure HTTP headers

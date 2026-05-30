@@ -61,10 +61,12 @@ app.use(helmet());
 app.use(express.json());
 app.use(mongoSanitize());
 
+const isTest = process.env.NODE_ENV === 'test' || process.env.JEST_WORKER_ID !== undefined;
+
 // Rate limiter — max 100 requests per 15 minutes per IP
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 100,
+  max: isTest ? 1000 : 100,
   message: { error: 'Too many requests, please try again later.' },
 });
 app.use('/api/', limiter);
@@ -72,7 +74,7 @@ app.use('/api/', limiter);
 // Stricter limiter for auth routes — max 10 attempts per 15 min
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 10,
+  max: isTest ? 1000 : 10,
   message: { error: 'Too many login attempts, please try again later.' },
 });
 app.use('/api/auth/', authLimiter);
