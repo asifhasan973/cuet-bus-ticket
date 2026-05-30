@@ -137,7 +137,7 @@ const SupervisorLogin = () => {
                 type="button"
                 className="flex-1 btn-success text-xs !py-2.5 flex items-center justify-center gap-1.5 cursor-pointer shadow-sm"
               >
-                👨‍🏫 Try as Supervisor
+                Try as Supervisor
               </button>
               <button
                 onClick={handleDemoAdminSignIn}
@@ -145,7 +145,7 @@ const SupervisorLogin = () => {
                 type="button"
                 className="flex-1 btn-primary text-xs !py-2.5 flex items-center justify-center gap-1.5 cursor-pointer shadow-sm"
               >
-                🛡️ Try as Admin
+                Try as Admin
               </button>
             </div>
           </div>

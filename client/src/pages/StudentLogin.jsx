@@ -111,7 +111,7 @@ const StudentLogin = () => {
               type="button"
               className="w-full btn-primary text-xs !py-2 flex items-center justify-center gap-2 cursor-pointer shadow-sm"
             >
-              🚀 Try as Demo Student (asif@student.cuet.ac.bd)
+              Try as Demo Student (asif@student.cuet.ac.bd)
             </button>
           </div>
 
