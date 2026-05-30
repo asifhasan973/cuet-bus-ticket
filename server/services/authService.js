@@ -19,9 +19,27 @@ const getFirebaseAdmin = () => {
     try {
       const admin = require('firebase-admin');
       if (!admin.apps.length) {
-        admin.initializeApp({
-          projectId: 'cuet-bus-ticket',
-        });
+        let config = {};
+        
+        if (process.env.FIREBASE_SERVICE_ACCOUNT) {
+          try {
+            const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+            config.credential = admin.credential.cert(serviceAccount);
+          } catch (e) {
+            console.error('Error parsing FIREBASE_SERVICE_ACCOUNT env var:', e.message);
+          }
+        } else if (process.env.FIREBASE_PRIVATE_KEY && process.env.FIREBASE_CLIENT_EMAIL) {
+          config.credential = admin.credential.cert({
+            projectId: process.env.FIREBASE_PROJECT_ID || 'cuet-bus-ticket',
+            clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+            privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
+          });
+        } else {
+          // Fallback to Application Default Credentials or basic init
+          config.projectId = process.env.FIREBASE_PROJECT_ID || 'cuet-bus-ticket';
+        }
+
+        admin.initializeApp(config);
       }
       firebaseAdmin = admin;
     } catch (err) {
