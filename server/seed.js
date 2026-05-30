@@ -59,6 +59,55 @@ const seedData = async () => {
     }
     console.log(`✅ ${supervisors.length} Supervisors created (password: ${SUPER_PASSWORD})`);
 
+    // ─── Create Pending Supervisors (For screenshots/demo) ───
+    const pendingSupervisorData = [
+      {
+        name: 'Prof. Dr. Mohammad Shamsul Arefin',
+        email: 'arefin@cuet.ac.bd',
+        employeeId: 'EMP007',
+        department: 'CSE',
+      },
+      {
+        name: 'Dr. Yasmin Obaid',
+        email: 'yasmin.obaid@cuet.ac.bd',
+        employeeId: 'EMP008',
+        department: 'EEE',
+      },
+      {
+        name: 'Prof. Dr. Jamal Uddin Ahamed',
+        email: 'jamal@cuet.ac.bd',
+        employeeId: 'EMP009',
+        department: 'ME',
+      },
+      {
+        name: 'Dr. Farzana Rahman',
+        email: 'farzana@cuet.ac.bd',
+        employeeId: 'EMP010',
+        department: 'CE',
+      },
+      {
+        name: 'Prof. Dr. Asaduzzaman',
+        email: 'asad@cuet.ac.bd',
+        employeeId: 'EMP011',
+        department: 'ETE',
+      },
+    ];
+
+    const pendingSupervisors = [];
+    for (const s of pendingSupervisorData) {
+      const sup = await User.create({
+        ...s,
+        password: SUPER_PASSWORD,
+        role: 'supervisor',
+        points: 0,
+        isApproved: false,
+      });
+      pendingSupervisors.push(sup);
+    }
+    console.log(
+      `✅ ${pendingSupervisors.length} Pending Supervisors created (password: ${SUPER_PASSWORD})`
+    );
+
     // ─── Create Students ───
     const students = [];
     const mainStudent = await User.create({
@@ -368,6 +417,12 @@ const seedData = async () => {
     console.log(`Supervisor: chowdhury@cuet.ac.bd  / ${SUPER_PASSWORD}`);
     console.log(`Supervisor: uddin@cuet.ac.bd      / ${SUPER_PASSWORD}`);
     console.log(`Student:    asif@student.cuet.ac.bd / ${STUDENT_PASSWORD}`);
+    console.log('\n⏳ Pending Supervisors (need admin approval):');
+    console.log(`Supervisor: arefin@cuet.ac.bd     / ${SUPER_PASSWORD}`);
+    console.log(`Supervisor: yasmin.obaid@cuet.ac.bd/ ${SUPER_PASSWORD}`);
+    console.log(`Supervisor: jamal@cuet.ac.bd      / ${SUPER_PASSWORD}`);
+    console.log(`Supervisor: farzana@cuet.ac.bd    / ${SUPER_PASSWORD}`);
+    console.log(`Supervisor: asad@cuet.ac.bd       / ${SUPER_PASSWORD}`);
     console.log('────────────────────────────────────');
     console.log('\n🚌 14 Buses: Halda, Shangu, Turag, Jamuna, Buriganga, Gomti,');
     console.log('   Rupsha, Isamoti, Shurma, Matamuhuri, Tista, Padma, BRTC-1, BRTC-2\n');

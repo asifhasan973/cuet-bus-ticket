@@ -61,16 +61,79 @@ To prevent students from exploiting latency to double-book seats using the same 
 
 ---
 
-## 📷 UI Preview
+## 💼 Why I Should Be Hired
 
-- **Student Dashboard:**
-  ![Student Dashboard](https://raw.githubusercontent.com/asifhasan973/cuet-bus-ticket/main/readme-assets/dashboard.png)
-- **Interactive Seat Selector:**
-  ![Seat Selector](https://raw.githubusercontent.com/asifhasan973/cuet-bus-ticket/main/readme-assets/seat-booking.png)
-- **Supervisor Attendance Scanner:**
-  ![Supervisor Scanner](https://raw.githubusercontent.com/asifhasan973/cuet-bus-ticket/main/readme-assets/supervisor.png)
-- **Admin Bus Management:**
-  ![Admin Dashboard](https://raw.githubusercontent.com/asifhasan973/cuet-bus-ticket/main/readme-assets/admin.png)
+If you are looking for a **Software Engineer** who writes production-ready code, maintains high standards of data integrity, and can design robust architectures under pressure, here is why I should be hired:
+
+- **Concurrency & Race Condition Expert:** I proactively identify concurrency risks. Instead of checking seat availability in-memory, I designed database-level compound unique indexes with partial filtering to prevent double bookings.
+- **Atomic State Management:** I write thread-safe queries (such as `$inc` combined with `$gt` in a single MongoDB operation) to prevent latency exploits and protect token/point balances.
+- **Real-time Synchronization Developer:** Deployed onto a persistent service backend supporting WebSockets (Socket.io) to ensure instant, reactive screen state updates instead of relying on heavy REST polling.
+- **End-to-End Product Ownership:** I design database transactions, code secure Express endpoints, construct sleek, responsive, and animated user interfaces (Tailwind, Framer Motion), and set up strict environment isolations.
+- **Robust Security Standards:** Committed to git safety guidelines, database credential rotation, OAuth token validation (Firebase Admin), and GitHub push protection.
+
+---
+
+## 📷 UI Previews & Portals
+
+Here are the interactive portals and features of **CUETGo**:
+
+<details>
+<summary><b>🏠 Public Portal & Authentication</b></summary>
+<br>
+
+- **Interactive Landing Page & Hero Section:**
+  ![Home](docs/Preview%20Images/Home.png)
+- **Services & Benefits Section:**
+  ![Home 2](docs/Preview%20Images/Home2.png)
+- **System Highlights & Statistics Section:**
+  ![Home 3](docs/Preview%20Images/Home3.png)
+- **Student Login Portal:**
+  ![Student Login](docs/Preview%20Images/student%20login.png)
+- **Supervisor & Admin Login Portal:**
+![Supervisor & Admin Login](docs/Preview%20Images/supervisor%26admin%20login.png)
+</details>
+
+<details>
+<summary><b>🎓 Student Portal</b></summary>
+<br>
+
+- **Student Dashboard (Bookings Overview & Point History):**
+  ![Student Dashboard](docs/Preview%20Images/student_dashboard.png)
+- **Seat Booking & Bus Selection:**
+  ![Book Seat Select Bus](docs/Preview%20Images/Book%20Seat%20with%20from%20bus.png)
+- **Interactive Seat Selection Layout:**
+  ![Book Seat Select Layout](docs/Preview%20Images/Book_seat.png)
+- **View & Print Boarding Ticket (with QR Code):**
+  ![View and Print Ticket](docs/Preview%20Images/View%20%26%20print%20tcket.png)
+- **Real-time Routes & Bus Schedules:**
+![Routes and Schedules](docs/Preview%20Images/Routes%20%26%20schedule.png)
+</details>
+
+<details>
+<summary><b>👮 Supervisor Portal</b></summary>
+<br>
+
+- **Supervisor Dashboard (Assigned Buses & Schedules):**
+  ![Supervisor Dashboard](docs/Preview%20Images/supevisor%20dashboard.png)
+- **Digital Boarding Attendance Management & QR Scanner:**
+![Supervisor Attendance Management](docs/Preview%20Images/supervisor%20attendance%20management.png)
+</details>
+
+<details>
+<summary><b>🛡️ Admin Control Panel</b></summary>
+<br>
+
+- **Admin Dashboard (Global Stats & Analytics Graphs):**
+  ![Admin Dashboard](docs/Preview%20Images/Admin%20dashboard.png)
+- **Supervisor Registration Approvals:**
+  ![Supervisor Registration Approvals](docs/Preview%20Images/Supervisor%20approval%20by%20admin.png)
+- **User Accounts & Point Balances Manager:**
+  ![Admin User Management](docs/Preview%20Images/Admin%20user%20management.png)
+- **Global Bus Fleet Management:**
+  ![Admin Bus Management](docs/Preview%20Images/Admin%20bus%20management.png)
+- **Assigning Buses to Supervisors:**
+![Assign Bus to Supervisor](docs/Preview%20Images/Assign%20bus%20to%20supervisor%20by%20admin.png)
+</details>
 
 ---
 
@@ -137,25 +200,6 @@ VITE_FIREBASE_APP_ID=your_app_id
 
    - Frontend: `http://localhost:5173`
    - Backend: `http://localhost:5001`
-
----
-
-## 🎙️ Recruiter Q&A
-
-### 1. How did you resolve seat booking race conditions on the backend?
-
-> **Answer:** Initially, a backend might query if a seat is available and then issue a save command. Under concurrent load, both queries see the seat as empty before either has completed their write, leading to double bookings.
-> To resolve this, I introduced an `isActive` boolean flag and a compound unique index on `{ bus, travelDate, shift, seatNumber }` filtered by `{ isActive: true }`. MongoDB handles this index validation atomically. If two requests try to claim the exact same seat, one will fail the index validation and throw a duplicate key error (code 11000). The backend catches this error, rolls back point deductions, and returns a graceful error to the second user.
-
-### 2. Why did you use `User.findOneAndUpdate` instead of checking points in memory?
-
-> **Answer:** Querying the user, checking if `points > 0` in memory, and then saving introduces a race condition. Under high-speed requests, a user with 1 point could book multiple seats because the point check is evaluated before the first booking is written.
-> I resolved this by performing an atomic operation: `User.findOneAndUpdate({ _id: studentId, points: { $gt: 0 } }, { $inc: { points: -1 } })`. Since MongoDB runs updates atomically on a document, if the points are 0, the query filter fails, no deduction occurs, and the booking request is instantly blocked.
-
-### 3. Why did you choose a partial filter unique index instead of a standard unique index?
-
-> **Answer:** When a student cancels a booking, its status changes to `'cancelled'`. If we had a standard unique index on `{ bus, travelDate, shift, seatNumber }`, a cancelled booking would remain in the index and block other students from booking that seat.
-> By utilizing a partial filter index (`{ isActive: true }`), cancelled bookings (which set `isActive: false`) are ignored by the index constraint, freeing the seat instantly for others to book while preserving the cancelled record in the database for admin analytics.
 
 ---
 

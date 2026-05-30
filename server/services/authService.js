@@ -20,7 +20,7 @@ const getFirebaseAdmin = () => {
       const admin = require('firebase-admin');
       if (!admin.apps.length) {
         let config = {};
-        
+
         if (process.env.FIREBASE_SERVICE_ACCOUNT) {
           try {
             const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
