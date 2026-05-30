@@ -64,7 +64,7 @@ app.use(mongoSanitize());
 // Rate limiting for auth endpoints
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 20, // max 20 requests per window
+  max: process.env.NODE_ENV === 'test' ? 1000 : 20, // bypass limit in test environment
   message: { message: 'Too many attempts, please try again later.' },
   standardHeaders: true,
   legacyHeaders: false,
@@ -72,6 +72,16 @@ const authLimiter = rateLimit({
 app.use('/api/auth/login', authLimiter);
 app.use('/api/auth/register', authLimiter);
 app.use('/api/auth/google', authLimiter);
+
+// Rate limiting for booking endpoints
+const bookingLimiter = rateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minute
+  max: process.env.NODE_ENV === 'test' ? 1000 : 10, // bypass limit in test environment
+  message: { message: 'Too many booking attempts. Please try again later.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+app.use('/api/bookings', bookingLimiter);
 
 // Routes
 app.use('/api/auth', require('./routes/auth'));

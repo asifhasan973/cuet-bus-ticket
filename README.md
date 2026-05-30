@@ -11,14 +11,6 @@
 
 ---
 
-## 🔗 Live Links
-
-- **Live Frontend Portal:** [https://cuet-bus-ticket-main.vercel.app/](https://cuet-bus-ticket-main.vercel.app/)
-- **GitHub Repository:** [https://github.com/asifhasan973/cuet-bus-ticket](https://github.com/asifhasan973/cuet-bus-ticket)
-- **Detailed System Architecture:** [docs/architecture.md](docs/architecture.md)
-
----
-
 ## 🔑 Recruiter Quick Access (Demo Credentials)
 
 > [!TIP]
@@ -29,6 +21,14 @@
 | **Student**    | `asif@student.cuet.ac.bd` | `student123` | **"Try as Demo Student"**    |
 | **Supervisor** | `rahman@cuet.ac.bd`       | `super123`   | **"Try as Demo Supervisor"** |
 | **Admin**      | `admin@cuet.ac.bd`        | `admin123`   | **"Try as Demo Admin"**      |
+
+---
+
+## 🔗 Live Links
+
+- **Live Frontend Portal:** [https://cuet-bus-ticket-main.vercel.app/](https://cuet-bus-ticket-main.vercel.app/)
+- **GitHub Repository:** [https://github.com/asifhasan973/cuet-bus-ticket](https://github.com/asifhasan973/cuet-bus-ticket)
+- **Detailed System Architecture:** [docs/architecture.md](docs/architecture.md)
 
 ---
 
@@ -61,15 +61,15 @@ To prevent students from exploiting latency to double-book seats using the same 
 
 ---
 
-## 💼 Why I Should Be Hired
+## 🛠️ Key Engineering Decisions
 
-If you are looking for a **Software Engineer** who writes production-ready code, maintains high standards of data integrity, and can design robust architectures under pressure, here is why I should be hired:
+To ensure high data integrity, reliability, and low latency under peak concurrent loads, the following key engineering design patterns were implemented:
 
-- **Concurrency & Race Condition Expert:** I proactively identify concurrency risks. Instead of checking seat availability in-memory, I designed database-level compound unique indexes with partial filtering to prevent double bookings.
-- **Atomic State Management:** I write thread-safe queries (such as `$inc` combined with `$gt` in a single MongoDB operation) to prevent latency exploits and protect token/point balances.
-- **Real-time Synchronization Developer:** Deployed onto a persistent service backend supporting WebSockets (Socket.io) to ensure instant, reactive screen state updates instead of relying on heavy REST polling.
-- **End-to-End Product Ownership:** I design database transactions, code secure Express endpoints, construct sleek, responsive, and animated user interfaces (Tailwind, Framer Motion), and set up strict environment isolations.
-- **Robust Security Standards:** Committed to git safety guidelines, database credential rotation, OAuth token validation (Firebase Admin), and GitHub push protection.
+- **Database-Level Concurrency Protection:** Used compound unique indexes on `{ bus, travelDate, shift, seatNumber }` filtered by `{ isActive: true }` in MongoDB to prevent double bookings at the database layer rather than relying on memory-level checks.
+- **Atomic Token Lifecycle Operations:** Employed atomic MongoDB operations (`$inc` and `$gt` validation within a single query) to avoid race conditions during token balance deductions, protecting against double-spends.
+- **Persistent WebSockets for Real-time Sync:** Utilized Socket.io on a persistent Node.js web service to push instant seat state updates to clients, optimizing network overhead and rendering latency compared to polling.
+- **Digital Boarding & Audit Trail:** Implemented unique QR code tokens scanned by supervisors to verify attendance, enforcing strict point-deduction penalty rules for no-shows to incentivize booking compliance.
+- **Secure Environment & Configuration Separation:** Enforced absolute isolation of credentials using environment variables, integrated Firebase Admin for safe server-side OAuth token verification, and added git push protection policies.
 
 ---
 
@@ -205,6 +205,8 @@ VITE_FIREBASE_APP_ID=your_app_id
 
 ## 🔒 Security Notes
 
+- **Input Validation:** Enforces strict server-side request payload validation using `express-validator` to prevent SQL/NoSQL injection, sanitize body parameters, and assert schema type safety.
+- **API Rate Limiting:** All authentication endpoints (`/api/auth/*`) and booking endpoints (`/api/bookings/*`) are protected with `express-rate-limit` to prevent brute force attacks and resource-exhaustion booking spam.
 - **Environment Isolation:** Real production environment variables and credentials are never committed to this Git repository. Local development configuration uses `.env` files which are strictly ignored in `.gitignore`.
 - **Configuration Templates:** Tracked `.env.example` files are only dummy templates containing non-sensitive placeholder configurations.
 - **Production Secrets:** Production database connections, JWT secrets, and admin access keys must be configured inside the deployment settings of the hosting provider (e.g., Render Environment Variables, Vercel Project Settings).
