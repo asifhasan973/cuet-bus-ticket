@@ -77,7 +77,7 @@ If you are looking for a **Software Engineer** who writes production-ready code,
 
 Here are the interactive portals and features of **CUETGo**:
 
-<details>
+<details open>
 <summary><b>🏠 Public Portal & Authentication</b></summary>
 <br>
 
@@ -93,7 +93,7 @@ Here are the interactive portals and features of **CUETGo**:
 ![Supervisor & Admin Login](docs/Preview%20Images/supervisor%26admin%20login.png)
 </details>
 
-<details>
+<details open>
 <summary><b>🎓 Student Portal</b></summary>
 <br>
 
@@ -109,7 +109,7 @@ Here are the interactive portals and features of **CUETGo**:
 ![Routes and Schedules](docs/Preview%20Images/Routes%20%26%20schedule.png)
 </details>
 
-<details>
+<details open>
 <summary><b>👮 Supervisor Portal</b></summary>
 <br>
 
@@ -119,7 +119,7 @@ Here are the interactive portals and features of **CUETGo**:
 ![Supervisor Attendance Management](docs/Preview%20Images/supervisor%20attendance%20management.png)
 </details>
 
-<details>
+<details open>
 <summary><b>🛡️ Admin Control Panel</b></summary>
 <br>
 
