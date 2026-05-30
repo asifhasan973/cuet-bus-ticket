@@ -61,27 +61,21 @@ app.use(helmet());
 app.use(express.json());
 app.use(mongoSanitize());
 
-// Rate limiting for auth endpoints
-const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: process.env.NODE_ENV === 'test' ? 1000 : 20, // bypass limit in test environment
-  message: { message: 'Too many attempts, please try again later.' },
-  standardHeaders: true,
-  legacyHeaders: false,
+// Rate limiter — max 100 requests per 15 minutes per IP
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  message: { error: 'Too many requests, please try again later.' },
 });
-app.use('/api/auth/login', authLimiter);
-app.use('/api/auth/register', authLimiter);
-app.use('/api/auth/google', authLimiter);
+app.use('/api/', limiter);
 
-// Rate limiting for booking endpoints
-const bookingLimiter = rateLimit({
-  windowMs: 1 * 60 * 1000, // 1 minute
-  max: process.env.NODE_ENV === 'test' ? 1000 : 10, // bypass limit in test environment
-  message: { message: 'Too many booking attempts. Please try again later.' },
-  standardHeaders: true,
-  legacyHeaders: false,
+// Stricter limiter for auth routes — max 10 attempts per 15 min
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  message: { error: 'Too many login attempts, please try again later.' },
 });
-app.use('/api/bookings', bookingLimiter);
+app.use('/api/auth/', authLimiter);
 
 // Routes
 app.use('/api/auth', require('./routes/auth'));

@@ -205,6 +205,8 @@ VITE_FIREBASE_APP_ID=your_app_id
 
 ## 🔒 Security Notes
 
+- **Helmet.js** for secure HTTP headers
+- **express-rate-limit:** 100 req/15min global, 10 req/15min on auth routes
 - **Input Validation:** Enforces strict server-side request payload validation using `express-validator` to prevent SQL/NoSQL injection, sanitize body parameters, and assert schema type safety.
 - **API Rate Limiting:** All authentication endpoints (`/api/auth/*`) and booking endpoints (`/api/bookings/*`) are protected with `express-rate-limit` to prevent brute force attacks and resource-exhaustion booking spam.
 - **Environment Isolation:** Real production environment variables and credentials are never committed to this Git repository. Local development configuration uses `.env` files which are strictly ignored in `.gitignore`.
