@@ -220,7 +220,7 @@ describe('CUETGo API Tests', () => {
       const mockBooking = {
         _id: '507f1f77bcf86cd799439011',
         student: 'mock_user_id',
-        shift: 1, // Morning shift
+        shift: 2, // Afternoon shift (exists on both weekdays and weekends)
         travelDate: yesterdayStr,
         status: 'confirmed',
         save: jest.fn().mockResolvedValue(true),
