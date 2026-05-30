@@ -104,11 +104,16 @@ app.get('/api/health', (req, res) => {
 
 // Cron Job Endpoint (Reset points daily)
 // Protected: only requests with the correct CRON_SECRET can trigger this (e.g. from a Render Cron Job or external service)
-app.get('/api/cron/reset-points', async (req, res) => {
+const handleResetPoints = async (req, res) => {
   try {
     // Verify the request using the shared secret
     const cronSecret = process.env.CRON_SECRET;
-    if (cronSecret && req.headers.authorization !== `Bearer ${cronSecret}`) {
+
+    if (!cronSecret) {
+      return res.status(500).json({ message: 'CRON_SECRET is not configured' });
+    }
+
+    if (req.headers.authorization !== `Bearer ${cronSecret}`) {
       return res.status(401).json({ message: 'Unauthorized' });
     }
 
@@ -121,7 +126,10 @@ app.get('/api/cron/reset-points', async (req, res) => {
     console.error('Error in daily point allocation:', error);
     res.status(500).json({ error: 'Failed to allocate points' });
   }
-});
+};
+
+app.get('/api/cron/reset-points', handleResetPoints);
+app.post('/api/cron/reset-points', handleResetPoints);
 
 // Global error handling middleware
 app.use((err, req, res, next) => {

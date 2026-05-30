@@ -124,38 +124,62 @@ describe('CUETGo API Tests', () => {
     });
   });
 
-  describe('GET /api/cron/reset-points', () => {
+  describe('POST /api/cron/reset-points security', () => {
     const originalCronSecret = process.env.CRON_SECRET;
 
-    beforeAll(() => {
+    beforeEach(() => {
+      jest.clearAllMocks();
+    });
+
+    afterEach(() => {
+      if (originalCronSecret === undefined) {
+        delete process.env.CRON_SECRET;
+      } else {
+        process.env.CRON_SECRET = originalCronSecret;
+      }
+    });
+
+    it('should return 500 and not reset points if CRON_SECRET is missing', async () => {
+      delete process.env.CRON_SECRET;
+      const res = await request(app)
+        .post('/api/cron/reset-points')
+        .set('Authorization', 'Bearer test_cron_secret');
+
+      expect(res.statusCode).toEqual(500);
+      expect(res.body.message).toEqual('CRON_SECRET is not configured');
+      expect(mockUserUpdateMany).not.toHaveBeenCalled();
+    });
+
+    it('should return 401 and not reset points if Authorization header is missing', async () => {
       process.env.CRON_SECRET = 'test_cron_secret';
-    });
+      const res = await request(app).post('/api/cron/reset-points');
 
-    afterAll(() => {
-      process.env.CRON_SECRET = originalCronSecret;
-    });
-
-    it('should return 401 Unauthorized if authorization header is missing', async () => {
-      const res = await request(app).get('/api/cron/reset-points');
       expect(res.statusCode).toEqual(401);
       expect(res.body.message).toEqual('Unauthorized');
+      expect(mockUserUpdateMany).not.toHaveBeenCalled();
     });
 
-    it('should return 401 Unauthorized if token is incorrect', async () => {
+    it('should return 401 and not reset points if Authorization header is incorrect', async () => {
+      process.env.CRON_SECRET = 'test_cron_secret';
       const res = await request(app)
-        .get('/api/cron/reset-points')
+        .post('/api/cron/reset-points')
         .set('Authorization', 'Bearer wrong_secret');
+
       expect(res.statusCode).toEqual(401);
       expect(res.body.message).toEqual('Unauthorized');
+      expect(mockUserUpdateMany).not.toHaveBeenCalled();
     });
 
-    it('should update user points and return 200 if token is correct', async () => {
+    it('should return 200 and reset points if Authorization header is correct', async () => {
+      process.env.CRON_SECRET = 'test_cron_secret';
+      mockUserUpdateMany.mockResolvedValue({ modifiedCount: 5 });
       const res = await request(app)
-        .get('/api/cron/reset-points')
+        .post('/api/cron/reset-points')
         .set('Authorization', 'Bearer test_cron_secret');
 
       expect(res.statusCode).toEqual(200);
       expect(res.body.message).toEqual('Points successfully allocated');
+      expect(mockUserUpdateMany).toHaveBeenCalledTimes(1);
       expect(mockUserUpdateMany).toHaveBeenCalledWith({ role: 'student' }, { $inc: { points: 2 } });
     });
   });
