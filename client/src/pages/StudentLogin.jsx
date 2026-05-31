@@ -63,14 +63,20 @@ const StudentLogin = () => {
   const handleGoogleSignIn = async () => {
     try {
       setLoading(true);
+      console.log('[GOOGLE AUTH] Step 1: Starting signInWithPopup...');
       const result = await signInWithPopup(auth, googleProvider);
+      console.log('[GOOGLE AUTH] Step 2: Popup success, email:', result.user.email);
       if (!isAllowedInstitutionEmail(result.user.email)) {
+        console.log('[GOOGLE AUTH] Step 2b: Email NOT allowed, signing out');
         await signOut(auth);
         toast.error(ALLOWED_EMAIL_MESSAGE);
         return;
       }
+      console.log('[GOOGLE AUTH] Step 3: Email allowed, getting ID token...');
       const credential = await result.user.getIdToken();
+      console.log('[GOOGLE AUTH] Step 4: Got ID token, calling backend /auth/google...');
       const user = await googleLogin(credential, 'student');
+      console.log('[GOOGLE AUTH] Step 5: Backend response, role:', user.role);
       if (user.role !== 'student') {
         toast.error('This account is registered as ' + user.role + '. Use the correct portal.');
         return;
@@ -78,8 +84,12 @@ const StudentLogin = () => {
       toast.success('Welcome back!');
       navigate('/student/dashboard');
     } catch (error) {
+      console.error('[GOOGLE AUTH] ERROR:', error);
+      console.error('[GOOGLE AUTH] Error code:', error.code);
+      console.error('[GOOGLE AUTH] Error message:', error.message);
+      console.error('[GOOGLE AUTH] Response data:', error.response?.data);
       if (error.code !== 'auth/popup-closed-by-user') {
-        toast.error(error.response?.data?.message || 'Google login failed');
+        toast.error(error.response?.data?.message || 'Google login failed: ' + error.message);
       }
     } finally {
       setLoading(false);
