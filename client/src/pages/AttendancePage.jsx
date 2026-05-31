@@ -114,7 +114,7 @@ const AttendancePage = () => {
       setBuses(res.data);
       if (busIdFromQuery) setSelectedBus(busIdFromQuery);
       else if (res.data.length > 0) setSelectedBus(res.data[0]._id);
-    } catch (error) {
+    } catch {
       toast.error('Failed to load buses');
     } finally {
       setLoading(false);
@@ -125,7 +125,7 @@ const AttendancePage = () => {
     try {
       const res = await API.get(`/shifts?date=${dateStr}`);
       setShifts(res.data);
-    } catch (error) {
+    } catch {
       console.error('Failed to load shifts');
     }
   };
@@ -135,7 +135,7 @@ const AttendancePage = () => {
       setLoading(true);
       const res = await API.get(`/supervisor/bus/${busId}/students?date=${dateStr}&shift=${shift}`);
       setStudents(res.data);
-    } catch (error) {
+    } catch {
       toast.error('Failed to load students');
     } finally {
       setLoading(false);
@@ -171,7 +171,7 @@ const AttendancePage = () => {
       if (selectedBus) {
         fetchStudents(selectedBus, selectedDate, selectedShift);
       }
-    } catch (error) {
+    } catch {
       toast.error('Failed to mark attendance');
     }
   };

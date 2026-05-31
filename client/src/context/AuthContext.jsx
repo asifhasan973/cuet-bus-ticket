@@ -22,7 +22,7 @@ export const AuthProvider = ({ children }) => {
     try {
       const res = await API.get('/auth/me');
       setUser(res.data);
-    } catch (error) {
+    } catch {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       setToken(null);

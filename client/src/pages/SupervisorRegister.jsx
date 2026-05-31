@@ -3,7 +3,11 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { auth, googleProvider } from '../firebase';
 import { signInWithPopup, signOut } from 'firebase/auth';
-import { normalizeEmail, isAllowedInstitutionEmail, ALLOWED_EMAIL_MESSAGE } from '../utils/emailDomain';
+import {
+  normalizeEmail,
+  isAllowedInstitutionEmail,
+  ALLOWED_EMAIL_MESSAGE,
+} from '../utils/emailDomain';
 import { FaBus, FaGoogle } from 'react-icons/fa';
 import {
   HiMail,

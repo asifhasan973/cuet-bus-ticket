@@ -40,7 +40,7 @@ export const useBusManagement = () => {
     try {
       const res = await API.get('/buses/all');
       setBuses(res.data);
-    } catch (error) {
+    } catch {
       toast.error('Failed to load buses');
     } finally {
       setLoading(false);
@@ -51,7 +51,7 @@ export const useBusManagement = () => {
     try {
       const res = await API.get('/admin/users?role=supervisor');
       setSupervisors(res.data);
-    } catch (error) {
+    } catch {
       console.error('Failed to load supervisors');
     }
   };
@@ -174,7 +174,7 @@ export const useBusManagement = () => {
       await API.delete(`/buses/${busId}`);
       toast.success('Bus deleted');
       fetchBuses();
-    } catch (error) {
+    } catch {
       toast.error('Failed to delete bus');
     }
   };

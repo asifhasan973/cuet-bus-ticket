@@ -125,7 +125,7 @@ export const useSeatBooking = () => {
     try {
       const res = await API.get('/buses');
       setBuses(res.data);
-    } catch (error) {
+    } catch {
       toast.error('Failed to load buses');
     } finally {
       setLoading(false);
@@ -136,7 +136,7 @@ export const useSeatBooking = () => {
     try {
       const res = await API.get(`/shifts?date=${dateStr}`);
       setShifts(res.data);
-    } catch (error) {
+    } catch {
       toast.error('Failed to load shifts');
     }
   };
@@ -153,7 +153,7 @@ export const useSeatBooking = () => {
       );
       setSelectedBus(res.data);
       setSelectedSeat(null);
-    } catch (error) {
+    } catch {
       toast.error('Failed to load bus details');
     } finally {
       setBusLoading(false);
@@ -168,7 +168,7 @@ export const useSeatBooking = () => {
       setBusLoading(true);
       const res = await API.get(`/buses?date=${selectedDate}&shift=${shift.shift}`);
       setBuses(res.data);
-    } catch (error) {
+    } catch {
       toast.error('Failed to load bus availability');
     } finally {
       setBusLoading(false);

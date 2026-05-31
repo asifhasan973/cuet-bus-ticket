@@ -47,7 +47,7 @@ const AdminDashboard = () => {
     try {
       const res = await API.get('/buses/all');
       setBuses(res.data);
-    } catch (error) {
+    } catch {
       console.error('Failed to load buses');
     }
   };
@@ -56,7 +56,7 @@ const AdminDashboard = () => {
     try {
       const res = await API.get('/admin/stats');
       setStats(res.data);
-    } catch (error) {
+    } catch {
       toast.error('Failed to load stats');
     } finally {
       setLoading(false);
@@ -68,7 +68,7 @@ const AdminDashboard = () => {
       const url = userFilter ? `/admin/users?role=${userFilter}` : '/admin/users';
       const res = await API.get(url);
       setUsers(res.data);
-    } catch (error) {
+    } catch {
       toast.error('Failed to load users');
     }
   };
@@ -77,7 +77,7 @@ const AdminDashboard = () => {
     try {
       const res = await API.get('/admin/users?role=supervisor&isApproved=false');
       setPendingSupervisors(res.data);
-    } catch (error) {
+    } catch {
       toast.error('Failed to load pending approvals');
     }
   };
@@ -87,7 +87,7 @@ const AdminDashboard = () => {
       setAnalyticsLoading(true);
       const res = await API.get('/admin/analytics');
       setAnalytics(res.data);
-    } catch (error) {
+    } catch {
       console.error('Failed to load analytics');
     } finally {
       setAnalyticsLoading(false);
@@ -117,7 +117,7 @@ const AdminDashboard = () => {
       await API.put(`/admin/users/${id}`, { points: currentPoints + delta });
       toast.success('Points updated');
       fetchUsers();
-    } catch (error) {
+    } catch {
       toast.error('Failed to update points');
     }
   };
@@ -132,7 +132,7 @@ const AdminDashboard = () => {
         setSelectedBuses([]);
         setShowBusModal(true);
       }
-    } catch (error) {
+    } catch {
       toast.error('Failed to update role');
     }
   };
@@ -145,7 +145,7 @@ const AdminDashboard = () => {
       fetchUsers();
       fetchStats();
       fetchAnalytics();
-    } catch (error) {
+    } catch {
       toast.error('Failed to approve supervisor');
     }
   };
@@ -160,7 +160,7 @@ const AdminDashboard = () => {
       fetchUsers();
       fetchStats();
       fetchAnalytics();
-    } catch (error) {
+    } catch {
       toast.error('Failed to reject supervisor');
     }
   };
@@ -173,7 +173,7 @@ const AdminDashboard = () => {
       setSelectedUserId(null);
       setSelectedBuses([]);
       fetchBuses();
-    } catch (error) {
+    } catch {
       toast.error('Failed to assign buses');
     }
   };
