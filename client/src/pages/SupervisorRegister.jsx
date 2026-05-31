@@ -1,13 +1,8 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { auth, googleProvider } from '../firebase';
-import { signInWithPopup, signOut } from 'firebase/auth';
-import {
-  ALLOWED_EMAIL_MESSAGE,
-  isAllowedInstitutionEmail,
-  normalizeEmail,
-} from '../utils/emailDomain';
+import { useGoogleAuth } from '../hooks/useGoogleAuth';
+import { normalizeEmail, isAllowedInstitutionEmail, ALLOWED_EMAIL_MESSAGE } from '../utils/emailDomain';
 import { FaBus, FaGoogle } from 'react-icons/fa';
 import {
   HiMail,
@@ -31,8 +26,13 @@ const SupervisorRegister = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { register, googleLogin } = useAuth();
+  const { register } = useAuth();
   const navigate = useNavigate();
+
+  const { startGoogleSignIn, isProcessingRedirect } = useGoogleAuth('supervisor', (user) => {
+    toast.success('Welcome! Account created successfully');
+    navigate('/supervisor/dashboard');
+  });
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -68,26 +68,8 @@ const SupervisorRegister = () => {
     }
   };
 
-  const handleGoogleSignIn = async () => {
-    try {
-      setLoading(true);
-      const result = await signInWithPopup(auth, googleProvider);
-      if (!isAllowedInstitutionEmail(result.user.email)) {
-        await signOut(auth);
-        toast.error(ALLOWED_EMAIL_MESSAGE);
-        return;
-      }
-      const credential = await result.user.getIdToken();
-      await googleLogin(credential, 'supervisor');
-      toast.success('Welcome! Account created successfully');
-      navigate('/supervisor/dashboard');
-    } catch (error) {
-      if (error.code !== 'auth/popup-closed-by-user') {
-        toast.error(error.response?.data?.message || 'Google sign-up failed');
-      }
-    } finally {
-      setLoading(false);
-    }
+  const handleGoogleSignIn = () => {
+    startGoogleSignIn();
   };
 
   return (
@@ -116,12 +98,21 @@ const SupervisorRegister = () => {
           {/* Google Sign Up */}
           <button
             onClick={handleGoogleSignIn}
-            disabled={loading}
+            disabled={loading || isProcessingRedirect}
             type="button"
             className="w-full flex items-center justify-center gap-3 bg-white dark:bg-dark-600 border-2 border-dark-200 dark:border-dark-500 text-dark-700 dark:text-dark-200 hover:bg-dark-50 dark:hover:bg-dark-500 hover:border-dark-300 font-semibold py-3 px-4 rounded-xl transition-all shadow-sm"
           >
-            <FaGoogle className="text-red-500 text-lg" />
-            Sign up with Google
+            {isProcessingRedirect ? (
+              <>
+                <div className="w-5 h-5 border-2 border-dark-300 border-t-dark-600 rounded-full animate-spin" />
+                Signing up...
+              </>
+            ) : (
+              <>
+                <FaGoogle className="text-red-500 text-lg" />
+                Sign up with Google
+              </>
+            )}
           </button>
 
           <div className="relative flex items-center my-6">
