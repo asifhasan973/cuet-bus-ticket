@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { useGoogleAuth } from '../hooks/useGoogleAuth';
+import { auth, googleProvider } from '../firebase';
+import { signInWithPopup, signOut } from 'firebase/auth';
 import { normalizeEmail, isAllowedInstitutionEmail, ALLOWED_EMAIL_MESSAGE } from '../utils/emailDomain';
 import { FaBus, FaGoogle } from 'react-icons/fa';
 import { HiMail, HiLockClosed, HiArrowRight, HiEye, HiEyeOff } from 'react-icons/hi';
@@ -12,20 +13,9 @@ const SupervisorLogin = () => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
+  const { login, googleLogin } = useAuth();
   const navigate = useNavigate();
 
-  const { startGoogleSignIn, isProcessingRedirect } = useGoogleAuth('supervisor', (user) => {
-    if (user.role === 'admin') {
-      toast.success('Welcome back, Admin!');
-      navigate('/admin/dashboard');
-    } else if (user.role === 'supervisor') {
-      toast.success('Welcome back!');
-      navigate('/supervisor/dashboard');
-    } else {
-      toast.error('This account is registered as student. Use the Student Login portal.');
-    }
-  });
   const handleDemoSupervisorSignIn = async () => {
     const demoEmail = 'rahman@cuet.ac.bd';
     const demoPassword = ['super', '123'].join('');
@@ -87,8 +77,33 @@ const SupervisorLogin = () => {
     }
   };
 
-  const handleGoogleSignIn = () => {
-    startGoogleSignIn();
+  const handleGoogleSignIn = async () => {
+    try {
+      setLoading(true);
+      const result = await signInWithPopup(auth, googleProvider);
+      if (!isAllowedInstitutionEmail(result.user.email)) {
+        await signOut(auth);
+        toast.error(ALLOWED_EMAIL_MESSAGE);
+        return;
+      }
+      const credential = await result.user.getIdToken();
+      const user = await googleLogin(credential, 'supervisor');
+      if (user.role === 'admin') {
+        toast.success('Welcome back, Admin!');
+        navigate('/admin/dashboard');
+      } else if (user.role === 'supervisor') {
+        toast.success('Welcome back!');
+        navigate('/supervisor/dashboard');
+      } else {
+        toast.error('This account is registered as student. Use the Student Login portal.');
+      }
+    } catch (error) {
+      if (error.code !== 'auth/popup-closed-by-user') {
+        toast.error(error.response?.data?.message || 'Google login failed');
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -135,21 +150,12 @@ const SupervisorLogin = () => {
           {/* Google Sign In */}
           <button
             onClick={handleGoogleSignIn}
-            disabled={loading || isProcessingRedirect}
+            disabled={loading}
             type="button"
             className="w-full flex items-center justify-center gap-3 bg-white dark:bg-dark-600 border-2 border-dark-200 dark:border-dark-500 text-dark-700 dark:text-dark-200 hover:bg-dark-50 dark:hover:bg-dark-500 hover:border-dark-300 font-semibold py-3 px-4 rounded-xl transition-all shadow-sm"
           >
-            {isProcessingRedirect ? (
-              <>
-                <div className="w-5 h-5 border-2 border-dark-300 border-t-dark-600 rounded-full animate-spin" />
-                Signing in...
-              </>
-            ) : (
-              <>
-                <FaGoogle className="text-red-500 text-lg" />
-                Sign in with Google
-              </>
-            )}
+            <FaGoogle className="text-red-500 text-lg" />
+            Sign in with Google
           </button>
 
           <div className="relative flex items-center my-6">

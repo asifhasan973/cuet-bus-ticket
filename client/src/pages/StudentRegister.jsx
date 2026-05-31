@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { useGoogleAuth } from '../hooks/useGoogleAuth';
+import { auth, googleProvider } from '../firebase';
+import { signInWithPopup, signOut } from 'firebase/auth';
 import { normalizeEmail, isAllowedInstitutionEmail, ALLOWED_EMAIL_MESSAGE } from '../utils/emailDomain';
 import { FaBus, FaGoogle } from 'react-icons/fa';
 import {
@@ -28,13 +29,8 @@ const StudentRegister = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { register } = useAuth();
+  const { register, googleLogin } = useAuth();
   const navigate = useNavigate();
-
-  const { startGoogleSignIn, isProcessingRedirect } = useGoogleAuth('student', (user) => {
-    toast.success('Welcome! Account created successfully');
-    navigate('/student/dashboard');
-  });
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -63,8 +59,26 @@ const StudentRegister = () => {
     }
   };
 
-  const handleGoogleSignIn = () => {
-    startGoogleSignIn();
+  const handleGoogleSignIn = async () => {
+    try {
+      setLoading(true);
+      const result = await signInWithPopup(auth, googleProvider);
+      if (!isAllowedInstitutionEmail(result.user.email)) {
+        await signOut(auth);
+        toast.error(ALLOWED_EMAIL_MESSAGE);
+        return;
+      }
+      const credential = await result.user.getIdToken();
+      await googleLogin(credential, 'student');
+      toast.success('Welcome! Account created successfully');
+      navigate('/student/dashboard');
+    } catch (error) {
+      if (error.code !== 'auth/popup-closed-by-user') {
+        toast.error(error.response?.data?.message || 'Google sign-up failed');
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   const departments = ['CSE', 'EEE', 'ME', 'CE', 'URP', 'Arch', 'PME', 'BME'];
@@ -88,21 +102,12 @@ const StudentRegister = () => {
           {/* Google Sign Up */}
           <button
             onClick={handleGoogleSignIn}
-            disabled={loading || isProcessingRedirect}
+            disabled={loading}
             type="button"
             className="w-full flex items-center justify-center gap-3 bg-white dark:bg-dark-600 border-2 border-dark-200 dark:border-dark-500 text-dark-700 dark:text-dark-200 hover:bg-dark-50 dark:hover:bg-dark-500 hover:border-dark-300 font-semibold py-3 px-4 rounded-xl transition-all shadow-sm"
           >
-            {isProcessingRedirect ? (
-              <>
-                <div className="w-5 h-5 border-2 border-dark-300 border-t-dark-600 rounded-full animate-spin" />
-                Signing up...
-              </>
-            ) : (
-              <>
-                <FaGoogle className="text-red-500 text-lg" />
-                Sign up with Google
-              </>
-            )}
+            <FaGoogle className="text-red-500 text-lg" />
+            Sign up with Google
           </button>
 
           <div className="relative flex items-center my-6">

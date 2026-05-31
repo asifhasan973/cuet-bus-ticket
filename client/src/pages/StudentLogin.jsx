@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { useGoogleAuth } from '../hooks/useGoogleAuth';
+import { auth, googleProvider } from '../firebase';
+import { signInWithPopup, signOut } from 'firebase/auth';
 import { normalizeEmail, isAllowedInstitutionEmail, ALLOWED_EMAIL_MESSAGE } from '../utils/emailDomain';
 import { FaBus, FaGoogle } from 'react-icons/fa';
 import { HiMail, HiLockClosed, HiArrowRight, HiEye, HiEyeOff } from 'react-icons/hi';
@@ -12,17 +13,9 @@ const StudentLogin = () => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
+  const { login, googleLogin } = useAuth();
   const navigate = useNavigate();
 
-  const { startGoogleSignIn, isProcessingRedirect } = useGoogleAuth('student', (user) => {
-    if (user.role !== 'student') {
-      toast.error('This account is registered as ' + user.role + '. Use the correct portal.');
-      return;
-    }
-    toast.success('Welcome back!');
-    navigate('/student/dashboard');
-  });
   const handleDemoSignIn = async () => {
     const demoEmail = 'asif@student.cuet.ac.bd';
     const demoPassword = ['student', '123'].join('');
@@ -64,8 +57,37 @@ const StudentLogin = () => {
     }
   };
 
-  const handleGoogleSignIn = () => {
-    startGoogleSignIn();
+  const handleGoogleSignIn = async () => {
+    try {
+      setLoading(true);
+      console.log('[GOOGLE AUTH] Step 1: Starting signInWithPopup...');
+      const result = await signInWithPopup(auth, googleProvider);
+      console.log('[GOOGLE AUTH] Step 2: Popup success, email:', result.user.email);
+      if (!isAllowedInstitutionEmail(result.user.email)) {
+        console.log('[GOOGLE AUTH] Step 2b: Email NOT allowed, signing out');
+        await signOut(auth);
+        toast.error(ALLOWED_EMAIL_MESSAGE);
+        return;
+      }
+      console.log('[GOOGLE AUTH] Step 3: Email allowed, getting ID token...');
+      const credential = await result.user.getIdToken();
+      console.log('[GOOGLE AUTH] Step 4: Got ID token, calling backend /auth/google...');
+      const user = await googleLogin(credential, 'student');
+      console.log('[GOOGLE AUTH] Step 5: Backend response, role:', user.role);
+      if (user.role !== 'student') {
+        toast.error('This account is registered as ' + user.role + '. Use the correct portal.');
+        return;
+      }
+      toast.success('Welcome back!');
+      navigate('/student/dashboard');
+    } catch (error) {
+      console.error('[GOOGLE AUTH] ERROR:', error);
+      if (error.code !== 'auth/popup-closed-by-user') {
+        toast.error(error.response?.data?.message || 'Google login failed: ' + error.message);
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -100,21 +122,12 @@ const StudentLogin = () => {
           {/* Google Sign In */}
           <button
             onClick={handleGoogleSignIn}
-            disabled={loading || isProcessingRedirect}
+            disabled={loading}
             type="button"
             className="w-full flex items-center justify-center gap-3 bg-white dark:bg-dark-600 border-2 border-dark-200 dark:border-dark-500 text-dark-700 dark:text-dark-200 hover:bg-dark-50 dark:hover:bg-dark-500 hover:border-dark-300 font-semibold py-3 px-4 rounded-xl transition-all shadow-sm"
           >
-            {isProcessingRedirect ? (
-              <>
-                <div className="w-5 h-5 border-2 border-dark-300 border-t-dark-600 rounded-full animate-spin" />
-                Signing in...
-              </>
-            ) : (
-              <>
-                <FaGoogle className="text-red-500 text-lg" />
-                Sign in with Google
-              </>
-            )}
+            <FaGoogle className="text-red-500 text-lg" />
+            Sign in with Google
           </button>
 
           <div className="relative flex items-center my-6">
